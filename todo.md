@@ -7,7 +7,7 @@
 - [x] Cambio bottone per pronto / non pronto, al momento non è intuitivo
 - [x] Aggiungere possibilità di condividere un link per entrare in una lobby [Pesto]
 - [x] Cambiare emoji della clessidra con un'immagine  [Mux]
-- [ ] Risolvere problema del player fantasma, quando si è dentro ad una lobby e si clicca il pulsante indietro del browser (o swipe su cellulare) il giocatore esce dalla lobby ma risulta allo stesso tempo dentro, rendendogli impossibile il rientro [Fede]
+- [x] Risolvere problema del player fantasma, quando si è dentro ad una lobby e si clicca il pulsante indietro del browser (o swipe su cellulare) il giocatore esce dalla lobby ma risulta allo stesso tempo dentro, rendendogli impossibile il rientro [Fede]
 - [ ] Creare branch di testing per non pushare ogni bugfix direttamente sul main (non lavoriamo alla cpl)
 
 ## v0.6.0
