@@ -17,8 +17,9 @@ const FinalResults: React.FC = () => {
 
   // Estrai i primi 3 risultati per il podio
 
-  const fake = sortedResults.slice(0, 1);
-  const podium = [fake, fake, fake].flat();
+  const podium = sortedResults.slice(0, 3);
+  // Scambia le posizioni 0 e 1
+  [podium[0], podium[1]] = [podium[1], podium[0]];
   const otherPlayers = sortedResults.slice(3);
 
   return (
@@ -26,11 +27,17 @@ const FinalResults: React.FC = () => {
       <div id="gameOverMessage" className="paginator">
         <h2 className="">Classifica</h2>
 
+
         <div className='podium' style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', width: '100%' }}>
           {podium.map(([player, { score, image }], index) => {
             // Imposta un'altezza diversa per ogni posizione
             const heightStyle = index === 0 ? { height: '7vh' } : index === 1 ? { height: '8vh' } : { height: '6vh' };
-
+            const backgroundColors = {
+              1: '#cda434', // Oro
+              0: '#8a9597', // Argento
+              2: '#cd7f32', // Bronzo
+            };
+            const backgroundColor = backgroundColors[index];
             return (
               <div
                 key={player}
@@ -38,7 +45,7 @@ const FinalResults: React.FC = () => {
                 style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }} // Aggiungi l'altezza specificata
               >
                 <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
-                <div className='my-bg-error' style={{ ...heightStyle, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}>
+                <div style={{ ...heightStyle, backgroundColor, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}>
                   <p style={{ margin: '0' }}>{score}</p>
                 </div>
                 <p style={{ textAlign: 'center' }}>{player}</p>
