@@ -7,23 +7,37 @@ export class GameManager {
     this.games = {}; // A map of lobby codes to game instances
   }
 
-  // Method to create a new game
-  createGame(lobbyCode: string, numQuestionsParam: number) {
+  /**
+   * Creates a new game with the specified lobby code and number of questions.
+   * 
+   * @param {string} lobbyCode - The unique code for the lobby.
+   * @param {number} numQuestionsParam - The number of questions for the game.
+   * @returns {Game | null} The created game instance or null if the lobby code already exists.
+   */
+  createGame(lobbyCode: string, numQuestionsParam: number): Game | null {
     if (!this.games[lobbyCode]) {
       this.games[lobbyCode] = new Game(lobbyCode, numQuestionsParam);
       return this.games[lobbyCode];
     }
     console.error('Lobby code already exists.');
     return null;
-
   }
 
-  // Method to get a game by lobby code
-  getGame(lobbyCode: string) {
+  /**
+   * Retrieves a game instance by its lobby code.
+   * 
+   * @param {string} lobbyCode - The unique code for the lobby.
+   * @returns {Game | null} The game instance associated with the lobby code or null if not found.
+   */
+  getGame(lobbyCode: string): Game | null {
     return this.games[lobbyCode] || null;
   }
 
-  // Method to delete a game
+  /**
+   * Deletes a game associated with the specified lobby code.
+   * 
+   * @param {string} lobbyCode - The unique code for the lobby.
+   */
   deleteGame(lobbyCode: string) {
     if (this.games[lobbyCode]) {
       delete this.games[lobbyCode];
@@ -32,13 +46,21 @@ export class GameManager {
     }
   }
 
-  // Method to list all games
-  listGames() {
+  /**
+   * Lists all current game instances.
+   * 
+   * @returns {Game[]} An array of all game instances.
+   */
+  listGames(): Game[] {
     return Object.values(this.games);
   }
 
-  // Method to list all lobbies code
-  listLobbiesCode() {
+  /**
+   * Lists all lobby codes currently in use.
+   * 
+   * @returns {string[]} An array of all lobby codes.
+   */
+  listLobbiesCode(): string[] {
     return Object.keys(this.games);
   }
 }
