@@ -1,7 +1,7 @@
 import * as c from './socketConsts.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
-import { AllQuestions } from './API/questions.js';
+import { AllQuestions, QuestionCategories } from './API/questions.js';
 
 export const actualGameManager = new GameManager();
 
@@ -94,10 +94,16 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    socket.on(c.CREATE_LOBBY, ([code, numQuestionsParam]: [string, number]) => {
-      console.log('Creo la lobby con [codice - domande]: ', code, ' - ', numQuestionsParam);
-      const newGame = actualGameManager.createGame(code, numQuestionsParam);
-      actualGameManager.getGame(code).selectedQuestions = shuffle(AllQuestions).slice(0, numQuestionsParam);
+    // TODO check params on react
+    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[] }) => {
+      console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
+      const newGame = actualGameManager.createGame(data.code, data.numQuestionsParam);
+
+      const allSelectedQuestions = data.categories
+        .map(category => AllQuestions[category as QuestionCategories]) // Mappa le categorie alle domande
+        .flat(); // Appiattisce l'array
+
+      actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
       socket.emit(c.RETURN_NEWGAME, { newGame })
