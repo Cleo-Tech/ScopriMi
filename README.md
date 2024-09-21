@@ -53,8 +53,8 @@ Un ringraziamento speciale va anche a tutti coloro che hanno giocato a Scoprimi,
 
 Clone del repository
 ```
-git clone https://github.com/fmanto01/party_game.git
-cd Party_game/
+git clone https://github.com/Cleo-Tech/ScopriMi.git
+cd ScopriMi/
 ```
 Server
 ```
