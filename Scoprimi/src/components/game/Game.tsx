@@ -41,6 +41,7 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(c.SEND_QUESTION, ({ question, players, images }: QuestionData) => {
+      console.log(question, players, images);
       setClicked(false);
       setIsTimerActive(true);
       setQuestion(question);

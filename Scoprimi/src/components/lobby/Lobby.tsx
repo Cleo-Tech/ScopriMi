@@ -27,13 +27,13 @@ const Lobby: React.FC = () => {
     socket.emit(c.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
       console.log('Received data:', data);
       setGame(data);
-      setIsReady(data.isReadyToGame[currentPlayer]);
+      setIsReady(data.players[currentPlayer].isReadyToGame);
     });
 
     socket.on(c.RENDER_LOBBY, (data: Game) => {
       console.log(data);
       setGame(data);
-      setIsReady(data.isReadyToGame[currentPlayer]);
+      setIsReady(data.players[currentPlayer].isReadyToGame);
     });
     socket.on(c.INIZIA, () => {
       setGame((prevGame) => {
@@ -117,19 +117,20 @@ const Lobby: React.FC = () => {
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
           <div className="players-list">
-            {game.players.map((player) => (
-              <div className="player-item" key={player}>
+            {Object.values(game.players).map((player) => (
+              <div className="player-item" key={player.name}>
                 <div className="player-image">
                   <img
-                    src={game.images[player] || 'default-image-url'}
-                    alt={player}
+                    // src={game.images[player] || 'default-image-url'}
+                    src={player.image || 'default-image-url'}
+                    alt={player.name}
                     className="player-img"
                   />
                 </div>
-                <div className="player-name">{player}</div>
+                <div className="player-name">{player.name}</div>
                 <div className="player-status">
-                  <span className={`status-pill ${game.isReadyToGame[player] ? 'my-bg-success' : 'my-bg-error'}`}>
-                    {game.isReadyToGame[player] ? 'Pronto' : 'Non pronto'}
+                  <span className={`status-pill ${player.isReadyToGame ? 'my-bg-success' : 'my-bg-error'}`}>
+                    {player.isReadyToGame ? 'Pronto' : 'Non pronto'}
                   </span>
                 </div>
               </div>

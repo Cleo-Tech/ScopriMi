@@ -17,7 +17,7 @@ const LobbyRow: React.FC<LobbyRowProps> = ({ lobby, onJoin }) => (
       ></span>
     </td>
     <td>{lobby.lobbyCode}</td>
-    <td>{lobby.players.length}</td>
+    <td>{Object.keys(lobby.players).length}</td>
   </tr>
 );
 

@@ -41,7 +41,7 @@ function mydisconnet(socket, io) {
       socket.emit(c.FORCE_RESET);
       return;
     }
-    const playerName = game.players.find(pname => game.playerSocketIds[pname] === socket.id);
+    const playerName = Object.keys(game.players).find(name => game.players[name].socketId === socket.id);
 
     if (playerName) {
       console.log(`Removing ${playerName} from lobby ${lobbyCode}`);
@@ -61,10 +61,11 @@ function mydisconnet(socket, io) {
       // TODO fix veloce per quando un player si disconnette
       if (game.didAllPlayersVote()) {
         const players = game.players;
-        const voteRecap = game.whatPlayersVoted;
-        const playerImages = game.images;
+        const voteRecap = game.getWhatPlayersVoted();
+        const playerImages = game.getImages();
         const mostVotedPerson = game.getMostVotedPerson();
-        game.whatPlayersVoted = {};
+        // ho un dubbio
+        game.resetWhatPlayersVoted();
         io.to(lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     }
@@ -105,7 +106,6 @@ export function setupSocket(io: any) {
     socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
         const code = data.lobbyCode;
-        console.log('sto joinando la lobby', code);
         const game = actualGameManager.getGame(code);
 
         if (!game) {
@@ -114,7 +114,7 @@ export function setupSocket(io: any) {
           return;
         }
 
-        if (game.players.includes(data.playerName)) {
+        if (Object.keys(game.players).includes(data.playerName)) {
           console.log(`Player with name ${data.playerName} already exists in lobby ${data.lobbyCode}`);
           socket.emit(c.PLAYER_CAN_JOIN, { canJoin: false, lobbyCode: code, playerName: data.playerName });
           return;
@@ -136,13 +136,13 @@ export function setupSocket(io: any) {
     });
 
     socket.on(c.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('Toggle', data.lobbyCode);
+      console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(c.FORCE_RESET);
         return;
       }
-      thisGame.toogleIsReadyToGame(data.playerName);
+      thisGame.toggleIsReadyToGame(data.playerName);
       io.to(data.lobbyCode).emit(c.RENDER_LOBBY, thisGame);
       if (!thisGame.isAllPlayersReadyToGame()) {
         return;
@@ -164,18 +164,18 @@ export function setupSocket(io: any) {
         return;
       }
 
-      if (thisGame.players.includes(data.vote) || data.vote === '') {
+      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '') {
         thisGame.castVote(data.voter, data.vote);
-        io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.whatPlayersVoted });
+        io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       }
 
 
       if (thisGame.didAllPlayersVote()) {
         const players = thisGame.players;
-        const voteRecap = thisGame.whatPlayersVoted;
-        const playerImages = thisGame.images;
+        const voteRecap = thisGame.getWhatPlayersVoted();
+        const playerImages = thisGame.getImages();
         const mostVotedPerson = thisGame.getMostVotedPerson();
-        thisGame.whatPlayersVoted = {};
+        thisGame.resetWhatPlayersVoted()
         io.to(data.lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     });
@@ -188,26 +188,23 @@ export function setupSocket(io: any) {
       }
       thisGame.setReadyForNextQuestion(data.playerName);
 
-      if (!thisGame.isAllPlayersReady()) {
+      if (!thisGame.isAllPlayersReadyForNextQuestion()) {
         return;
       }
       // chiedo la prossima domanda, se posso altrimento partita finita
       const { value: question, done } = thisGame.getNextQuestion();
       if (!done) {
         thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
-        const players = thisGame.players;
-        const images = thisGame.images;
+        const players = Object.keys(thisGame.players);
+        console.log(players);
+        const images = thisGame.getImages();
         console.log(images);
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images });
       } else {
         console.log('Game Over: no more questions.');
         console.log('Risultati finali:');
 
-        thisGame.players.forEach((player: string) => {
-          console.log(`${player}: ${thisGame.playerScores[player]} punti`);
-        });
-
-        io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.playerScores, playerImages: thisGame.images });
+        io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
         actualGameManager.deleteGame(thisGame.lobbyCode);
       }
     });
