@@ -6,7 +6,12 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 
 // Tutte le domande che vengono lette dal file json
-export let AllQuestions: string[];
+export enum QuestionCategories {
+  GENERIC = 'generic',
+  ADULT = 'adult',
+}
+// export let AllQuestions: string[];
+export let AllQuestions: { [key in QuestionCategories]: string[] }
 
 export const SetAllQuestions = async (): Promise<any> => {
   const __filename = fileURLToPath(import.meta.url);
