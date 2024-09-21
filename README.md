@@ -16,12 +16,16 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
 
 
 ## Immagini del Gioco
-![Login](images/Login.png)
-![Home](images/Home.png)
-![Lobby](images/Lobby.png)
-![Game](images/Game.png)
-![Results](images/Results.png)
-![Final Results](images/FinalResults.png)
+
+<p>
+  <img src="images/Login.png" alt="Login" width="300" style="display:inline-block;" />
+  <img src="images/Home.png" alt="Home" width="300" style="display:inline-block;" />
+  <img src="images/Lobby.png" alt="Lobby" width="300" style="display:inline-block;" />
+  <img src="images/Game.png" alt="Game" width="300" style="display:inline-block;" />
+  <img src="images/Results.png" alt="Results" width="300" style="display:inline-block;" />
+  <img src="images/FinalResults.png" alt="Final Results" width="300" style="display:inline-block;" />
+</p>
+
 
 
 
