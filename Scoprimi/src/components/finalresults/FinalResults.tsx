@@ -27,17 +27,24 @@ const FinalResults: React.FC = () => {
         <h2 className="">Classifica</h2>
 
         <div className='podium' style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', width: '100%' }}>
-          {podium.map(([player, { score, image }], index) => (
-            <div
-              key={player}
-              className={`podium-position position-${index + 1}`}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }} // Maggiore flessibilità
-            >
-              <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
-              <div className='my-bg-error' style={{ height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}><p style={{ margin: '0' }}>{score}</p></div>
-              <p className={''} style={{ textAlign: 'center' }}>{player}</p>
-            </div>
-          ))}
+          {podium.map(([player, { score, image }], index) => {
+            // Imposta un'altezza diversa per ogni posizione
+            const heightStyle = index === 0 ? { height: '7vh' } : index === 1 ? { height: '8vh' } : { height: '6vh' };
+
+            return (
+              <div
+                key={player}
+                className={`podium-position position-${index + 1}`}
+                style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }} // Aggiungi l'altezza specificata
+              >
+                <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
+                <div className='my-bg-error' style={{ ...heightStyle, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}>
+                  <p style={{ margin: '0' }}>{score}</p>
+                </div>
+                <p style={{ textAlign: 'center' }}>{player}</p>
+              </div>
+            );
+          })}
         </div>
 
 
