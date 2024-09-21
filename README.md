@@ -14,6 +14,17 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
 4. Punti vengono assegnati a coloro che hanno votato per la maggioranza.
 5. Il gioco continua per un certo numero di turni, e il giocatore con più punti alla fine vince.
 
+
+## Immagini del Gioco
+![Login](images/Login.png)
+![Home](images/Home.png)
+![Lobby](images/Lobby.png)
+![Game](images/Game.png)
+![Results](images/Results.png)
+![Final Results](images/FinalResults.png)
+
+
+
 ## Stack Tecnologico
 - **Frontend**: React, Bootstrap, CSS per lo stile.
 - **Backend**: Express, Node.js.
