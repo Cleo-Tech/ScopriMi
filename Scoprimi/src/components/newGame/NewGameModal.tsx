@@ -50,7 +50,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose }) => {
   const handleCreateGame = () => {
     const code = generateLobbyCode();
     // TODO, crea interfaccia per questo
-    socket.emit(c.CREATE_LOBBY, { code, numQuestions, categories: ['adult', 'generic'] });
+    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: ['adult', 'generic'] });
     onClose();
   };
 

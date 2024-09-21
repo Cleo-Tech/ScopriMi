@@ -15,19 +15,36 @@ const FinalResults: React.FC = () => {
     return <div className="text-center mt-5">Nessun risultato disponibile.</div>;
   }
 
+  // Estrai i primi 3 risultati per il podio
+
+  const fake = sortedResults.slice(0, 1);
+  const podium = [fake, fake, fake].flat();
+  const otherPlayers = sortedResults.slice(3);
+
   return (
     <>
       <div id="gameOverMessage" className="paginator">
         <h2 className="">Classifica</h2>
-        {/* TODO podium */}
-        <div>
+
+        <div className='podium' style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', width: '100%' }}>
+          {podium.map(([player, { score, image }], index) => (
+            <div
+              key={player}
+              className={`podium-position position-${index + 1}`}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }} // Maggiore flessibilità
+            >
+              <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
+              <div className='my-bg-error' style={{ height: '40px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}><p style={{ margin: '0' }}>{score}</p></div>
+              <p className={''} style={{ textAlign: 'center' }}>{player}</p>
+            </div>
+          ))}
         </div>
 
-        {/* non-podium players */}
+
         <div className="elegant-background mt-3 scrollable fill">
           <table className="my-table">
             <tbody>
-              {sortedResults.map(([player, { score, image }]) => (
+              {otherPlayers.map(([player, { score, image }]) => (
                 <tr key={player}>
                   <td>
                     <img
@@ -42,6 +59,7 @@ const FinalResults: React.FC = () => {
             </tbody>
           </table>
         </div>
+
         <button
           className='my-btn mt-3 my-bg-puss'
           onClick={() => navigate('/')}
