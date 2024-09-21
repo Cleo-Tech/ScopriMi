@@ -1,15 +1,3 @@
-
-## v0.5.0
-
-- [x] Sistemare disconnessione dal gioco
-- [x] Controllo del timer, tra il voto di un giocatore e un altro ritorna a 25 secondi
-- [x] Aggiungere gesture di swipe down quando si seleziona il numero di domande [Fede]
-- [x] Cambio bottone per pronto / non pronto, al momento non è intuitivo
-- [x] Aggiungere possibilità di condividere un link per entrare in una lobby [Pesto]
-- [x] Cambiare emoji della clessidra con un'immagine  [Mux]
-- [x] Risolvere problema del player fantasma, quando si è dentro ad una lobby e si clicca il pulsante indietro del browser (o swipe su cellulare) il giocatore esce dalla lobby ma risulta allo stesso tempo dentro, rendendogli impossibile il rientro [Fede]
-- [ ] Creare branch di testing per non pushare ogni bugfix direttamente sul main (non lavoriamo alla cpl)
-
 ## v0.6.0
 
 Estimated time: 1-1.5 months.
