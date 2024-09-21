@@ -106,7 +106,7 @@ const Lobby: React.FC = () => {
         className='my-btn-login elegant-background'
         onClick={() => handleShareLobby(currentLobby)}
       >
-        <i className="fa-solid fa-arrow-up-from-bracket"></i>
+        <i className="fa-solid fa-share-from-square"></i>
       </button>
       <div className="paginator">
         <h2>ScopriMi</h2>

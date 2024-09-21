@@ -129,7 +129,10 @@ const Home: React.FC = () => {
       <BottomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        playerName={currentPlayer}
+        image={currentPlayerImage}
       />
+
     </>
   );
 };
