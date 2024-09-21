@@ -35,7 +35,7 @@ export const setupGame = (app: Express) => {
 
     // Aggiungi il giocatore al gioco
     game.addPlayer(playerName, 'socketId' + playerName, imageList[randomInt(imageList.length)]);
-    game.toogleIsReadyToGame(playerName); // Imposta il giocatore come pronto a giocare
+    game.toggleIsReadyToGame(playerName); // Imposta il giocatore come pronto a giocare
 
     // Invia una risposta al client
     return res.status(201).json({ message: 'Player created', playerName });

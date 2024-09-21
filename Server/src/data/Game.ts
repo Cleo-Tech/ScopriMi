@@ -1,4 +1,4 @@
-import { Player } from "./Player";
+import { Player } from "./Player.js";
 
 /**
  * Represents a game in a lobby.
@@ -21,6 +21,8 @@ export class Game {
   public iterator: Iterator<string>;
   // Creation time of the lobby
   public creationTime: number;
+  // Stores who voted for whom
+  public whatPlayerVoted: { [key: string]: string };
 
   /**
    * Creates an instance of the game.
@@ -37,6 +39,7 @@ export class Game {
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
+    this.whatPlayerVoted = {};
   }
 
   /**
@@ -216,7 +219,7 @@ export class Game {
    * Checks if all players are ready for the next question.
    * @returns True if all players are ready, otherwise false
    */
-  isAllPlayersReady(): boolean {
+  isAllPlayersReadyToGame(): boolean {
     return Object.values(this.players).every(player => player.readyForNextQuestion);
   }
 
@@ -246,4 +249,51 @@ export class Game {
       player.readyForNextQuestion = false;
     });
   }
+
+  /**
+   * Gets the voting status of players.
+   * @returns An object mapping player names to their votes
+   */
+  getWhatPlayersVoted(): { [key: string]: string } {
+    const votes: { [key: string]: string } = {};
+    Object.values(this.players).forEach(player => {
+      votes[player.name] = player.whatPlayerVoted;
+    });
+    return votes;
+  }
+
+  /**
+   * Gets a dictionary of player images.
+   * @returns An object where keys are player names and values are their corresponding image URLs.
+   */
+  getImages(): { [key: string]: string } {
+    const images: { [key: string]: string } = {};
+    Object.values(this.players).forEach(player => {
+      images[player.name] = player.image;
+    });
+    return images;
+  }
+
+  /**
+  * Gets a dictionary of player scores.
+  * @returns An object where keys are player names and values are their corresponding scores.
+  */
+  getScores(): { [key: string]: number } {
+    const scores: { [key: string]: number } = {};
+    Object.values(this.players).forEach(player => {
+      scores[player.name] = player.score;
+    });
+    return scores;
+  }
+
+  /**
+   * Resets the voting status for all players.
+   * This method clears the `whatPlayerVoted` property for each player, indicating that they have not voted.
+   */
+  resetWhatPlayersVoted(): void {
+    Object.values(this.players).forEach(p => {
+      p.whatPlayerVoted = '';
+    });
+  }
+
 }
