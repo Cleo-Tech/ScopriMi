@@ -106,7 +106,6 @@ export function setupSocket(io: any) {
     socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
         const code = data.lobbyCode;
-        console.log('sto joinando la lobby', code);
         const game = actualGameManager.getGame(code);
 
         if (!game) {
