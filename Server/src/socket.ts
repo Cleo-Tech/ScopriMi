@@ -94,9 +94,9 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    socket.on(c.CREATE_LOBBY, ([code, numQuestionsParam]: [string, number]) => {
-      console.log('Creo la lobby con [codice - domande]: ', code, ' - ', numQuestionsParam);
-      const newGame = actualGameManager.createGame(code, numQuestionsParam);
+    socket.on(c.CREATE_LOBBY, ([code, numQuestionsParam, admin]: [string, number, string]) => {
+      console.log('Creo la lobby con [codice - domande - admin]: ', code, ' - ', numQuestionsParam, ' - ', admin);
+      const newGame = actualGameManager.createGame(code, numQuestionsParam, admin);
       actualGameManager.getGame(code).selectedQuestions = shuffle(AllQuestions).slice(0, numQuestionsParam);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });

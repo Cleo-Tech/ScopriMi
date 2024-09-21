@@ -121,13 +121,15 @@ const Lobby: React.FC = () => {
               <div className="player-item" key={player.name}>
                 <div className="player-image">
                   <img
-                    // src={game.images[player] || 'default-image-url'}
                     src={player.image || 'default-image-url'}
                     alt={player.name}
                     className="player-img"
                   />
                 </div>
-                <div className="player-name">{player.name}</div>
+                <div className="player-name">
+                  {player.name}
+                  {player.name === game.admin && ' 🔑'} {/* Aggiungi la chiave se il player è l'admin */}
+                </div>
                 <div className="player-status">
                   <span className={`status-pill ${player.isReadyToGame ? 'my-bg-success' : 'my-bg-error'}`}>
                     {player.isReadyToGame ? 'Pronto' : 'Non pronto'}
