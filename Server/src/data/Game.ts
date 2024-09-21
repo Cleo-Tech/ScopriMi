@@ -1,40 +1,33 @@
-export class Game {
+import { Player } from "./Player";
 
+export class Game {
+  // Codice della lobby
   public lobbyCode: string;
+  // Se il game e` iniziato o meno
   public isGameStarted: boolean;
-  public players: string[];
+  // elenco dei player
+  public players: { [key: string]: Player };
+  // Quanti hanno votato nella mache
   public numOfVoters: number;
+  // A quale domanda siamo arrivati
   public currentQuestionIndex: number;
+  // Numero di domande totale del game
   public numQuestions: number;
+  // Elenco di domande del game
   public selectedQuestions: string[];
   public iterator: Iterator<string>;
-  public playerSocketIds: { [key: string]: string };
-  public votes: { [key: string]: number };
-  public playerScores: { [key: string]: number };
-  public readyForNextQuestion: { [key: string]: boolean };
-  public isReadyToGame: { [key: string]: boolean };
-  public images: { [key: string]: string };
-  public whatPlayersVoted: { [key: string]: string };
   public creationTime: number;
 
   constructor(lobbyCode: string, numQuestions: number) {
     this.lobbyCode = lobbyCode;
     this.isGameStarted = false;
-    this.players = [];
+    this.players = {};
     this.numOfVoters = 0;
     this.currentQuestionIndex = 0;
     this.numQuestions = numQuestions >= 5 ? numQuestions : 5;
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
-    this.creationTime = Date.now();  // Inizializzazione con l'ora corrente
-    // Player denormalizzato
-    this.playerSocketIds = {}
-    this.votes = {};
-    this.playerScores = {};
-    this.readyForNextQuestion = {};
-    this.isReadyToGame = {};
-    this.images = {};
-    this.whatPlayersVoted = {};
+    this.creationTime = Date.now();
   }
 
   getMostVotedPerson(): string {
@@ -43,12 +36,10 @@ export class Game {
     let maxVotes = 0;
     let isTie = false;
 
-    for (const voter in this.whatPlayersVoted) {
-      const votedPerson = this.whatPlayersVoted[voter];
-      if (votedPerson in voteCounts) {
-        voteCounts[votedPerson] += 1;
-      } else {
-        voteCounts[votedPerson] = 1;
+    for (const voter in this.players) {
+      const votedPerson = this.players[voter].whatPlayerVoted;
+      if (votedPerson) {
+        voteCounts[votedPerson] = (voteCounts[votedPerson] || 0) + 1;
       }
     }
 
@@ -62,12 +53,12 @@ export class Game {
       }
     }
 
-    if (isTie)
-      mostVotedPerson = '';
+    if (isTie) mostVotedPerson = '';
 
-    for (const voter in this.whatPlayersVoted) {
-      if (this.whatPlayersVoted[voter] === mostVotedPerson)
-        this.playerScores[voter] += 1;
+    for (const player of Object.values(this.players)) {
+      if (player.whatPlayerVoted === mostVotedPerson) {
+        player.score += 1; // Incrementa il punteggio del giocatore
+      }
     }
 
     console.log('MostVotedPerson: ', mostVotedPerson);
@@ -77,36 +68,25 @@ export class Game {
 
   resetVoters(): void {
     this.numOfVoters = 0;
-    Object.keys(this.votes).forEach(player => this.votes[player] = 0);
+    Object.values(this.players).forEach(player => {
+      player.whatPlayerVoted = ''; // Resetta il voto di ogni giocatore
+    });
   }
 
   addPlayer(playerName: string, socketId: string, image: string): void {
-    if (!this.players.includes(playerName)) {
-      this.players.push(playerName);
-      this.playerScores[playerName] = 0; // Initialize score for new player
-      this.readyForNextQuestion[playerName] = false; // Set readiness status
-      this.votes[playerName] = 0;
-      this.isReadyToGame[playerName] = false;
-      this.playerSocketIds[playerName] = socketId;
-      this.images[playerName] = image;
+    if (!(playerName in this.players)) {
+      this.players[playerName] = new Player(playerName, socketId, image);
     }
   }
 
   removePlayer(playerName: string): void {
-    const index = this.players.indexOf(playerName);
-    if (index !== -1) {
-      this.players.splice(index, 1);
-      delete this.playerScores[playerName];
-      delete this.readyForNextQuestion[playerName];
-      delete this.isReadyToGame[playerName];
-      delete this.playerSocketIds[playerName];
-      delete this.images[playerName];
-      delete this.whatPlayersVoted[playerName];
-    }
+    delete this.players[playerName];
   }
 
-  toogleIsReadyToGame(playerName: string): void {
-    this.isReadyToGame[playerName] = !this.isReadyToGame[playerName];
+  toggleIsReadyToGame(playerName: string): void {
+    if (playerName in this.players) {
+      this.players[playerName].isReadyToGame = !this.players[playerName].isReadyToGame;
+    }
   }
 
   setNumQuestions(num: number): void {
@@ -126,34 +106,29 @@ export class Game {
   }
 
   castVote(playerName: string, vote: string): void {
-    this.whatPlayersVoted[playerName] = vote;
-
-    if (this.players.includes(playerName)) {
-      if (!this.votes[vote]) {
-        this.votes[vote] = 0;
-      }
-      this.votes[vote]++;
+    if (playerName in this.players) {
+      this.players[playerName].whatPlayerVoted = vote; // Imposta il voto del giocatore
+      this.numOfVoters++;
     } else {
       console.error('Giocatore non trovato.');
     }
-    this.numOfVoters++;
   }
 
   didAllPlayersVote(): boolean {
-    return this.numOfVoters === this.players.length;
+    return this.numOfVoters === Object.keys(this.players).length;
   }
 
   updateScore(playerName: string, score: number): void {
-    if (this.players.includes(playerName)) {
-      this.playerScores[playerName] = (this.playerScores[playerName] || 0) + score;
+    if (playerName in this.players) {
+      this.players[playerName].score += score;
     } else {
       console.error('Giocatore non trovato.');
     }
   }
 
   setReadyForNextQuestion(playerName: string): void {
-    if (this.players.includes(playerName)) {
-      this.readyForNextQuestion[playerName] = true;
+    if (playerName in this.players) {
+      this.players[playerName].readyForNextQuestion = true;
     } else {
       console.error('Giocatore non trovato.');
     }
@@ -172,11 +147,7 @@ export class Game {
   }
 
   isAllPlayersReady(): boolean {
-    return this.players.every(player => this.readyForNextQuestion[player]);
-  }
-
-  isAllPlayersReadyToGame(): boolean {
-    return this.players.every(player => this.isReadyToGame[player]);
+    return Object.values(this.players).every(player => player.readyForNextQuestion);
   }
 
   getNextQuestion(): IteratorResult<string> {
@@ -190,8 +161,8 @@ export class Game {
   }
 
   resetReadyForNextQuestion(): void {
-    this.players.forEach(player => {
-      this.readyForNextQuestion[player] = false;
+    Object.values(this.players).forEach(player => {
+      player.readyForNextQuestion = false;
     });
   }
 }
