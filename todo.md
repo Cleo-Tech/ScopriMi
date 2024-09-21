@@ -10,6 +10,12 @@ Features:
 </br>
 
 - [ ] Suddividere domande in categorie
+  - [ ] frontend creare interfaccia
+  - [x] gestire backend
+</br>
+
+- [ ] Redesing della schermata classifica ( quella che aveva mandato Zelo tempo fa )
+- [ ] Animazioni di qualche tipo
 - [ ] Foto in game + domanda su foto migliore
 - [ ] Domande su un giocatore specifico (Ex. pick di un player random e domanda tipo "Cosa farebbe il giocatore x in questa situazione")
   - [ ] Creazione di nuove domande dedicate
