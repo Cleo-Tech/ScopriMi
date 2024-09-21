@@ -137,7 +137,7 @@ export function setupSocket(io: any) {
     });
 
     socket.on(c.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('Toggle', data.lobbyCode);
+      console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(c.FORCE_RESET);
@@ -189,14 +189,15 @@ export function setupSocket(io: any) {
       }
       thisGame.setReadyForNextQuestion(data.playerName);
 
-      if (!thisGame.isAllPlayersReadyToGame()) {
+      if (!thisGame.isAllPlayersReadyForNextQuestion()) {
         return;
       }
       // chiedo la prossima domanda, se posso altrimento partita finita
       const { value: question, done } = thisGame.getNextQuestion();
       if (!done) {
         thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
-        const players = thisGame.players;
+        const players = Object.keys(thisGame.players);
+        console.log(players);
         const images = thisGame.getImages();
         console.log(images);
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images });

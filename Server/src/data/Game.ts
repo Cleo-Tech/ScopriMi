@@ -21,8 +21,6 @@ export class Game {
   public iterator: Iterator<string>;
   // Creation time of the lobby
   public creationTime: number;
-  // Stores who voted for whom
-  public whatPlayerVoted: { [key: string]: string };
 
   /**
    * Creates an instance of the game.
@@ -39,7 +37,6 @@ export class Game {
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
-    this.whatPlayerVoted = {};
   }
 
   /**
@@ -219,8 +216,16 @@ export class Game {
    * Checks if all players are ready for the next question.
    * @returns True if all players are ready, otherwise false
    */
-  isAllPlayersReadyToGame(): boolean {
+  isAllPlayersReadyForNextQuestion(): boolean {
     return Object.values(this.players).every(player => player.readyForNextQuestion);
+  }
+
+  /**
+   * Checks if all players are ready to game.
+   * @returns True if all players are ready, otherwise false
+   */
+  isAllPlayersReadyToGame(): boolean {
+    return Object.values(this.players).every(player => player.isReadyToGame);
   }
 
   /**
