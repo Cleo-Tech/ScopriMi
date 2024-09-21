@@ -21,5 +21,6 @@ export class Player {
     this.score = 0;
     this.isReadyToGame = false;
     this.readyForNextQuestion = false;
+    this.whatPlayerVoted = '';
   }
 }
