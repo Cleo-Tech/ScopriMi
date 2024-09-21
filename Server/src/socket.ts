@@ -114,10 +114,17 @@ export function setupSocket(io: any) {
           return;
         }
 
+        // Controlla se il giocatore esiste già
         if (Object.keys(game.players).includes(data.playerName)) {
           console.log(`Player with name ${data.playerName} already exists in lobby ${data.lobbyCode}`);
           socket.emit(c.PLAYER_CAN_JOIN, { canJoin: false, lobbyCode: code, playerName: data.playerName });
           return;
+        }
+
+        // Se la lobby non ha un admin, assegna il primo giocatore come admin
+        if (!game.admin) {
+          game.admin = data.playerName;
+          console.log(`New admin is ${data.playerName} for lobby ${data.lobbyCode}`);
         }
 
         console.log(`${data.playerName} just joined the lobby`);
@@ -231,15 +238,32 @@ export function setupSocket(io: any) {
     })
 
     socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
-      console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby}`);
       const thisGame = actualGameManager.getGame(data.currentLobby);
+      console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
+
       if (!thisGame) {
         socket.emit(c.FORCE_RESET);
         return;
       }
+
+      // Rimuovo il giocatore dalla lobby
       thisGame.removePlayer(data.currentPlayer);
+
+      // Se l'admin lascia la lobby, assegno il ruolo a un altro giocatore
+      // Se non ci sono giocatori, non c'è nessun admin
+      if (data.currentPlayer === thisGame.admin) {
+        const remainingPlayers = Object.keys(thisGame.players);
+
+        if (remainingPlayers.length > 0) {
+          // Imposto il primo giocatore come nuovo admin
+          thisGame.admin = remainingPlayers[0];
+          console.log(`New admin for lobby ${data.currentLobby} is ${thisGame.admin}`);
+        } else {
+          thisGame.admin = '';
+        }
+      }
+
       const lobbies = actualGameManager.listGames();
-      console.log(thisGame.players);
       socket.leave(data.currentLobby);
       io.emit(c.RENDER_LOBBIES, { lobbies });
       io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
