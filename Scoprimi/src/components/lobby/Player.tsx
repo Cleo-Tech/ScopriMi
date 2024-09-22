@@ -5,13 +5,13 @@ interface PlayerProps {
   name: string;
   image?: string;
   isReadyToGame: boolean;
-  isAdmin: boolean;
+  admin: string;
   currentPlayer: string;
   showDeleteBtn: boolean;
   onRemove: (playerName: string) => void;
 }
 
-const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, isAdmin, currentPlayer, showDeleteBtn: initialDeleteBtnState, onRemove }) => {
+const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin, currentPlayer, showDeleteBtn: initialDeleteBtnState, onRemove }) => {
   // Usa lo state per showDeleteBtn all'interno del componente
   const [showDeleteBtn, setShowDeleteBtn] = useState(initialDeleteBtnState);
 
@@ -29,7 +29,7 @@ const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, isAdmin, cu
   });
 
   return (
-    <div {...(isAdmin) ? swipeHandler : {}} className="player-item" key={name}>
+    <div {...(admin === currentPlayer) ? swipeHandler : {}} className="player-item" key={name}>
       <div className="player-image">
         <img
           src={image || 'default-image-url'}
@@ -38,8 +38,7 @@ const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, isAdmin, cu
         />
       </div>
       <div className="player-name">
-        {name}
-        {isAdmin && ' 🔑'} {/* Chiave per l'admin */}
+        {admin === name ? name + ' 🔑' : name} {/* Chiave per l'admin */}
       </div>
       <div className="player-status">
         <span className={`status-pill ${isReadyToGame ? 'my-bg-success' : 'my-bg-error'}`}>

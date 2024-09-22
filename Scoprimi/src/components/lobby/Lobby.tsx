@@ -129,7 +129,7 @@ const Lobby: React.FC = () => {
               name={player.name}
               image={player.image}
               isReadyToGame={player.isReadyToGame}
-              isAdmin={game.admin === player.name}
+              admin={game.admin}
               currentPlayer={currentPlayer}
               showDeleteBtn={showDeleteBtn}
               onRemove={handleRemovePlayer}
