@@ -21,28 +21,30 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [log, setlog] = useState<string>('');
+  // const [log, setlog] = useState<string>('');
+  const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
+  const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      setlog(log + '------------------\n');
-      setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
+      // setlog(log + '------------------\n');
+      // setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
+      setIsPageVisible(!document.hidden);
       if (!document.hidden) {
-        setlog(log + 'VISIBLE\n');
-
-
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
-        setlog(log + Object.values(data) + '\n');
+        // setlog(log + Object.values(data) + '\n');
 
-        // Ritarda l'emissione di 2 secondi
+        // Ritarda l'emissione di 3 secondi
+        setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
-          setlog(log + 'sto per lanciare evento\n');
+          // setlog(log + 'sto per lanciare evento\n');
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-        }, 20000);
+          setLoading(false);
+        }, 3000);
 
         // Pulizia del timer se la pagina diventa non visibile prima del timeout
         return () => clearTimeout(timer);
@@ -56,7 +58,7 @@ const Lobby: React.FC = () => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [currentLobby, currentPlayer, currentPlayerImage, log]);
+  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
@@ -134,10 +136,37 @@ const Lobby: React.FC = () => {
       }
     }
   }
+  const styles = {
+    loaderContainer: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      zIndex: 1000,
+    } as React.CSSProperties,
+    loader: {
+      border: '16px solid #f3f3f3',
+      borderRadius: '50%',
+      borderTop: '16px solid #3498db',
+      width: '120px',
+      height: '120px',
+      animation: 'spin 2s linear infinite',
+    } as React.CSSProperties,
+  };
 
   return (
     <>
-      {(log && <p style={{ whiteSpace: 'pre-wrap' }}>{log}</p>)}
+      {/* {(log && <p style={{ whiteSpace: 'pre-wrap' }}>{log}</p>)} */}
+      {loading && (
+        <div style={styles.loaderContainer}>
+          <div style={styles.loader}></div>
+        </div>
+      )}
       <Alert text='Link copiato negli appunti' show={showAlert} onHide={() => setShowAlert(false)} />
       <button
         className='my-btn-login elegant-background'
