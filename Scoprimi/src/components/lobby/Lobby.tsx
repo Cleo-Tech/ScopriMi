@@ -31,6 +31,7 @@ const Lobby: React.FC = () => {
       // setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
       setIsPageVisible(!document.hidden);
       if (!document.hidden) {
+        setIsPageVisible(!document.hidden);
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
@@ -44,7 +45,7 @@ const Lobby: React.FC = () => {
         const timer = setTimeout(() => {
           // setlog(log + 'sto per lanciare evento\n');
           setLoading(false);
-        }, 3000);
+        }, 5000);
 
         // Pulizia del timer se la pagina diventa non visibile prima del timeout
         return () => clearTimeout(timer);
