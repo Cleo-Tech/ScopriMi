@@ -26,15 +26,20 @@ const Lobby: React.FC = () => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         console.log('VISIBILE');
+
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
-        // Viene gestito dal server se gia presente.
-        socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-      } else {
-        console.log('Pagina non è più visibile');
+
+        // Ritarda l'emissione di 2 secondi
+        const timer = setTimeout(() => {
+          socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+        }, 2000);
+
+        // Pulizia del timer se la pagina diventa non visibile prima del timeout
+        return () => clearTimeout(timer);
       }
     };
 
