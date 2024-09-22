@@ -10,7 +10,7 @@ interface PlayerProps {
   onRemove: (playerName: string) => void;
 }
 
-const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin, currentPlayer, onRemove }) => {
+const LobbyPlayer: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin, currentPlayer, onRemove }) => {
   // Usa lo state per showDeleteBtn all'interno del componente
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
 
@@ -57,4 +57,4 @@ const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin, curr
   );
 };
 
-export default Player;
+export default LobbyPlayer;

@@ -7,7 +7,7 @@ import LobbyList from '../common/LobbyList.tsx';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
-import Player from './Player.tsx'; // Import del nuovo componente Player
+import LobbyPlayer from './LobbyPlayer.tsx'; // Import del nuovo componente Player
 
 const Lobby: React.FC = () => {
 
@@ -168,7 +168,7 @@ const Lobby: React.FC = () => {
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
           {Object.values(game.players).map((player) => (
-            <Player
+            <LobbyPlayer
               key={player.name}
               name={player.name}
               image={player.image}
