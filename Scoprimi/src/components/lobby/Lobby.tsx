@@ -24,7 +24,7 @@ const Lobby: React.FC = () => {
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
+      if (!document.hidden) {
         console.log('VISIBILE');
         const data = {
           lobbyCode: currentLobby,
