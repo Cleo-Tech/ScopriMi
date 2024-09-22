@@ -43,7 +43,7 @@ const Lobby: React.FC = () => {
 
     // Pulizia dell'event listener al momento dello smontaggio
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [currentLobby, currentPlayer, currentPlayerImage]);
 
