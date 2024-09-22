@@ -41,8 +41,8 @@ const Lobby: React.FC = () => {
 
         // Ritarda l'emissione di 3 secondi
         setLoading(true); // mostra la rotella di caricamento
-        socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
         const timer = setTimeout(() => {
+          socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
           // setlog(log + 'sto per lanciare evento\n');
           setLoading(false);
         }, 5000);
