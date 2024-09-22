@@ -7,13 +7,12 @@ interface PlayerProps {
   isReadyToGame: boolean;
   isAdmin: boolean;
   currentPlayer: string;
-  showDeleteBtn: boolean;
   onRemove: (playerName: string) => void;
 }
 
-const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, isAdmin, currentPlayer, showDeleteBtn: initialDeleteBtnState, onRemove }) => {
+const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, isAdmin, currentPlayer, onRemove }) => {
   // Usa lo state per showDeleteBtn all'interno del componente
-  const [showDeleteBtn, setShowDeleteBtn] = useState(initialDeleteBtnState);
+  const [showDeleteBtn, setShowDeleteBtn] = useState(false);
 
   const swipeHandler = useSwipeable({
     onSwipedLeft: () => {

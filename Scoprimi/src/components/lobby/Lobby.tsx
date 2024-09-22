@@ -16,7 +16,6 @@ const Lobby: React.FC = () => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [showDeleteBtn, setShowDeleteBtn] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
@@ -131,7 +130,6 @@ const Lobby: React.FC = () => {
               isReadyToGame={player.isReadyToGame}
               isAdmin={game.admin === player.name}
               currentPlayer={currentPlayer}
-              showDeleteBtn={showDeleteBtn}
               onRemove={handleRemovePlayer}
             />
           ))}
