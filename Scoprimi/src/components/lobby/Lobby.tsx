@@ -23,6 +23,17 @@ const Lobby: React.FC = () => {
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
+    socket.on(c.PLAYER_CAN_JOIN, (data) => {
+      if (data.canJoin) {
+        console.log('ti sei riconnesso scemo');
+      } else {
+        console.log('effettivamente non potevi entrrate');
+
+      }
+    });
+  }, [navigate, setCurrentLobby]);
+
+  useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
     socket.emit(c.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
       console.log('Received data:', data);
