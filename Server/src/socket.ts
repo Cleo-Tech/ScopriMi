@@ -95,15 +95,16 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[] }) => {
-      console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
-      const newGame = actualGameManager.createGame(data.code, data.numQuestionsParam);
+    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
+      console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
+      const newGame = actualGameManager.createGame(data.code, data.numQuestionsParam, data.admin);
 
       const allSelectedQuestions = data.categories
         .map(category => AllQuestions[category as QuestionCategories]) // Mappa le categorie alle domande
         .flat(); // Appiattisce l'array
 
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
       socket.emit(c.RETURN_NEWGAME, { newGame })
@@ -120,13 +121,21 @@ export function setupSocket(io: any) {
           return;
         }
 
+        // Controlla se il giocatore esiste già
         if (Object.keys(game.players).includes(data.playerName)) {
           console.log(`Player with name ${data.playerName} already exists in lobby ${data.lobbyCode}`);
           socket.emit(c.PLAYER_CAN_JOIN, { canJoin: false, lobbyCode: code, playerName: data.playerName });
           return;
         }
 
+        // Se la lobby non ha un admin, assegna il primo giocatore come admin
+        if (!game.admin) {
+          game.admin = data.playerName;
+          console.log(`New admin is ${data.playerName} for lobby ${data.lobbyCode}`);
+        }
+
         console.log(`${data.playerName} just joined the lobby ${data.lobbyCode}`);
+
         game.addPlayer(data.playerName, socket.id, data.image);
         socket.join(code);
         socket.emit(c.PLAYER_CAN_JOIN, { canJoin: true, lobbyCode: code, playerName: data.playerName });
@@ -236,16 +245,39 @@ export function setupSocket(io: any) {
       socket.leave(data.lobbyCode);
     })
 
-    socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
-      console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby}`);
+    socket.on(c.REMOVE_PLAYER, (data: { playerName: string, currentLobby: string }) => {
       const thisGame = actualGameManager.getGame(data.currentLobby);
+      thisGame.removePlayer(data.playerName);
+      io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+    })
+
+    socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
+
       if (!thisGame) {
         socket.emit(c.FORCE_RESET);
         return;
       }
+
+      // Rimuovo il giocatore dalla lobby
       thisGame.removePlayer(data.currentPlayer);
+
+      // Se l'admin lascia la lobby, assegno il ruolo a un altro giocatore
+      // Se non ci sono giocatori, non c'è nessun admin
+      if (data.currentPlayer === thisGame.admin) {
+        const remainingPlayers = Object.keys(thisGame.players);
+
+        if (remainingPlayers.length > 0) {
+          // Imposto il primo giocatore come nuovo admin
+          thisGame.admin = remainingPlayers[0];
+          console.log(`New admin for lobby ${data.currentLobby} is ${thisGame.admin}`);
+        } else {
+          thisGame.admin = '';
+        }
+      }
+
       const lobbies = actualGameManager.listGames();
-      console.log(thisGame.players);
       socket.leave(data.currentLobby);
       io.emit(c.RENDER_LOBBIES, { lobbies });
       io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);

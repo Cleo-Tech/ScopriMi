@@ -21,13 +21,15 @@ export class Game {
   public iterator: Iterator<string>;
   // Creation time of the lobby
   public creationTime: number;
+  // Admin of the lobby (can start the game / remove a player from the lobby)
+  public admin: string;
 
   /**
    * Creates an instance of the game.
    * @param lobbyCode - Unique code for the lobby
    * @param numQuestions - Number of questions for the game
    */
-  constructor(lobbyCode: string, numQuestions: number) {
+  constructor(lobbyCode: string, numQuestions: number, admin: string) {
     this.lobbyCode = lobbyCode;
     this.isGameStarted = false;
     this.players = {};
@@ -37,6 +39,7 @@ export class Game {
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
+    this.admin = admin;
   }
 
   /**
