@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/socketConsts.js';
-import { useSwipeable } from 'react-swipeable'; // Importa il gestore dello swipe
+import { useSwipeable } from 'react-swipeable';
 
 interface NewGameModalProps {
   isOpen: boolean;

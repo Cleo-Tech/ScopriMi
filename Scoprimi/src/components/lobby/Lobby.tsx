@@ -7,6 +7,7 @@ import LobbyList from '../common/LobbyList.tsx';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
+import { useSwipeable } from 'react-swipeable';
 
 function handleToggleisReadyToGame(data: { lobbyCode: string, playerName: string }) {
   console.log('handleLobbycode ', data.lobbyCode);
@@ -20,6 +21,8 @@ const Lobby: React.FC = () => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [showDeleteBtn, setShowDeleteBtn] = useState<boolean>(false);
+  //const [showDeleteBtn, setShowDeleteBtn] = useState<{ [playerName: string]: boolean }>({});
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
@@ -55,7 +58,6 @@ const Lobby: React.FC = () => {
       navigate('/game');
     });
 
-
     return () => {
       socket.off(c.INIZIA);
     };
@@ -66,6 +68,19 @@ const Lobby: React.FC = () => {
     setCurrentLobby(undefined);
     navigate('/');
   };
+
+  const swipeHandler = useSwipeable({
+    onSwipedLeft: () => {
+      setShowDeleteBtn(true);
+    },
+
+    onSwipedRight: () => {
+      setShowDeleteBtn(false);
+    },
+
+    delta: 5, // Minima distanza di swipe per attivare l'evento
+    trackMouse: true, // Facoltativo: attiva il test anche per il mouse
+  });
 
   const handleCancelLeave = () => {
     setShowModal(false);
@@ -133,7 +148,11 @@ const Lobby: React.FC = () => {
         <div className="elegant-background mt-3 scrollable fill">
           <div className="players-list">
             {Object.values(game.players).map((player) => (
-              <div className="player-item" key={player.name}>
+              <div
+                {...(game.admin === currentPlayer ? swipeHandler : {})}
+                className="player-item"
+                key={player.name}
+              >
                 <div className="player-image">
                   <img
                     src={player.image || 'default-image-url'}
@@ -150,7 +169,7 @@ const Lobby: React.FC = () => {
                     {player.isReadyToGame ? 'Pronto' : 'Non pronto'}
                   </span>
                   {/* Mostra il pulsante di rimozione solo se l'utente è admin e non per se stesso */}
-                  {currentPlayer === game.admin && player.name !== currentPlayer && (
+                  {showDeleteBtn && (
                     <button
                       className="my-btn my-bg-error"
                       onClick={() => handleRemovePlayer(player.name)}
@@ -162,6 +181,7 @@ const Lobby: React.FC = () => {
                 </div>
               </div>
             ))}
+
           </div>
         </div>
 
