@@ -25,6 +25,8 @@ const Lobby: React.FC = () => {
   const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
   const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
+  // ATTENZIONE
+  // Non modificare chiedere a PESTO se proprio
   useEffect(() => {
     const handleVisibilityChange = () => {
       setlog(log + '------------------\n');
