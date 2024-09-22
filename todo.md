@@ -5,8 +5,9 @@ Estimated time: 1.5-2 months.
 Features:
 
 - [ ] Lobby manager **Fede**
-  - [ ] Gesture per kick di una persona da una partita
-  - [ ] Start della partita
+  - [x] Gesture per kick di una persona da una partita
+  - [ ] Migliorare grafica stile WhatsApp (gesture)
+  - [ ] Start della partita (?)
 </br>
 
 - [ ] Suddividere domande in categorie
