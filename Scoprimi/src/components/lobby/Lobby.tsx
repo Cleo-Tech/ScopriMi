@@ -7,12 +7,7 @@ import LobbyList from '../common/LobbyList.tsx';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
-import { useSwipeable } from 'react-swipeable';
-
-function handleToggleisReadyToGame(data: { lobbyCode: string, playerName: string }) {
-  console.log('handleLobbycode ', data.lobbyCode);
-  socket.emit(c.TOGGLE_IS_READY_TO_GAME, data);
-}
+import Player from './Player.tsx'; // Import del nuovo componente Player
 
 const Lobby: React.FC = () => {
 
@@ -22,7 +17,6 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showDeleteBtn, setShowDeleteBtn] = useState<boolean>(false);
-  //const [showDeleteBtn, setShowDeleteBtn] = useState<{ [playerName: string]: boolean }>({});
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
@@ -48,9 +42,7 @@ const Lobby: React.FC = () => {
 
     socket.on(c.INIZIA, () => {
       setGame((prevGame) => {
-        if (!prevGame) { return undefined; } // Check if prevGame is undefined
-
-        // Return the full previous game state with the updated property
+        if (!prevGame) { return undefined; }
         return Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame, {
           isGameStarted: true,
         });
@@ -69,40 +61,21 @@ const Lobby: React.FC = () => {
     navigate('/');
   };
 
-  const swipeHandler = useSwipeable({
-    onSwipedLeft: () => {
-      setShowDeleteBtn(true);
-    },
-
-    onSwipedRight: () => {
-      setShowDeleteBtn(false);
-    },
-
-    delta: 5, // Minima distanza di swipe per attivare l'evento
-    trackMouse: true, // Facoltativo: attiva il test anche per il mouse
-  });
-
-  const handleCancelLeave = () => {
-    setShowModal(false);
-  };
-
   const toggleReady = () => {
     const newReadyState = !isReady;
     setIsReady(newReadyState);
-    handleToggleisReadyToGame({ lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(c.TOGGLE_IS_READY_TO_GAME, { lobbyCode: currentLobby, playerName: currentPlayer });
   };
 
   const handleRemovePlayer = (playerName: string) => {
-    // TODO Remove player
     console.log('Admin is removing the player:', playerName);
     socket.emit(c.REMOVE_PLAYER, { playerName, currentLobby });
     console.log('Io sono il giocatore: ', currentPlayer);
   };
 
-  // TODO load page
-  if (!game) {
-    return <div>Loading...</div>;
-  }
+  const handleCancelLeave = () => {
+    setShowModal(false);
+  };
 
   async function handleShareLobby(lobbyCode: string) {
     const shareableLink = `${window.location.origin}/join/${lobbyCode}`;
@@ -129,6 +102,10 @@ const Lobby: React.FC = () => {
     }
   }
 
+  if (!game) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <Alert text='Link copiato negli appunti' show={showAlert} onHide={() => setShowAlert(false)} />
@@ -146,43 +123,18 @@ const Lobby: React.FC = () => {
         </div>
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
-          <div className="players-list">
-            {Object.values(game.players).map((player) => (
-              <div
-                {...(game.admin === currentPlayer ? swipeHandler : {})}
-                className="player-item"
-                key={player.name}
-              >
-                <div className="player-image">
-                  <img
-                    src={player.image || 'default-image-url'}
-                    alt={player.name}
-                    className="player-img"
-                  />
-                </div>
-                <div className="player-name">
-                  {player.name}
-                  {player.name === game.admin && ' 🔑'} {/* Aggiungi la chiave se il player è l'admin */}
-                </div>
-                <div className="player-status">
-                  <span className={`status-pill ${player.isReadyToGame ? 'my-bg-success' : 'my-bg-error'}`}>
-                    {player.isReadyToGame ? 'Pronto' : 'Non pronto'}
-                  </span>
-                  {/* Mostra il pulsante di rimozione solo se l'utente è admin e non per se stesso */}
-                  {showDeleteBtn && (
-                    <button
-                      className="my-btn my-bg-error"
-                      onClick={() => handleRemovePlayer(player.name)}
-                      style={{ marginLeft: '10px' }}
-                    >
-                      🗑️
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-
-          </div>
+          {Object.values(game.players).map((player) => (
+            <Player
+              key={player.name}
+              name={player.name}
+              image={player.image}
+              isReadyToGame={player.isReadyToGame}
+              isAdmin={game.admin === player.name}
+              currentPlayer={currentPlayer}
+              showDeleteBtn={showDeleteBtn}
+              onRemove={handleRemovePlayer}
+            />
+          ))}
         </div>
 
         <div className='lobby-button-group mt-3'>
@@ -198,7 +150,7 @@ const Lobby: React.FC = () => {
             {isReady ? 'Non pronto' : 'Pronto'}
           </button>
         </div>
-        {/* // Modal for confirm exit lobby */}
+        {/* Modal per confermare l'uscita dalla lobby */}
         <Modal
           show={showModal}
           onConfirm={handleConfirmLeave}
@@ -207,7 +159,6 @@ const Lobby: React.FC = () => {
       </div>
     </>
   );
-
 };
 
 export default Lobby;
