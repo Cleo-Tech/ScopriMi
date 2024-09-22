@@ -36,7 +36,7 @@ const Lobby: React.FC = () => {
         // Ritarda l'emissione di 2 secondi
         const timer = setTimeout(() => {
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-        }, 2000);
+        }, 20000);
 
         // Pulizia del timer se la pagina diventa non visibile prima del timeout
         return () => clearTimeout(timer);
