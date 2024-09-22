@@ -19,7 +19,9 @@ const FinalResults: React.FC = () => {
 
   const podium = sortedResults.slice(0, 3);
   // Scambia le posizioni 0 e 1
-  [podium[0], podium[1]] = [podium[1], podium[0]];
+  if (podium.length > 1) {
+    [podium[0], podium[1]] = [podium[1], podium[0]];
+  }
   const otherPlayers = sortedResults.slice(3);
 
   return (

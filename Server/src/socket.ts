@@ -159,9 +159,11 @@ export function setupSocket(io: any) {
       }
       thisGame.toggleIsReadyToGame(data.playerName);
       io.to(data.lobbyCode).emit(c.RENDER_LOBBY, thisGame);
-      if (!thisGame.isAllPlayersReadyToGame()) {
+      if (!thisGame.isAllPlayersReadyToGame() ||
+        process.env.NODE_ENV === 'production' && Object.keys(thisGame.players).length < 2) {
         return;
       }
+
       thisGame.isGameStarted = true;
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
