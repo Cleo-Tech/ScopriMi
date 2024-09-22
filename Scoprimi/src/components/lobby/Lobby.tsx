@@ -16,22 +16,36 @@ function handleToggleisReadyToGame(data: { lobbyCode: string, playerName: string
 const Lobby: React.FC = () => {
 
   const [game, setGame] = useState<Game | undefined>(undefined);
-  const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
+  const { currentLobby, currentPlayer, setCurrentLobby, currentPlayerImage } = useSession();
   const [isReady, setIsReady] = useState<boolean>(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
   useEffect(() => {
-    socket.on(c.PLAYER_CAN_JOIN, (data) => {
-      if (data.canJoin) {
-        console.log('ti sei riconnesso scemo');
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('VISIBILE');
+        const data = {
+          lobbyCode: currentLobby,
+          playerName: currentPlayer,
+          image: currentPlayerImage,
+        };
+        // Viene gestito dal server se gia presente.
+        socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
       } else {
-        console.log('effettivamente non potevi entrrate');
-
+        console.log('Pagina non è più visibile');
       }
-    });
-  }, [navigate, setCurrentLobby]);
+    };
+
+    // Ascolta i cambiamenti di visibilità
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Pulizia dell'event listener al momento dello smontaggio
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentLobby, currentPlayer, currentPlayerImage]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
