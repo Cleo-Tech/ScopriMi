@@ -33,8 +33,16 @@ const Lobby: React.FC = () => {
     socket.on(c.RENDER_LOBBY, (data: Game) => {
       console.log(data);
       setGame(data);
+
+      if (data.players[currentPlayer] === undefined || data.players[currentPlayer] === null) {
+        console.log('Devo uscire dalla lobby');
+        navigate('/');
+        return;
+      }
+
       setIsReady(data.players[currentPlayer].isReadyToGame);
     });
+
     socket.on(c.INIZIA, () => {
       setGame((prevGame) => {
         if (!prevGame) { return undefined; } // Check if prevGame is undefined
@@ -67,6 +75,13 @@ const Lobby: React.FC = () => {
     const newReadyState = !isReady;
     setIsReady(newReadyState);
     handleToggleisReadyToGame({ lobbyCode: currentLobby, playerName: currentPlayer });
+  };
+
+  const handleRemovePlayer = (playerName: string) => {
+    // TODO Remove player
+    console.log('Admin is removing the player:', playerName);
+    socket.emit(c.REMOVE_PLAYER, { playerName, currentLobby });
+    console.log('Io sono il giocatore: ', currentPlayer);
   };
 
   // TODO load page
@@ -134,6 +149,16 @@ const Lobby: React.FC = () => {
                   <span className={`status-pill ${player.isReadyToGame ? 'my-bg-success' : 'my-bg-error'}`}>
                     {player.isReadyToGame ? 'Pronto' : 'Non pronto'}
                   </span>
+                  {/* Mostra il pulsante di rimozione solo se l'utente è admin e non per se stesso */}
+                  {currentPlayer === game.admin && player.name !== currentPlayer && (
+                    <button
+                      className="my-btn my-bg-error"
+                      onClick={() => handleRemovePlayer(player.name)}
+                      style={{ marginLeft: '10px' }}
+                    >
+                      🗑️
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

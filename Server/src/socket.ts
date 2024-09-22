@@ -237,6 +237,12 @@ export function setupSocket(io: any) {
       socket.leave(data.lobbyCode);
     })
 
+    socket.on(c.REMOVE_PLAYER, (data: { playerName: string, currentLobby: string }) => {
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      thisGame.removePlayer(data.playerName);
+      io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+    })
+
     socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
       const thisGame = actualGameManager.getGame(data.currentLobby);
       console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
