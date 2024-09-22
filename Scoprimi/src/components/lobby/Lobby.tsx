@@ -21,11 +21,12 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [log, setlog] = useState<string>();
+  const [log, setlog] = useState<string>('');
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       setlog(log + '------------------\n');
+      setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
       if (!document.hidden) {
         setlog(log + 'VISIBLE\n');
 
@@ -39,6 +40,7 @@ const Lobby: React.FC = () => {
 
         // Ritarda l'emissione di 2 secondi
         const timer = setTimeout(() => {
+          setlog(log + 'sto per lanciare evento\n');
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
         }, 20000);
 
