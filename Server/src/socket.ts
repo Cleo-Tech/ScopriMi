@@ -59,7 +59,7 @@ function mydisconnet(socket, io) {
       // }
 
       // TODO fix veloce per quando un player si disconnette
-      if (game.didAllPlayersVote()) {
+      if (game.isGameStarted && game.didAllPlayersVote()) {
         const players = game.players;
         const voteRecap = game.getWhatPlayersVoted();
         const playerImages = game.getImages();
@@ -115,7 +115,7 @@ export function setupSocket(io: any) {
         const game = actualGameManager.getGame(code);
 
         if (!game) {
-          console.log('non esiste questa lobby');
+          console.error('non esiste questa lobby');
           socket.emit(c.FORCE_RESET);
           return;
         }
@@ -126,7 +126,7 @@ export function setupSocket(io: any) {
           return;
         }
 
-        console.log(`${data.playerName} just joined the lobby`);
+        console.log(`${data.playerName} just joined the lobby ${data.lobbyCode}`);
         game.addPlayer(data.playerName, socket.id, data.image);
         socket.join(code);
         socket.emit(c.PLAYER_CAN_JOIN, { canJoin: true, lobbyCode: code, playerName: data.playerName });
