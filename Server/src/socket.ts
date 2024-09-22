@@ -1,7 +1,7 @@
 import * as c from './socketConsts.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
-import { AllQuestions } from './API/questions.js';
+import { AllQuestions, QuestionCategories } from './API/questions.js';
 
 export const actualGameManager = new GameManager();
 
@@ -32,7 +32,7 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function mydisconnet(socket, io) {
+function mydisconnect(socket, io) {
   console.log('Client disconnected:', socket.id);
 
   for (const lobbyCode of actualGameManager.listLobbiesCode()) {
@@ -59,7 +59,7 @@ function mydisconnet(socket, io) {
       // }
 
       // TODO fix veloce per quando un player si disconnette
-      if (game.didAllPlayersVote()) {
+      if (game.isGameStarted && game.didAllPlayersVote()) {
         const players = game.players;
         const voteRecap = game.getWhatPlayersVoted();
         const playerImages = game.getImages();
@@ -82,9 +82,9 @@ export function setupSocket(io: any) {
     // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
     setInterval(() => checkLobbiesAge(io), 10 * 1000);
 
-    socket.on('mydisconnet', () => mydisconnet(socket, io));
+    socket.on('mydisconnet', () => mydisconnect(socket, io));
 
-    socket.on(c.DISCONNECT, () => mydisconnet(socket, io));
+    socket.on(c.DISCONNECT, () => mydisconnect(socket, io));
 
     socket.on(c.TEST_LOBBY, (data: { lobbyCode: string }, callback: (arg0: boolean) => void) => {
       const game = actualGameManager.getGame(data.lobbyCode);
@@ -94,10 +94,17 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    socket.on(c.CREATE_LOBBY, ([code, numQuestionsParam, admin]: [string, number, string]) => {
+    // TODO check params on react
+    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', code, ' - ', numQuestionsParam, ' - ', admin);
       const newGame = actualGameManager.createGame(code, numQuestionsParam, admin);
-      actualGameManager.getGame(code).selectedQuestions = shuffle(AllQuestions).slice(0, numQuestionsParam);
+
+      const allSelectedQuestions = data.categories
+        .map(category => AllQuestions[category as QuestionCategories]) // Mappa le categorie alle domande
+        .flat(); // Appiattisce l'array
+
+      actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
       socket.emit(c.RETURN_NEWGAME, { newGame })
@@ -109,7 +116,7 @@ export function setupSocket(io: any) {
         const game = actualGameManager.getGame(code);
 
         if (!game) {
-          console.log('non esiste questa lobby');
+          console.error('non esiste questa lobby');
           socket.emit(c.FORCE_RESET);
           return;
         }
@@ -127,7 +134,8 @@ export function setupSocket(io: any) {
           console.log(`New admin is ${data.playerName} for lobby ${data.lobbyCode}`);
         }
 
-        console.log(`${data.playerName} just joined the lobby`);
+        console.log(`${data.playerName} just joined the lobby ${data.lobbyCode}`);
+
         game.addPlayer(data.playerName, socket.id, data.image);
         socket.join(code);
         socket.emit(c.PLAYER_CAN_JOIN, { canJoin: true, lobbyCode: code, playerName: data.playerName });

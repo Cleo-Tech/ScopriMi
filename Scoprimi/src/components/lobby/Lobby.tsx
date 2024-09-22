@@ -12,11 +12,52 @@ import Player from './Player.tsx'; // Import del nuovo componente Player
 const Lobby: React.FC = () => {
 
   const [game, setGame] = useState<Game | undefined>(undefined);
-  const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
+  const { currentLobby, currentPlayer, setCurrentLobby, currentPlayerImage } = useSession();
   const [isReady, setIsReady] = useState<boolean>(false);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [log, setlog] = useState<string>('');
+  const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
+  const [loading, setLoading] = useState(false); // stato per gestire il caricamento
+
+  // ATTENZIONE
+  // Non modificare chiedere a PESTO se proprio
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setlog(log + '------------------\n');
+      setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
+      setIsPageVisible(!document.hidden);
+      if (!document.hidden) {
+        setIsPageVisible(!document.hidden);
+        const data = {
+          lobbyCode: currentLobby,
+          playerName: currentPlayer,
+          image: currentPlayerImage,
+        };
+        setlog(log + Object.values(data) + '\n');
+
+
+        setLoading(true); // mostra la rotella di caricamento
+        const timer = setTimeout(() => {
+          socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+          setlog(log + 'sto per lanciare evento\n');
+          setLoading(false);
+        }, 5000);
+
+        // Pulizia del timer se la pagina diventa non visibile prima del timeout
+        return () => clearTimeout(timer);
+      }
+    };
+
+    // Ascolta i cambiamenti di visibilità
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Pulizia dell'event listener al momento dello smontaggio
+    return () => {
+      // document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible, log]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
@@ -107,6 +148,10 @@ const Lobby: React.FC = () => {
 
   return (
     <>
+      {/* {(log && <p style={{ whiteSpace: 'pre-wrap' }}>{log}</p>)} */}
+      {loading && (
+        <div className="loader"></div>
+      )}
       <Alert text='Link copiato negli appunti' show={showAlert} onHide={() => setShowAlert(false)} />
       <button
         className='my-btn-login elegant-background'

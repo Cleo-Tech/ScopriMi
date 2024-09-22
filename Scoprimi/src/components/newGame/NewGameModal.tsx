@@ -51,7 +51,9 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
 
   const handleCreateGame = () => {
     const code = generateLobbyCode();
-    socket.emit(c.CREATE_LOBBY, [code, numQuestions, playerName]);
+
+    // TODO, crea interfaccia per questo
+    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: ['adult', 'generic'] });
 
     // Entrare nella lobby automaticamente
     socket.on(c.RETURN_NEWGAME, () => {
@@ -63,7 +65,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       console.log('Player creatore della lobby: ', data);
       socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
     });
-
+      
     onClose();
   };
 
