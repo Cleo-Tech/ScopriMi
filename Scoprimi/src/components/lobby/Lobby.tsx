@@ -21,17 +21,21 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [log, setlog] = useState<string>();
 
   useEffect(() => {
     const handleVisibilityChange = () => {
+      setlog(log + '------------------\n');
       if (!document.hidden) {
-        console.log('VISIBILE');
+        setlog(log + 'VISIBLE\n');
+
 
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
+        setlog(log + Object.values(data) + '\n');
 
         // Ritarda l'emissione di 2 secondi
         const timer = setTimeout(() => {
@@ -50,7 +54,7 @@ const Lobby: React.FC = () => {
     return () => {
       // document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [currentLobby, currentPlayer, currentPlayerImage]);
+  }, [currentLobby, currentPlayer, currentPlayerImage, log]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
@@ -131,6 +135,7 @@ const Lobby: React.FC = () => {
 
   return (
     <>
+      {(log && <p style={{ whiteSpace: 'pre-wrap' }}>{log}</p>)}
       <Alert text='Link copiato negli appunti' show={showAlert} onHide={() => setShowAlert(false)} />
       <button
         className='my-btn-login elegant-background'
