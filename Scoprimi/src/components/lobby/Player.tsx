@@ -25,6 +25,7 @@ const Player: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin, curr
     },
     delta: 5,
     trackMouse: true,
+    preventScrollOnSwipe: true,
   });
 
   return (
