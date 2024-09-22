@@ -32,7 +32,7 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function mydisconnet(socket, io) {
+function mydisconnect(socket, io) {
   console.log('Client disconnected:', socket.id);
 
   for (const lobbyCode of actualGameManager.listLobbiesCode()) {
@@ -82,9 +82,9 @@ export function setupSocket(io: any) {
     // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
     setInterval(() => checkLobbiesAge(io), 10 * 1000);
 
-    socket.on('mydisconnet', () => mydisconnet(socket, io));
+    socket.on('mydisconnet', () => mydisconnect(socket, io));
 
-    socket.on(c.DISCONNECT, () => mydisconnet(socket, io));
+    socket.on(c.DISCONNECT, () => mydisconnect(socket, io));
 
     socket.on(c.TEST_LOBBY, (data: { lobbyCode: string }, callback: (arg0: boolean) => void) => {
       const game = actualGameManager.getGame(data.lobbyCode);
