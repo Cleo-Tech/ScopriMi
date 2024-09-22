@@ -21,14 +21,14 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  // const [log, setlog] = useState<string>('');
+  const [log, setlog] = useState<string>('');
   const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
   const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      // setlog(log + '------------------\n');
-      // setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
+      setlog(log + '------------------\n');
+      setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
       setIsPageVisible(!document.hidden);
       if (!document.hidden) {
         setIsPageVisible(!document.hidden);
@@ -37,13 +37,13 @@ const Lobby: React.FC = () => {
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
-        // setlog(log + Object.values(data) + '\n');
+        setlog(log + Object.values(data) + '\n');
 
-        // Ritarda l'emissione di 3 secondi
+
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-          // setlog(log + 'sto per lanciare evento\n');
+          setlog(log + 'sto per lanciare evento\n');
           setLoading(false);
         }, 5000);
 
@@ -59,7 +59,7 @@ const Lobby: React.FC = () => {
     return () => {
       // document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible]);
+  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible, log]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
