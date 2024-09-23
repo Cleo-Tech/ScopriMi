@@ -32,6 +32,38 @@ function checkLobbiesAge(io: any) {
   });
 }
 
+function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
+  const thisGame = actualGameManager.getGame(data.currentLobby);
+  console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
+
+  if (!thisGame) {
+    socket.emit(c.FORCE_RESET);
+    return;
+  }
+
+  // Rimuovo il giocatore dalla lobby
+  thisGame.removePlayer(data.currentPlayer);
+
+  // Se l'admin lascia la lobby, assegno il ruolo a un altro giocatore
+  // Se non ci sono giocatori, non c'è nessun admin
+  if (data.currentPlayer === thisGame.admin) {
+    const remainingPlayers = Object.keys(thisGame.players);
+
+    if (remainingPlayers.length > 0) {
+      // Imposto il primo giocatore come nuovo admin
+      thisGame.admin = remainingPlayers[0];
+      console.log(`New admin for lobby ${data.currentLobby} is ${thisGame.admin}`);
+    } else {
+      thisGame.admin = '';
+    }
+  }
+
+  const lobbies = actualGameManager.listGames();
+  socket.leave(data.currentLobby);
+  io.emit(c.RENDER_LOBBIES, { lobbies });
+  io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+}
+
 function mydisconnect(socket, io) {
   console.log('Client disconnected:', socket.id);
 
@@ -44,10 +76,13 @@ function mydisconnect(socket, io) {
     const playerName = Object.keys(game.players).find(name => game.players[name].socketId === socket.id);
 
     if (playerName) {
-      console.log(`Removing ${playerName} from lobby ${lobbyCode}`);
-      game.removePlayer(playerName);
-      io.to(lobbyCode).emit(c.RENDER_LOBBY, game);
-      socket.leave(lobbyCode);
+
+      const data = {
+        currentPlayer: playerName,
+        currentLobby: lobbyCode,
+      };
+
+      myExitLobby(socket, io, data);
 
       // // Se la lobby è vuota, la elimino
       // if (game.players.length === 0) {
@@ -64,7 +99,6 @@ function mydisconnect(socket, io) {
         const voteRecap = game.getWhatPlayersVoted();
         const playerImages = game.getImages();
         const mostVotedPerson = game.getMostVotedPerson();
-        // ho un dubbio
         game.resetWhatPlayersVoted();
         io.to(lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
@@ -254,35 +288,7 @@ export function setupSocket(io: any) {
     })
 
     socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
-      const thisGame = actualGameManager.getGame(data.currentLobby);
-      console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
-
-      if (!thisGame) {
-        socket.emit(c.FORCE_RESET);
-        return;
-      }
-
-      // Rimuovo il giocatore dalla lobby
-      thisGame.removePlayer(data.currentPlayer);
-
-      // Se l'admin lascia la lobby, assegno il ruolo a un altro giocatore
-      // Se non ci sono giocatori, non c'è nessun admin
-      if (data.currentPlayer === thisGame.admin) {
-        const remainingPlayers = Object.keys(thisGame.players);
-
-        if (remainingPlayers.length > 0) {
-          // Imposto il primo giocatore come nuovo admin
-          thisGame.admin = remainingPlayers[0];
-          console.log(`New admin for lobby ${data.currentLobby} is ${thisGame.admin}`);
-        } else {
-          thisGame.admin = '';
-        }
-      }
-
-      const lobbies = actualGameManager.listGames();
-      socket.leave(data.currentLobby);
-      io.emit(c.RENDER_LOBBIES, { lobbies });
-      io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+      myExitLobby(socket, io, data);
     });
 
   });
