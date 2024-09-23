@@ -17,14 +17,9 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  // const [log, setlog] = useState<string>('');
-  // const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
   const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
-  // ATTENZIONE
-  // Non modificare chiedere a PESTO se proprio
   useEffect(() => {
-    console.log('pussy');
     const handleVisibilityChange = () => {
       console.log('dentro alla funzione');
       if (!document.hidden) {
@@ -38,7 +33,6 @@ const Lobby: React.FC = () => {
 
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
-          console.log('lancio la funzione');
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
           setLoading(false);
         }, 5000);
@@ -53,7 +47,6 @@ const Lobby: React.FC = () => {
 
     // Pulizia dell'event listener al momento dello smontaggio
     return () => {
-      console.log('tolgo listern');
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [currentLobby, currentPlayer, currentPlayerImage]);
@@ -183,13 +176,17 @@ const Lobby: React.FC = () => {
         <div className='lobby-button-group mt-3'>
           <button
             onClick={() => setShowModal(true)}
-            className="my-btn my-bg-elegant-backgorund">
+            className="my-btn my-bg-elegant-backgorund"
+            disabled={loading}
+          >
             Indietro
           </button>
           <button
             id="toggleisReadyToGame"
             className={`my-btn ${isReady ? 'my-bg-error' : 'my-bg-success'}`}
-            onClick={() => toggleReady()}>
+            onClick={() => toggleReady()}
+            disabled={loading}
+          >
             {isReady ? 'Non pronto' : 'Pronto'}
           </button>
         </div>
