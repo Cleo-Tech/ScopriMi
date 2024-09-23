@@ -17,7 +17,7 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [log, setlog] = useState<string>('');
+  // const [log, setlog] = useState<string>('');
   const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
   const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
@@ -25,23 +25,23 @@ const Lobby: React.FC = () => {
   // Non modificare chiedere a PESTO se proprio
   useEffect(() => {
     const handleVisibilityChange = () => {
-      setlog(log + '------------------\n');
-      setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
+      // setlog(log + '------------------\n');
+      // setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
       setIsPageVisible(!document.hidden);
-      if (!document.hidden) {
-        setIsPageVisible(!document.hidden);
+      if (isPageVisible) {
+
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
-        setlog(log + Object.values(data) + '\n');
+        // setlog(log + Object.values(data) + '\n');
 
 
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-          setlog(log + 'sto per lanciare evento\n');
+          // setlog(log + 'sto per lanciare evento\n');
           setLoading(false);
         }, 5000);
 
@@ -55,9 +55,9 @@ const Lobby: React.FC = () => {
 
     // Pulizia dell'event listener al momento dello smontaggio
     return () => {
-      // document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible, log]);
+  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible]);
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
