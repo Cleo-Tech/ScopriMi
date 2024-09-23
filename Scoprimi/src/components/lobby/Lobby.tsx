@@ -18,30 +18,28 @@ const Lobby: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   // const [log, setlog] = useState<string>('');
-  const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
+  // const [isPageVisible, setIsPageVisible] = useState(!document.hidden);
   const [loading, setLoading] = useState(false); // stato per gestire il caricamento
 
   // ATTENZIONE
   // Non modificare chiedere a PESTO se proprio
   useEffect(() => {
+    console.log('pussy');
     const handleVisibilityChange = () => {
-      // setlog(log + '------------------\n');
-      // setlog(log + `DOCUMENT.hidden: ${document.hidden}\n`);
-      setIsPageVisible(!document.hidden);
-      if (isPageVisible) {
+      console.log('dentro alla funzione');
+      if (!document.hidden) {
 
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
           image: currentPlayerImage,
         };
-        // setlog(log + Object.values(data) + '\n');
 
 
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
+          console.log('lancio la funzione');
           socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
-          // setlog(log + 'sto per lanciare evento\n');
           setLoading(false);
         }, 5000);
 
@@ -55,9 +53,11 @@ const Lobby: React.FC = () => {
 
     // Pulizia dell'event listener al momento dello smontaggio
     return () => {
+      console.log('tolgo listern');
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [currentLobby, currentPlayer, currentPlayerImage, isPageVisible]);
+  }, [currentLobby, currentPlayer, currentPlayerImage]);
+
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
