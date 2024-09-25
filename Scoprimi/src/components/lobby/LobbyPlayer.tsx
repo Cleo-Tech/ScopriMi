@@ -13,10 +13,13 @@ const LobbyPlayer: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin,
   const [startX, setStartX] = useState<number | null>(null);
   const [currentX, setCurrentX] = useState<number | null>(null);
   const [showDeleteBtn, setShowDeleteBtn] = useState(false);
+  const [transitionEnabled, setTransitionEnabled] = useState(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setStartX(e.touches[0].clientX);
     setCurrentX(e.touches[0].clientX);
+    // Durante il drag spengo la transition
+    setTransitionEnabled(false);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -35,6 +38,8 @@ const LobbyPlayer: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin,
         setShowDeleteBtn(false);
       }
     }
+    // finito il drag la abilito
+    setTransitionEnabled(true);
     setStartX(null);
     setCurrentX(null);
   };
@@ -47,14 +52,14 @@ const LobbyPlayer: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin,
 
   return (
     <div
-      className={`player-item swipeable`}
+      className={'player-item swipeable'}
       key={name}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       style={{
         transform: `translateX(${translateX}px)`,
-        transition: 'transform 0.3s ease',
+        transition: transitionEnabled ? 'transform 0.3s ease' : 'none', // Applica la transition al rilascio, non durante il drag
       }}
     >
       <div className="player-image">
