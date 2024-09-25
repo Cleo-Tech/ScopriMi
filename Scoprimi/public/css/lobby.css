@@ -1,5 +1,3 @@
-/* Solo per le righe di lobby */
-
 .players-list {
   display: flex;
   flex-direction: column;
@@ -10,11 +8,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /*background-color: #787878;
-  border-radius: 2vw;
-  box-shadow: 0 0.8vw 1.2vw rgba(0, 0, 0, 0.1);*/
+  position: relative;
+  /* Permette al pulsante Delete di posizionarsi assolutamente */
+  padding: 10px;
+  /* Padding per l'intero elemento */
+  border-radius: 10px;
+  /* Bordo arrotondato */
   color: #fff;
   text-align: left;
+  transition: transform 0.3s ease;
+  /* Transizione fluida per il movimento */
 }
 
 /* Div dell'immagine */
@@ -59,4 +62,105 @@
 
 .lobby-button-group button {
   width: 47%;
+}
+
+.swipeable {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 10px;
+  vertical-align: bottom;
+  backface-visibility: hidden;
+}
+
+.swipeable:last-child {
+  margin: 0;
+}
+
+.swipeable .inner {
+  position: relative;
+  z-index: 2;
+  backface-visibility: hidden;
+  padding: 5px 24px 5px 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+  font-size: 12px;
+  color: #555;
+}
+
+.swipeable .inner:active {
+  cursor: grabbing;
+}
+
+/* Stile per il pulsante Delete */
+.action-button.delete {
+  position: absolute;
+  /* Posizionamento assoluto */
+  right: 0;
+  /* Posiziona il pulsante a destra */
+  top: 0;
+  /* Allinea in alto */
+  bottom: 0;
+  /* Estende fino in basso */
+  width: 50px;
+  /* Larghezza iniziale minima */
+  display: flex;
+  /* Usa flexbox per centrare il contenuto */
+  align-items: center;
+  /* Centra verticalmente il contenuto */
+  justify-content: center;
+  /* Centra orizzontalmente il contenuto */
+  background: rgb(214, 77, 77);
+  /* Colore di sfondo del pulsante */
+  color: white;
+  /* Colore del testo */
+  transition: width 0.3s ease, opacity 0.3s ease;
+  /* Transizioni per larghezza e opacità */
+  overflow: hidden;
+  /* Evita che il testo trabocchi */
+}
+
+.action-button.delete .text {
+  font-size: 12px;
+  /* Dimensione del testo */
+  white-space: nowrap;
+  /* Evita la rottura del testo */
+}
+
+/* Quando il pulsante Delete viene mostrato */
+.swipeable .action-button.delete {
+  right: 0;
+  /* Fissa il pulsante a destra */
+}
+
+.swipeable .tab-icon,
+.swipeable .tab-icon:before,
+.swipeable .tab-icon:after {
+  background: #666;
+  /* Colore della tab-icon */
+}
+
+.swipeable .tab-icon {
+  position: absolute;
+  top: 50%;
+  right: calc(24px / 2 - 1px);
+  margin-top: -1px;
+  margin-right: 1px;
+  width: 2px;
+  height: 2px;
+}
+
+.swipeable .tab-icon:before,
+.swipeable .tab-icon:after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+.swipeable .tab-icon:before {
+  top: -4px;
+}
+
+.swipeable .tab-icon:after {
+  top: 4px;
 }
