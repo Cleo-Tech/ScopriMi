@@ -63,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ onButtonClick }) => {
         <label className='my-label'>Username</label>
       </div>
       {/* Secondo blocco */}
-      <div className="elegant-background image-container mt-3 fill">
+      <div className="elegant-background mt-3 fill">
         <div className="image-row">
           {images.map((image, index) => (
             <div key={index} className="image-column">

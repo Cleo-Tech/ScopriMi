@@ -148,7 +148,7 @@ const Game: React.FC = () => {
       </div>
 
       {!gameOver && (
-        <div className='elegant-background image-container fill scrollable'>
+        <div className='elegant-background fill scrollable'>
           {showResults ? (
             <>
               <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} />
