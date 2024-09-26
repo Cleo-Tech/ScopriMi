@@ -29,12 +29,8 @@ const Game: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Emetti l'evento e fai la transizione solo al montaggio del componente
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
-    transitionTo(GameStates.NEXTQUESTION);
-    // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
-    transitionTo(GameStates.GENERICQUESTION);
-  }, [currentLobby, currentPlayer, transitionTo]);
+  }, []);
 
 
   useEffect(() => {
@@ -58,6 +54,8 @@ const Game: React.FC = () => {
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
+      // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
+      transitionTo(GameStates.GENERICQUESTION);
     });
   }, []);
 
@@ -117,6 +115,7 @@ const Game: React.FC = () => {
     setResetSelection(true);
     setButtonClicked(true); // Cambia lo stato del bottone
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    transitionTo(GameStates.NEXTQUESTION);
   };
 
   const handleTimeUp = () => {
@@ -130,6 +129,7 @@ const Game: React.FC = () => {
   switch (actualState) {
 
     case GameStates.NEXTQUESTION:
+      transitionTo(GameStates.GENERICQUESTION);
       break;
     case GameStates.GENERICRESPONSE:
       break;

@@ -42,7 +42,7 @@ const GameStateContext = createContext<GameStateContextType | undefined>(undefin
 
 // Game state provider component
 const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [actualState, setActualState] = useState<GameStates>(GameStates.START);
+  const [actualState, setActualState] = useState<GameStates>(GameStates.NEXTQUESTION);
 
   const transitionTo = (nextState: GameStates) => {
     const validStates = states[actualState];
