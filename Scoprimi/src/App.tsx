@@ -46,6 +46,12 @@ const App = () => {
     return <div id="loader">Service is Down. Please try again later.</div>;
   }
 
+  const GameWithState: React.FC = () => (
+    <GameStateProvider>
+      <Game />
+    </GameStateProvider>
+  );
+
   return (
     <SessionProvider>
 
@@ -56,9 +62,7 @@ const App = () => {
             <Route path="" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/lobby" element={<ProtectedRoute component={Lobby} />} />
-            <GameStateProvider>
-              <Route path="/game" element={<ProtectedRoute component={Game} />} />
-            </GameStateProvider>
+            <Route path="/game" element={<ProtectedRoute component={GameWithState} />} />
             <Route path="/final-results" element={<FinalResults />} />
             <Route path="/join/:lobbyCode" element={<JoinLobbyWithShare />} />
             <Route path="/error" element={<ErrorPage />} />

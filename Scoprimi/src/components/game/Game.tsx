@@ -17,7 +17,6 @@ const Game: React.FC = () => {
   const [playerImages, setPlayerImages] = useState<{ [key: string]: string }>({});
   const [showResults, setShowResults] = useState<boolean>(false);
   const [voteRecap, setVoteRecap] = useState<{ [key: string]: string }>({});
-  const [gameOver, setGameOver] = useState<boolean>(false);
 
   const [clicked, setClicked] = useState<boolean>(false);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
@@ -66,7 +65,6 @@ const Game: React.FC = () => {
     });
 
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
-      setGameOver(true);
       setQuestion('');
       setPlayers([]);
       setShowResults(false);
@@ -120,7 +118,7 @@ const Game: React.FC = () => {
   return (
     <div className="paginator">
       <div className={showResults ? 'text-center' : 'text-left'}>
-        {!gameOver && (
+        {(
           <>
             {showResults ? (
               <div className="result-message">
@@ -147,7 +145,7 @@ const Game: React.FC = () => {
         )}
       </div>
 
-      {!gameOver && (
+      {(
         <div className='elegant-background image-container fill scrollable'>
           {showResults ? (
             <>
