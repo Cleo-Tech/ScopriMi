@@ -3,28 +3,30 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // eslint-disable-next-line no-unused-vars
 enum GameStates {
-  NEXTQUESTION,
-  GENERICQUESTION,
-  GENERICRESPONSE,
-  WHOQUESTION,
-  WHORESPONSE,
-  THEMEQUESTION,
-  THEMERESPONSE,
-  RESULT_OUTCOME,
-  THEMERESULTFINAL,
-  PERCULARE,
+  START = 'START',
+  NEXTQUESTION = 'NEXTQUESTION',
+  GENERICQUESTION = 'GENERICQUESTION',
+  GENERICRESPONSE = 'GENERICRESPONSE',
+  WHOQUESTION = 'WHOQUESTION',
+  WHORESPONSE = 'WHORESPONSE',
+  THEMEQUESTION = 'THEMEQUESTION',
+  THEMERESPONSE = 'THEMERESPONSE',
+  RESULTOUTCOME = 'RESULTOUTCOME',
+  THEMERESULTFINAL = 'THEMERESULTFINAL',
+  PERCULARE = 'PERCULARE'
 }
 
 // Define states with possible transitions using the enum
 const states = {
+  [GameStates.START]: [GameStates.NEXTQUESTION],
   [GameStates.NEXTQUESTION]: [GameStates.GENERICQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
   [GameStates.GENERICQUESTION]: [GameStates.GENERICRESPONSE],
-  [GameStates.GENERICRESPONSE]: [GameStates.RESULT_OUTCOME],
+  [GameStates.GENERICRESPONSE]: [GameStates.RESULTOUTCOME],
   [GameStates.WHOQUESTION]: [GameStates.WHORESPONSE],
-  [GameStates.WHORESPONSE]: [GameStates.RESULT_OUTCOME],
+  [GameStates.WHORESPONSE]: [GameStates.RESULTOUTCOME],
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
-  [GameStates.THEMERESPONSE]: [GameStates.RESULT_OUTCOME],
-  [GameStates.RESULT_OUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE],
+  [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
+  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE, GameStates.NEXTQUESTION],
   [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE],
   [GameStates.PERCULARE]: [GameStates.NEXTQUESTION],
 };
@@ -40,16 +42,15 @@ const GameStateContext = createContext<GameStateContextType | undefined>(undefin
 
 // Game state provider component
 const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [actualState, setActualState] = useState<GameStates>(GameStates.NEXTQUESTION);
+  const [actualState, setActualState] = useState<GameStates>(GameStates.START);
 
   const transitionTo = (nextState: GameStates) => {
     const validStates = states[actualState];
-
     if (validStates.includes(nextState)) {
+      console.log(`Transitioned from ${actualState} to: ${nextState}`);
       setActualState(nextState);
-      console.log('Transitioned to:', nextState);
     } else {
-      console.log('Invalid state transition from', actualState, 'to', nextState);
+      console.error('Invalid state transition from', actualState, 'to', nextState);
     }
   };
 

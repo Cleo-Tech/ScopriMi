@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GameStates, useGameState } from '../../contexts/GameStateContext';
 
 interface PlayerListProps {
   players: string[]
@@ -11,7 +12,7 @@ interface PlayerListProps {
 
 const PlayerList: React.FC<PlayerListProps> = ({ players, images, onVote, disabled, resetSelection, playersWhoVoted }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
-
+  const { transitionTo } = useGameState();
   useEffect(() => {
     if (resetSelection) {
       setSelectedPlayer(null); // Resetta la selezione quando `resetSelection` è vero
@@ -22,6 +23,7 @@ const PlayerList: React.FC<PlayerListProps> = ({ players, images, onVote, disabl
     if (!disabled) {
       setSelectedPlayer(player);
       onVote(player);
+      transitionTo(GameStates.GENERICRESPONSE);
     }
   };
 
