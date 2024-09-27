@@ -130,7 +130,7 @@ const Game: React.FC = () => {
   switch (actualState) {
 
     case GameStates.NEXTQUESTION:
-      transitionTo(GameStates.GENERICQUESTION);
+      // transitionTo(GameStates.GENERICQUESTION);
       break;
     case GameStates.GENERICRESPONSE:
       break;
