@@ -28,23 +28,15 @@ const Game: React.FC = () => {
   const { actualState, transitionTo } = useGameState();
   const navigate = useNavigate();
 
+  // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-
-  useEffect(() => {
-    socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
-      setPlayersWhoVoted(Object.keys(data.players));
-    });
-    return () => {
-      socket.off(c.PLAYERS_WHO_VOTED);
-    };
-  }, []);
-
 
   useEffect(() => {
     socket.on(c.SEND_QUESTION, ({ question, players, images }: QuestionData) => {
+      console.log('ciaoooo');
       console.log(question, players, images);
       setClicked(false);
       setIsTimerActive(true);
@@ -57,6 +49,16 @@ const Game: React.FC = () => {
       // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
       transitionTo(GameStates.GENERICQUESTION);
     });
+  }, [transitionTo]);
+
+
+  useEffect(() => {
+    socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
+      setPlayersWhoVoted(Object.keys(data.players));
+    });
+    return () => {
+      socket.off(c.PLAYERS_WHO_VOTED);
+    };
   }, []);
 
   useEffect(() => {
@@ -75,8 +77,6 @@ const Game: React.FC = () => {
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
       setPlayers([]);
-      // TODO
-      // setShowResults(false);
       setCurrentLobby(undefined);
       socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
