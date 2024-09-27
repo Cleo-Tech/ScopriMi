@@ -121,6 +121,7 @@ const Game: React.FC = () => {
   const handleTimeUp = () => {
     if (!clicked) {
       socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
+      transitionTo(GameStates.GENERICRESPONSE);
     }
     setIsTimerActive(false);
   };
@@ -154,7 +155,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={2} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <div className='elegant-background image-container fill scrollable'>
             <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
@@ -165,7 +166,7 @@ const Game: React.FC = () => {
     case GameStates.RESULTOUTCOME:
       return (
         <div className="paginator">
-          <div className="result-message">
+          <div className="result-message text-center">
             {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Persona più votata</h3>)}
             <img
               src={playerImages[mostVotedPerson]}
