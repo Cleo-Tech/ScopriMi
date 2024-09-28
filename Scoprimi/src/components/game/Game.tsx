@@ -145,13 +145,13 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={250000} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <div className='elegant-background image-container'>
-            <img src='./snikerts.jpeg' className='image-question'></img>
-            <img src='./snikerts.jpeg' className='image-question'></img>
-            <img src='./snikerts.jpeg' className='image-question'></img>
-            <img src='./snikerts.jpeg' className='image-question'></img>
+          <div className='elegant-background-images fill'>
+            <img src='https://i.ytimg.com/vi/nNjCpukp5lo/maxresdefault.jpg' className='image-question'></img>
+            <img src='https://miro.medium.com/v2/resize:fit:1400/1*Hz3fnB40eMaZZnD4cFMRfg.jpeg' className='image-question'></img>
+            <img src='https://ih1.redbubble.net/image.4004485084.6105/flat,750x1000,075,f.jpg' className='image-question'></img>
+            <img src='https://i1.sndcdn.com/artworks-AefWRyXAZ9zyI2GI-y2hCVQ-t500x500.jpg' className='image-question'></img>
             {/* <img src='./snikerts.jpeg'></img>
             <img src='./snikerts.jpeg'></img>
             <img src='./snikerts.jpeg'></img> */}

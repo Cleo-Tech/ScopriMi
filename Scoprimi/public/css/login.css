@@ -30,14 +30,18 @@
 }
 
 /* Stile delle immagini */
+
 .image-question {
-  max-height: 40%;
-  max-width: 40%;
-  width: auto;
-  height: auto;
-  border-radius: 20%;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out, border-color 0.2s;
+  width: calc(50% - 0.5rem);
+  /* Occupano metà della larghezza, meno il margine */
+  height: 50%;
+  /* Imposta l'altezza al 50% del contenitore */
+  margin-bottom: 1rem;
+  /* Margine inferiore per lo spazio tra le righe */
+  object-fit: cover;
+  /* Ritaglia l'immagine per riempire il contenitore */
+  border-radius: 10px;
+  /* Arrotonda i bordi delle immagini */
 }
 
 /* Hover su immagini */
@@ -49,4 +53,14 @@
 /* Immagine selezionata */
 .selected {
   border: 3px solid var(--tertiary-color);
+}
+
+.elegant-background-images {
+  display: flex;
+  flex-wrap: wrap;
+  /* Permette alle immagini di andare a capo */
+  justify-content: space-between;
+  /* Spazio tra le immagini */
+  margin: 1rem;
+  /* Margine attorno al contenitore */
 }
