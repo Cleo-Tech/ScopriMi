@@ -129,11 +129,10 @@ const Game: React.FC = () => {
   // Render delle page
   switch (actualState) {
 
-    case GameStates.NEXTQUESTION:
-      // transitionTo(GameStates.GENERICQUESTION);
-      break;
-    case GameStates.GENERICRESPONSE:
-      break;
+    // case GameStates.NEXTQUESTION:
+    //   break;
+    // case GameStates.GENERICRESPONSE:
+    //   break;
     case GameStates.PERCULARE:
       break;
     case GameStates.WHOQUESTION:
@@ -148,6 +147,7 @@ const Game: React.FC = () => {
       break;
 
     case GameStates.GENERICQUESTION:
+    case GameStates.GENERICRESPONSE:
       return (
         <div className="paginator">
           <Question question={question} />
@@ -155,7 +155,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={2} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={7} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <div className='elegant-background image-container fill scrollable'>
             <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
@@ -164,6 +164,7 @@ const Game: React.FC = () => {
       );
 
     case GameStates.RESULTOUTCOME:
+    case GameStates.NEXTQUESTION:
       return (
         <div className="paginator">
           <div className="result-message text-center">
