@@ -20,14 +20,18 @@ enum GameStates {
 const states = {
   [GameStates.START]: [GameStates.NEXTQUESTION],
   [GameStates.NEXTQUESTION]: [GameStates.GENERICQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
+
   [GameStates.GENERICQUESTION]: [GameStates.GENERICRESPONSE],
   [GameStates.GENERICRESPONSE]: [GameStates.RESULTOUTCOME],
+
   [GameStates.WHOQUESTION]: [GameStates.WHORESPONSE],
   [GameStates.WHORESPONSE]: [GameStates.RESULTOUTCOME],
+
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
+  [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE, GameStates.NEXTQUESTION],
+
   [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE, GameStates.NEXTQUESTION],
-  [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE],
   [GameStates.PERCULARE]: [GameStates.NEXTQUESTION],
 };
 
