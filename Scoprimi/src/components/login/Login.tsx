@@ -2,18 +2,21 @@ import { useSession } from '../../contexts/SessionContext';
 import { useNavigate } from 'react-router-dom';
 
 const images = [
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_1.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_2.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_3.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_4.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_5.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_10.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_1.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_2.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_3.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_4.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_5.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_10.png',
   'https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_7.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_13.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_6.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_7.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_8.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_9.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_11.png',
+  'https://raw.githubusercontent.com/Cleo-Tech/ScoprimiImages/refs/heads/main/profilePic/profile_icon_12.png',
   'https://cdn.jsdelivr.net/gh/alohe/avatars/png/memo_17.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_6.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_7.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_8.png',
-  'https://raw.githubusercontent.com/simomux/party-game-images/04d617ebf044d3b73978b3c45430d3d74c0e262c/images/profile_icon_9.png',
 ];
 
 interface LoginProps {
