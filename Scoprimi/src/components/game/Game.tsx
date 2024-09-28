@@ -126,6 +126,7 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
+
   // Render delle page
   switch (actualState) {
 
@@ -157,7 +158,7 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <div className='elegant-background image-container fill scrollable'>
+          <div className='elegant-background fill scrollable'>
             <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
           </div>
         </div>
