@@ -13,12 +13,12 @@ enum GameStates {
   THEMERESPONSE = 'THEMERESPONSE',
   RESULTOUTCOME = 'RESULTOUTCOME',
   THEMERESULTFINAL = 'THEMERESULTFINAL',
-  PERCULARE = 'PERCULARE'
+  PERCULARE = 'PERCULARE',
+  PODIUM = 'PODIUM',
 }
 
 // Define states with possible transitions using the enum
 const states = {
-  [GameStates.START]: [GameStates.NEXTQUESTION],
   [GameStates.NEXTQUESTION]: [GameStates.GENERICQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
 
   [GameStates.GENERICQUESTION]: [GameStates.GENERICRESPONSE],
@@ -29,9 +29,11 @@ const states = {
 
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
-  [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE, GameStates.NEXTQUESTION],
+  [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE, GameStates.NEXTQUESTION, GameStates.PODIUM],
 
-  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE, GameStates.NEXTQUESTION],
+  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE, GameStates.NEXTQUESTION, GameStates.PODIUM],
+
+  [GameStates.PODIUM]: [GameStates.PERCULARE],
   [GameStates.PERCULARE]: [GameStates.NEXTQUESTION],
 };
 

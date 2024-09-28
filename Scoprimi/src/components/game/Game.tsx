@@ -155,7 +155,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={7} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <div className='elegant-background image-container fill scrollable'>
             <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
