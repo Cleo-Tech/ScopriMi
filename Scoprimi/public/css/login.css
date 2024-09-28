@@ -61,6 +61,5 @@
   /* Permette alle immagini di andare a capo */
   justify-content: space-between;
   /* Spazio tra le immagini */
-  margin: 1rem;
   /* Margine attorno al contenitore */
 }
