@@ -10,9 +10,9 @@ Features:
   - [ ] Start della partita (?)
 </br>
 
-- [ ] GameFlow **Pesto**
+- [x] GameFlow **Pesto**
   - [x] Definizione del GameFlow
-  - [ ] Implementazione del GameFlow
+  - [x] Implementazione del GameFlow
 </br>
 
 - [ ] Suddividere domande in categorie
