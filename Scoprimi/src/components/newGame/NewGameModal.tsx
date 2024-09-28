@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/socketConsts.js';
 import { useSwipeable } from 'react-swipeable';
@@ -12,19 +12,23 @@ interface NewGameModalProps {
 
 const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image }) => {
   const [numQuestions, setNumQuestions] = useState(5);
+  const [categories, setCategories] = useState<string[]>([]); // Stato per le categorie
 
+  // Incrementa il numero di domande
   const increment = () => {
     if (numQuestions < 50) {
       setNumQuestions(numQuestions + 1);
     }
   };
 
+  // Decrementa il numero di domande
   const decrement = () => {
     if (numQuestions > 5) {
       setNumQuestions(numQuestions - 1);
     }
   };
 
+  // Gestore per l'input manuale del numero di domande
   const handleInputChange = (stringValue: string) => {
     let value = parseInt(stringValue);
     if (isNaN(value)) {
@@ -40,6 +44,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     setNumQuestions(value);
   };
 
+  // Genera un codice per la lobby
   function generateLobbyCode() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
@@ -49,13 +54,14 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     return code;
   }
 
+  // Crea una nuova partita
   const handleCreateGame = () => {
     const code = generateLobbyCode();
 
-    // TODO, crea interfaccia per questo
-    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: ['adult', 'generic'] });
+    // Emette l'evento per creare la lobby
+    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories });
 
-    // Entrare nella lobby automaticamente
+    // Ascolta il ritorno della creazione della partita
     socket.on(c.RETURN_NEWGAME, () => {
       const data = {
         lobbyCode: code,
@@ -65,15 +71,33 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       console.log('Player creatore della lobby: ', data);
       socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
     });
-      
+
     onClose();
   };
 
-  // Gestore dello swipe
+  // Effetto che invia un socket.emit quando la pagina si apre e riceve categorie
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Modal aperto per il giocatore:', playerName);
+      socket.emit(c.REQUEST_CATEGORIES);
+
+      socket.on(c.SEND_CATEGORIES, (data: { categories: string[] }) => {
+        console.log('Categorie ricevute: ', data.categories);
+        setCategories(data.categories);
+      });
+    }
+
+    // Cleanup listener quando il modal si chiude
+    return () => {
+      socket.off(c.SEND_CATEGORIES);
+    };
+  }, [isOpen, playerName]);
+
+  // Gestore dello swipe per chiudere la modal
   const swipeHandlers = useSwipeable({
     onSwipedDown: () => onClose(), // Chiusura su swipe verso il basso
     delta: 5, // Minima distanza di swipe per attivare l'evento
-    trackMouse: true, // Facoltativo: attiva il test anche per il mouse
+    trackMouse: true, // Attiva anche per il mouse
   });
 
   return (
@@ -90,9 +114,22 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               value={numQuestions}
               onChange={(e) => handleInputChange(e.target.value)}
               min="5"
-              max="50" />
+              max="50"
+              disabled // Disabilita l'input manuale
+            />
             <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
           </div>
+          <p>Categoria domande:</p>
+          {/* Render dinamico delle categorie */}
+          {categories.map((category, index) => (
+            <div className="switch-container" key={index}>
+              <label className="switch">
+                <input type="checkbox" />
+                <span className="slider round"></span>
+              </label>
+              <span className="switch-label">{category}</span>
+            </div>
+          ))}
           <div className='counter pt-3'>
             <button onClick={handleCreateGame} className="my-btn my-bg-quartary">Crea</button>
           </div>

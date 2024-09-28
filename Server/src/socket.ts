@@ -267,6 +267,17 @@ export function setupSocket(io: any) {
       }
     });
 
+    const getQuestionCategoriesAsStrings = (): string[] => {
+      return Object.values(QuestionCategories);
+    }
+
+    socket.on(c.REQUEST_CATEGORIES, () => {
+      //const categories = ["Cat 1", "Cat 2", "Cat 3"];
+      const categories = getQuestionCategoriesAsStrings();
+      console.log('Categorie da inviare: ', categories);
+      socket.emit(c.SEND_CATEGORIES, { categories });
+    });
+
     socket.on(c.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {
       socket.join(data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
