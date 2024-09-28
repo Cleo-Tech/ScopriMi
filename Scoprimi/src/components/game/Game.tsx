@@ -36,7 +36,6 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(c.SEND_QUESTION, ({ question, players, images }: QuestionData) => {
-      console.log('ciaoooo');
       console.log(question, players, images);
       setClicked(false);
       setIsTimerActive(true);
@@ -47,7 +46,7 @@ const Game: React.FC = () => {
       setButtonClicked(false);
       setPlayersWhoVoted([]);
       // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
-      transitionTo(GameStates.GENERICQUESTION);
+      transitionTo(GameStates.THEMEQUESTION);
     });
   }, [transitionTo]);
 
@@ -139,7 +138,26 @@ const Game: React.FC = () => {
     case GameStates.WHOQUESTION:
       break;
     case GameStates.THEMEQUESTION:
-      break;
+      return (
+        <div className="paginator">
+          <Question question={question} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={250000} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <div className='elegant-background image-container'>
+            <img src='./snikerts.jpeg' className='image-question'></img>
+            <img src='./snikerts.jpeg' className='image-question'></img>
+            <img src='./snikerts.jpeg' className='image-question'></img>
+            <img src='./snikerts.jpeg' className='image-question'></img>
+            {/* <img src='./snikerts.jpeg'></img>
+            <img src='./snikerts.jpeg'></img>
+            <img src='./snikerts.jpeg'></img> */}
+          </div>
+        </div>
+      );
     case GameStates.THEMERESPONSE:
       break;
     case GameStates.WHORESPONSE:

@@ -29,6 +29,17 @@
   transition: transform 0.2s ease-in-out, border-color 0.2s;
 }
 
+/* Stile delle immagini */
+.image-question {
+  max-height: 40%;
+  max-width: 40%;
+  width: auto;
+  height: auto;
+  border-radius: 20%;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, border-color 0.2s;
+}
+
 /* Hover su immagini */
 .image-thumbnail:hover {
   transform: scale(1.1);
