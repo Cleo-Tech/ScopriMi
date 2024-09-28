@@ -13,6 +13,7 @@ interface NewGameModalProps {
 const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image }) => {
   const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]); // Stato per le categorie
+  const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]); // Stato per le categorie selezionate
 
   // Incrementa il numero di domande
   const increment = () => {
@@ -58,8 +59,11 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   const handleCreateGame = () => {
     const code = generateLobbyCode();
 
+    // Filtra le categorie selezionate
+    const selected = categories.filter((_, index) => selectedCategories[index]);
+
     // Emette l'evento per creare la lobby
-    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories });
+    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
 
     // Ascolta il ritorno della creazione della partita
     socket.on(c.RETURN_NEWGAME, () => {
@@ -84,6 +88,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       socket.on(c.SEND_CATEGORIES, (data: { categories: string[] }) => {
         console.log('Categorie ricevute: ', data.categories);
         setCategories(data.categories);
+        setSelectedCategories(new Array(data.categories.length).fill(false)); // Inizializza gli switch come non selezionati
       });
     }
 
@@ -99,6 +104,15 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     delta: 5, // Minima distanza di swipe per attivare l'evento
     trackMouse: true, // Attiva anche per il mouse
   });
+
+  // Gestore del cambio di stato dello switch
+  const handleSwitchChange = (index: number) => {
+    setSelectedCategories(prev => {
+      const newSelected = [...prev];
+      newSelected[index] = !newSelected[index];
+      return newSelected;
+    });
+  };
 
   return (
     <div {...swipeHandlers} className={`bottom-modal ${isOpen ? 'open' : ''}`}>
@@ -124,7 +138,11 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
           {categories.map((category, index) => (
             <div className="switch-container" key={index}>
               <label className="switch">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={selectedCategories[index]}
+                  onChange={() => handleSwitchChange(index)} // Gestore del cambio
+                />
                 <span className="slider round"></span>
               </label>
               <span className="switch-label">{category}</span>

@@ -131,6 +131,7 @@ export function setupSocket(io: any) {
     // TODO check params on react
     socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
+      console.log('Categorie scelte: ', data.categories);
       const newGame = actualGameManager.createGame(data.code, data.numQuestionsParam, data.admin);
 
       const allSelectedQuestions = data.categories
