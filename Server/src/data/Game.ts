@@ -14,8 +14,6 @@ export class Game {
   public numOfVoters: number;
   // Current question index
   public currentQuestionIndex: number;
-  // Total number of questions in the game
-  public numQuestions: number;
   // List of questions for the game
   public selectedQuestions: string[];
   public iterator: Iterator<string>;
@@ -29,13 +27,12 @@ export class Game {
    * @param lobbyCode - Unique code for the lobby
    * @param numQuestions - Number of questions for the game
    */
-  constructor(lobbyCode: string, numQuestions: number, admin: string) {
+  constructor(lobbyCode: string, admin: string) {
     this.lobbyCode = lobbyCode;
     this.isGameStarted = false;
     this.players = {};
     this.numOfVoters = 0;
     this.currentQuestionIndex = 0;
-    this.numQuestions = numQuestions >= 5 ? numQuestions : 5; // Ensure at least 5 questions
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
@@ -122,30 +119,6 @@ export class Game {
   toggleIsReadyToGame(playerName: string): void {
     if (playerName in this.players) {
       this.players[playerName].isReadyToGame = !this.players[playerName].isReadyToGame;
-    }
-  }
-
-  /**
-   * Sets the number of questions for the game.
-   * @param num - Number of questions
-   */
-  setNumQuestions(num: number): void {
-    if (num >= 5) {
-      this.numQuestions = num;
-    } else {
-      console.error('The minimum number of questions is 5.');
-    }
-  }
-
-  /**
-   * Selects the questions for the game.
-   * @param questions - Array of available questions
-   */
-  selectQuestions(questions: string[]): void {
-    if (questions.length >= this.numQuestions) {
-      this.selectedQuestions = questions.slice(0, this.numQuestions);
-    } else {
-      console.error('Not enough questions available.');
     }
   }
 
@@ -266,7 +239,7 @@ export class Game {
     const votes: { [key: string]: string } = {};
     Object.values(this.players).forEach(player => {
       // if (player.whatPlayerVoted !== '') {
-        votes[player.name] = player.whatPlayerVoted;
+      votes[player.name] = player.whatPlayerVoted;
       // }
     });
     return votes;

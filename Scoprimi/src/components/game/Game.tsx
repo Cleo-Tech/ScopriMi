@@ -45,7 +45,7 @@ const Game: React.FC = () => {
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
+      // TODO controlla tipo di domanda (metto STANDARD perche ora ho solo questo)
       transitionTo(GameStates.THEMEQUESTION);
     });
   }, [transitionTo]);
@@ -120,7 +120,7 @@ const Game: React.FC = () => {
   const handleTimeUp = () => {
     if (!clicked) {
       socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
-      transitionTo(GameStates.GENERICRESPONSE);
+      transitionTo(GameStates.STANDARDRESPONSE);
     }
     setIsTimerActive(false);
   };
@@ -131,9 +131,9 @@ const Game: React.FC = () => {
 
     // case GameStates.NEXTQUESTION:
     //   break;
-    // case GameStates.GENERICRESPONSE:
+    // case GameStates.STANDARDRESPONSE:
     //   break;
-    case GameStates.PERCULARE:
+    case GameStates.MOCK:
       break;
     case GameStates.WHOQUESTION:
       break;
@@ -165,8 +165,8 @@ const Game: React.FC = () => {
     case GameStates.THEMERESULTFINAL:
       break;
 
-    case GameStates.GENERICQUESTION:
-    case GameStates.GENERICRESPONSE:
+    case GameStates.STANDARDQUESTION:
+    case GameStates.STANDARDRESPONSE:
       return (
         <div className="paginator">
           <Question question={question} />

@@ -23,7 +23,7 @@ const PlayerList: React.FC<PlayerListProps> = ({ players, images, onVote, disabl
     if (!disabled) {
       setSelectedPlayer(player);
       onVote(player);
-      transitionTo(GameStates.GENERICRESPONSE);
+      transitionTo(GameStates.STANDARDRESPONSE);
     }
   };
 
