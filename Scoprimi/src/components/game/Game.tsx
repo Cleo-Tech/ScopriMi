@@ -9,7 +9,6 @@ import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
-import { QuestionMode } from '../../../../Server/src/data/Question';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -26,7 +25,7 @@ const Game: React.FC = () => {
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
 
   const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
-  const { actualState, transitionTo } = useGameState();
+  const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
   const navigate = useNavigate();
 
   // Questo viene fatto solo 1 volta e amen
@@ -46,20 +45,9 @@ const Game: React.FC = () => {
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      switch (question.mode) {
-        case QuestionMode.Photo:
-          // TODO fix
-          transitionTo(GameStates.WHOQUESTION);
-          break;
-        case QuestionMode.Standard:
-          transitionTo(GameStates.STANDARDQUESTION);
-          break;
-        default:
-          console.error('non dovevi finire qua');
-          break;
-      }
+      fromNextQuestionToQuestion(question.mode);
     });
-  }, [transitionTo]);
+  }, [fromNextQuestionToQuestion]);
 
 
   useEffect(() => {
@@ -131,7 +119,7 @@ const Game: React.FC = () => {
   const handleTimeUp = () => {
     if (!clicked) {
       socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
-      transitionTo(GameStates.STANDARDRESPONSE);
+      fromQuestionToResponse();
     }
     setIsTimerActive(false);
   };
