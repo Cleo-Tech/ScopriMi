@@ -132,6 +132,7 @@ export function setupSocket(io: any) {
     // TODO check params on react
     socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
+      console.log('Categorie scelte: ', data.categories);
       const newGame = actualGameManager.createGame(data.code, data.admin);
 
       data.categories = ['photo'];
@@ -301,6 +302,17 @@ export function setupSocket(io: any) {
       if (thisGame) {
         callback(thisGame);
       }
+    });
+
+    const getQuestionCategoriesAsStrings = (): string[] => {
+      return Object.values(QuestionCategories);
+    }
+
+    socket.on(c.REQUEST_CATEGORIES, () => {
+      //const categories = ["Cat 1", "Cat 2", "Cat 3"];
+      const categories = getQuestionCategoriesAsStrings();
+      console.log('Categorie da inviare: ', categories);
+      socket.emit(c.SEND_CATEGORIES, { categories });
     });
 
     socket.on(c.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {
