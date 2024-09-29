@@ -140,10 +140,6 @@ const Game: React.FC = () => {
   // Render delle page
   switch (actualState) {
 
-    // case GameStates.NEXTQUESTION:
-    //   break;
-    // case GameStates.STANDARDRESPONSE:
-    //   break;
     case GameStates.MOCK:
       break;
     case GameStates.WHOQUESTION:
@@ -161,9 +157,6 @@ const Game: React.FC = () => {
             <img src='https://miro.medium.com/v2/resize:fit:1400/1*Hz3fnB40eMaZZnD4cFMRfg.jpeg' className='image-question'></img>
             <img src='https://ih1.redbubble.net/image.4004485084.6105/flat,750x1000,075,f.jpg' className='image-question'></img>
             <img src='https://i1.sndcdn.com/artworks-AefWRyXAZ9zyI2GI-y2hCVQ-t500x500.jpg' className='image-question'></img>
-            {/* <img src='./snikerts.jpeg'></img>
-            <img src='./snikerts.jpeg'></img>
-            <img src='./snikerts.jpeg'></img> */}
           </div>
         </div>
       );
