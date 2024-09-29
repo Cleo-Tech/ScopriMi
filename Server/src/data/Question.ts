@@ -10,6 +10,7 @@ import { QuestionGenre } from "../API/questions";
 // QuestionGenre (il genere di suddivisione del json nella domande)
 // -generic
 // -adult
+// -photo
 
 // QuestionMode (REACT layout + logic)
 // -standard (come who tranne per domanda)

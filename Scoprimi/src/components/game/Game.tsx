@@ -27,7 +27,7 @@ const Game: React.FC = () => {
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
 
   const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
-  const { actualState, transitionTo } = useGameState();
+  const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
   const navigate = useNavigate();
 
   // Questo viene fatto solo 1 volta e amen
@@ -47,20 +47,9 @@ const Game: React.FC = () => {
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      switch (question.mode) {
-        case QuestionMode.Photo:
-          // TODO fix
-          transitionTo(GameStates.WHOQUESTION);
-          break;
-        case QuestionMode.Standard:
-          transitionTo(GameStates.STANDARDQUESTION);
-          break;
-        default:
-          console.error('non dovevi finire qua');
-          break;
-      }
+      fromNextQuestionToQuestion(question.mode);
     });
-  }, [transitionTo]);
+  }, [fromNextQuestionToQuestion]);
 
 
   useEffect(() => {
@@ -143,7 +132,7 @@ const Game: React.FC = () => {
   const handleTimeUp = () => {
     if (!clicked) {
       socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
-      transitionTo(GameStates.STANDARDRESPONSE);
+      fromQuestionToResponse();
     }
     setIsTimerActive(false);
   };
@@ -152,10 +141,6 @@ const Game: React.FC = () => {
   // Render delle page
   switch (actualState) {
 
-    // case GameStates.NEXTQUESTION:
-    //   break;
-    // case GameStates.STANDARDRESPONSE:
-    //   break;
     case GameStates.MOCK:
       break;
     case GameStates.WHOQUESTION:

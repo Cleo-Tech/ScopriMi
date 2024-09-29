@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { QuestionMode } from '../../../Server/src/data/Question';
 
 // eslint-disable-next-line no-unused-vars
 enum GameStates {
@@ -47,6 +48,8 @@ const states = {
 interface GameStateContextType {
   actualState: GameStates;
   transitionTo: (nextState: GameStates) => void;
+  fromNextQuestionToQuestion: (qstMode: QuestionMode) => void;
+  fromQuestionToResponse: () => void;
 }
 
 // Create the context
@@ -66,8 +69,42 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const fromNextQuestionToQuestion = (qstMode: QuestionMode) => {
+    switch (qstMode) {
+      case QuestionMode.Photo:
+        // TODO add ALL
+        transitionTo(GameStates.WHOQUESTION);
+        break;
+      case QuestionMode.Standard:
+        transitionTo(GameStates.STANDARDQUESTION);
+        break;
+      default:
+        console.error('non dovevi finire qua');
+        break;
+    }
+  };
+
+  const fromQuestionToResponse = () => {
+
+    switch (actualState) {
+      case GameStates.STANDARDQUESTION:
+        // TODO add ALL
+        transitionTo(GameStates.STANDARDRESPONSE);
+        break;
+      case GameStates.WHOQUESTION:
+        transitionTo(GameStates.WHORESPONSE);
+        break;
+      case GameStates.THEMEQUESTION:
+        transitionTo(GameStates.THEMERESPONSE);
+        break;
+      default:
+        console.error('non dovevi finire qua');
+        break;
+    }
+  };
+
   return (
-    <GameStateContext.Provider value={{ actualState, transitionTo }}>
+    <GameStateContext.Provider value={{ actualState, transitionTo, fromNextQuestionToQuestion, fromQuestionToResponse }}>
       {children}
     </GameStateContext.Provider>
   );
