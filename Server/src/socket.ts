@@ -304,15 +304,14 @@ export function setupSocket(io: any) {
       }
     });
 
-    const getQuestionCategoriesAsStrings = (): string[] => {
-      return Object.values(QuestionCategories);
+    const getQuestionGenresAsStrings = (): string[] => {
+      return Object.values(QuestionGenre);
     }
 
     socket.on(c.REQUEST_CATEGORIES, () => {
-      //const categories = ["Cat 1", "Cat 2", "Cat 3"];
-      const categories = getQuestionCategoriesAsStrings();
-      console.log('Categorie da inviare: ', categories);
-      socket.emit(c.SEND_CATEGORIES, { categories });
+      const genres = getQuestionGenresAsStrings();
+      console.log('Generi da inviare: ', genres);
+      socket.emit(c.SEND_GENRES, { genres });
     });
 
     socket.on(c.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {

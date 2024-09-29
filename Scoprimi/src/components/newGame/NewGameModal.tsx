@@ -84,16 +84,16 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       console.log('Modal aperto per il giocatore:', playerName);
       socket.emit(c.REQUEST_CATEGORIES);
 
-      socket.on(c.SEND_CATEGORIES, (data: { categories: string[] }) => {
-        console.log('Categorie ricevute: ', data.categories);
-        setCategories(data.categories);
-        setSelectedCategories(new Array(data.categories.length).fill(false)); // Inizializza gli switch come non selezionati
+      socket.on(c.SEND_GENRES, (data: { genres: string[] }) => {
+        console.log('Categorie ricevute: ', data.genres);
+        setCategories(data.genres);
+        setSelectedCategories(new Array(data.genres.length).fill(false)); // Inizializza gli switch come non selezionati
       });
     }
 
     // Cleanup listener quando il modal si chiude
     return () => {
-      socket.off(c.SEND_CATEGORIES);
+      socket.off(c.SEND_GENRES);
     };
   }, [isOpen, playerName]);
 
