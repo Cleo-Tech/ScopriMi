@@ -9,6 +9,8 @@ import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
+import { QuestionMode } from '../../../../Server/src/data/Question';
+import ImageList from './ImageList';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -109,6 +111,17 @@ const Game: React.FC = () => {
     socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
   };
 
+  // TODO Da finire
+  const handleVoteImage = (player: string) => {
+    if (clicked) {
+      console.log('Hai già votato!');
+      return;
+    }
+    setClicked(true);
+    setIsTimerActive(false);
+    socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+  };
+
   const handleNextQuestion = () => {
     setResetSelection(true);
     setButtonClicked(true); // Cambia lo stato del bottone
@@ -140,12 +153,9 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <div className='elegant-background-images fill'>
-            <img src='https://i.ytimg.com/vi/nNjCpukp5lo/maxresdefault.jpg' className='image-question'></img>
-            <img src='https://miro.medium.com/v2/resize:fit:1400/1*Hz3fnB40eMaZZnD4cFMRfg.jpeg' className='image-question'></img>
-            <img src='https://ih1.redbubble.net/image.4004485084.6105/flat,750x1000,075,f.jpg' className='image-question'></img>
-            <img src='https://i1.sndcdn.com/artworks-AefWRyXAZ9zyI2GI-y2hCVQ-t500x500.jpg' className='image-question'></img>
-          </div>
+          <ImageList images={['https://www.geo.tv/assets/uploads/updates/2024-09-29/566514_7476378_updates.jpg', 'https://images.rockol.it/wAQnkZSCoxywstvx1lWXOmhWTNU=/645x482/smart/rockol-img/img/foto/upload/kanye-west.2018-05-24-13-13-07.jpg',
+            'https://www.trend-online.com/wp-content/uploads/2024/03/kanye-west-patrimonio.jpg', 'https://content.imageresizer.com/images/memes/Kanye-West-Stare-meme-10.jpg'
+          ]} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
     case GameStates.THEMEQUESTION:
@@ -169,7 +179,7 @@ const Game: React.FC = () => {
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <div className='elegant-background fill scrollable'>
-            <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
+            <PlayerList players={players} images={images} onVote={handleVoteImage} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
           </div>
         </div>
       );
