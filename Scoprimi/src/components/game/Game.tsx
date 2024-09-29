@@ -9,7 +9,6 @@ import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
-import { QuestionMode } from '../../../../Server/src/data/Question';
 import ImageList from './ImageList';
 
 const Game: React.FC = () => {
@@ -153,8 +152,11 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <ImageList images={['https://www.geo.tv/assets/uploads/updates/2024-09-29/566514_7476378_updates.jpg', 'https://images.rockol.it/wAQnkZSCoxywstvx1lWXOmhWTNU=/645x482/smart/rockol-img/img/foto/upload/kanye-west.2018-05-24-13-13-07.jpg',
-            'https://www.trend-online.com/wp-content/uploads/2024/03/kanye-west-patrimonio.jpg', 'https://content.imageresizer.com/images/memes/Kanye-West-Stare-meme-10.jpg'
+          <ImageList images={[
+            'https://www.geo.tv/assets/uploads/updates/2024-09-29/566514_7476378_updates.jpg',
+            'https://images.rockol.it/wAQnkZSCoxywstvx1lWXOmhWTNU=/645x482/smart/rockol-img/img/foto/upload/kanye-west.2018-05-24-13-13-07.jpg',
+            'https://www.trend-online.com/wp-content/uploads/2024/03/kanye-west-patrimonio.jpg',
+            'https://content.imageresizer.com/images/memes/Kanye-West-Stare-meme-10.jpg',
           ]} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
