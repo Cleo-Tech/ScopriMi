@@ -9,6 +9,7 @@ import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
+import { QuestionMode } from '../../../../Server/src/data/Question';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -39,14 +40,24 @@ const Game: React.FC = () => {
       console.log(question, players, images);
       setClicked(false);
       setIsTimerActive(true);
-      setQuestion(question);
+      setQuestion(question.text);
       setPlayers(players);
       setImages(images);
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      // TODO controlla tipo di domanda (metto STANDARD perche ora ho solo questo)
-      transitionTo(GameStates.THEMEQUESTION);
+      switch (question.mode) {
+        case QuestionMode.Photo:
+          // TODO fix
+          transitionTo(GameStates.WHOQUESTION);
+          break;
+        case QuestionMode.Standard:
+          transitionTo(GameStates.STANDARDQUESTION);
+          break;
+        default:
+          console.error('non dovevi finire qua');
+          break;
+      }
     });
   }, [transitionTo]);
 
@@ -136,8 +147,6 @@ const Game: React.FC = () => {
     case GameStates.MOCK:
       break;
     case GameStates.WHOQUESTION:
-      break;
-    case GameStates.THEMEQUESTION:
       return (
         <div className="paginator">
           <Question question={question} />
@@ -158,6 +167,8 @@ const Game: React.FC = () => {
           </div>
         </div>
       );
+    case GameStates.THEMEQUESTION:
+      break;
     case GameStates.THEMERESPONSE:
       break;
     case GameStates.WHORESPONSE:

@@ -1,4 +1,4 @@
-enum QuestionMode {
+export enum QuestionMode {
   Standard,
   Photo,
   Who,

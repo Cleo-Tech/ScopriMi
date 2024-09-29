@@ -1,5 +1,7 @@
+import { Question } from '../../../Server/src/data/Question';
+
 export interface QuestionData {
-  question: string;
+  question: Question;
   players: string[];
   images: { [key: string]: string };
 }
