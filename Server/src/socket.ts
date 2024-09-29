@@ -2,10 +2,11 @@ import * as c from './socketConsts.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
 import { AllQuestions, QuestionGenre } from './API/questions.js';
+import { Question } from './data/Question.js';
 
 export const actualGameManager = new GameManager();
 
-function shuffle(array: string[]) {
+function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
     return [];
   }
@@ -133,12 +134,47 @@ export function setupSocket(io: any) {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
       const newGame = actualGameManager.createGame(data.code, data.admin);
 
+      data.categories = ['photo'];
+      const photoUrls = ["img1", "img2", "img3", "img4"]; // Simula gli URL delle immagini
+
+      enum QuestionMode {
+        Standard,
+        Photo,
+        Who,
+        Theme
+      }
+
       const allSelectedQuestions = data.categories
-        .map(category => AllQuestions[category as QuestionGenre]) // Mappa le categorie alle domande
+        .map(category => {
+          const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
+
+          return questions.map((questionText) => {
+            let questionMode = QuestionMode.Standard;
+            let images: string[] = [];
+
+            // Determina il `mode` in base alla categoria o altre logiche
+            if (category === 'photo') {
+              questionMode = QuestionMode.Photo;
+              images = photoUrls.slice(0, 4); // Assegna un'immagine
+            }
+            // else if (category === 'who'){
+            //   questionMode = QuestionMode.Who;
+            // }
+
+            // Crea l'istanza della classe `Question`
+            return new Question(
+              questionMode,
+              category as QuestionGenre,
+              questionText,
+              images
+            );
+          });
+        })
         .flat(); // Appiattisce l'array
 
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
 
+      console.log(allSelectedQuestions);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
       socket.emit(c.RETURN_NEWGAME, { newGame })

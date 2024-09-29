@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 export enum QuestionGenre {
   GENERIC = 'generic',
   ADULT = 'adult',
+  PHOTO = 'photo',
 }
 
 // export let AllQuestions: string[];

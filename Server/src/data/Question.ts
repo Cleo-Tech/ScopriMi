@@ -18,17 +18,18 @@ import { QuestionGenre } from "../API/questions";
 // -theme (ha un contatore di x domande per poi fare apparire la frase)
 
 export class Question {
-  public questionMode: QuestionMode;
-  public questionGenre: QuestionGenre;
-  public question: string;
+  public mode: QuestionMode;
+  public genre: QuestionGenre;
+  public text: string;
   public images: string[];
 
   constructor(questionMode: QuestionMode, questionGenre: QuestionGenre, question: string, images: string[]) {
-    this.questionMode = questionMode;
-    this.question = question;
-    this.questionGenre = questionGenre;
+    this.mode = questionMode;
+    this.text = question;
+    this.genre = questionGenre;
     this.images = images;
   }
+
 
 
 }

@@ -1,4 +1,5 @@
 import { Player } from "./Player.js";
+import { Question } from "./Question.js";
 
 /**
  * Represents a game in a lobby.
@@ -15,8 +16,8 @@ export class Game {
   // Current question index
   public currentQuestionIndex: number;
   // List of questions for the game
-  public selectedQuestions: string[];
-  public iterator: Iterator<string>;
+  public selectedQuestions: Question[];
+  public iterator: Iterator<Question>;
   // Creation time of the lobby
   public creationTime: number;
   // Admin of the lobby (can start the game / remove a player from the lobby)
@@ -173,7 +174,7 @@ export class Game {
    * Gets the current question.
    * @returns The current question or null if there are no questions
    */
-  getCurrentQuestion(): string | null {
+  getCurrentQuestion(): Question | null {
     return this.selectedQuestions[this.currentQuestionIndex] || null;
   }
 
@@ -208,7 +209,7 @@ export class Game {
    * Returns the next result from the question iterator.
    * @returns The iterator result object
    */
-  getNextQuestion(): IteratorResult<string> {
+  getNextQuestion(): IteratorResult<Question> {
     return this.iterator.next();
   }
 
@@ -216,7 +217,7 @@ export class Game {
    * Creates an iterator for the selected questions.
    * @returns An iterator for the questions
    */
-  *createIterator(): IterableIterator<string> {
+  *createIterator(): IterableIterator<Question> {
     for (const question of this.selectedQuestions) {
       yield question;
     }
