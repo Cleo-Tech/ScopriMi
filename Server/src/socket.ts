@@ -241,6 +241,8 @@ export function setupSocket(io: any) {
       io.to(data.lobbyCode).emit(c.INIZIA);
     });
 
+    //socket.on(c.VOTE_IMAGE) // TODO Una roba del genere
+
     socket.on(c.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
       console.log('Ho ricevuto il voto ', data);
 
