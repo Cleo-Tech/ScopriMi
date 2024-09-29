@@ -135,7 +135,6 @@ export function setupSocket(io: any) {
       console.log('Categorie scelte: ', data.categories);
       const newGame = actualGameManager.createGame(data.code, data.admin);
 
-      data.categories = ['photo'];
       const photoUrls = ["img1", "img2", "img3", "img4"]; // Simula gli URL delle immagini
 
       enum QuestionMode {
