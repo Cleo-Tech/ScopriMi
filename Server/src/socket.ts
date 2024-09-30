@@ -249,17 +249,20 @@ export function setupSocket(io: any) {
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
       if (!thisGame) {
+        console.log('Force reset');
         socket.emit(c.FORCE_RESET);
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '') {
+      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '' || data.vote.startsWith('https')) {
         thisGame.castVote(data.voter, data.vote);
+        console.log('Data: ', thisGame.getWhatPlayersVoted());
         io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       }
 
 
       if (thisGame.didAllPlayersVote()) {
+        console.log('Tutti i giocatori hanno votato');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
