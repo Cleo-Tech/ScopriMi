@@ -108,6 +108,7 @@ const Game: React.FC = () => {
     setClicked(true);
     setIsTimerActive(false);
     socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+    fromQuestionToResponse();
   };
 
   // TODO Da finire
@@ -119,6 +120,7 @@ const Game: React.FC = () => {
     setClicked(true);
     setIsTimerActive(false);
     socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+    fromQuestionToResponse();
   };
 
   const handleNextQuestion = () => {

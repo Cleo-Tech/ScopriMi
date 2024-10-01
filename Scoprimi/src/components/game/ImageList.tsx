@@ -16,7 +16,7 @@ const ImageList: React.FC<ImageListProps> = ({ images, onVote, disabled, resetSe
     }
   }, [resetSelection]);
 
-  const handlePlayerClick = (imageUrl) => {
+  const handlePlayerClick = (imageUrl: string) => {
     if (!disabled) {
       onVote(imageUrl);
     }
