@@ -177,7 +177,8 @@ export function setupSocket(io: any) {
       console.log(allSelectedQuestions);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
-      socket.emit(c.RETURN_NEWGAME, { newGame })
+      const lobbyCode = data.code;
+      socket.emit(c.RETURN_NEWGAME, { lobbyCode })
     });
 
     socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {

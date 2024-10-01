@@ -58,6 +58,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   // Crea una nuova partita
   const handleCreateGame = () => {
     const code = generateLobbyCode();
+    console.log('eccoic');
 
     // Filtra le categorie selezionate
     const selected = categories.filter((_, index) => selectedCategories[index]);
@@ -65,18 +66,25 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     // Emette l'evento per creare la lobby
     socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
 
+    onClose();
+  };
+
+  useEffect(() => {
     // Ascolta il ritorno della creazione della partita
-    socket.on(c.RETURN_NEWGAME, () => {
-      const data = {
-        lobbyCode: code,
+    socket.on(c.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
+      const datatoSend = {
+        lobbyCode: data.lobbyCode,
         playerName: playerName,
         image: image,
       };
-      socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+      console.log(data);
+      socket.emit(c.REQUEST_TO_JOIN_LOBBY, datatoSend);
     });
 
-    onClose();
-  };
+    return () => {
+      socket.off(c.RETURN_NEWGAME);
+    };
+  }, [image, playerName]);
 
   // Effetto che invia un socket.emit quando la pagina si apre e riceve categorie
   useEffect(() => {
