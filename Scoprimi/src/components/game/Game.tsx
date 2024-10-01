@@ -111,17 +111,6 @@ const Game: React.FC = () => {
     fromQuestionToResponse();
   };
 
-  // TODO Da finire
-  const handleVoteImage = (player: string) => {
-    if (clicked) {
-      console.log('Hai già votato!');
-      return;
-    }
-    setClicked(true);
-    setIsTimerActive(false);
-    socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
-    fromQuestionToResponse();
-  };
 
   const handleNextQuestion = () => {
     setResetSelection(true);
@@ -183,7 +172,7 @@ const Game: React.FC = () => {
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <div className='elegant-background fill scrollable'>
-            <PlayerList players={players} images={images} onVote={handleVoteImage} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
+            <PlayerList players={players} images={images} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} playersWhoVoted={playersWhoVoted} />
           </div>
         </div>
       );
