@@ -9,6 +9,8 @@ import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
+import ImageList from './ImageList';
+import { QuestionMode } from '../../../../Server/src/data/Question';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -23,10 +25,12 @@ const Game: React.FC = () => {
   const [resetSelection, setResetSelection] = useState<boolean>(false);
   const [buttonClicked, setButtonClicked] = useState<boolean>(false); // Nuovo stato per il bottone
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
+  const [questionImages, setQuestionImages] = useState<string[]>([]);
 
   const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
-  const { actualState, transitionTo } = useGameState();
+  const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
   const navigate = useNavigate();
+  const [isPhoto, setIsPhoto] = useState<boolean>(false);
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
@@ -36,20 +40,21 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(c.SEND_QUESTION, ({ question, players, images }: QuestionData) => {
-      console.log('ciaoooo');
       console.log(question, players, images);
       setClicked(false);
       setIsTimerActive(true);
-      setQuestion(question);
+      setQuestion(question.text);
       setPlayers(players);
       setImages(images);
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      // TODO controlla tipo di domanda (metto generic perche ora ho solo questo)
-      transitionTo(GameStates.GENERICQUESTION);
+      fromNextQuestionToQuestion(question.mode);
+      setQuestionImages(question.images);
+      // TODO fix veloce per 2 pagine di show_result
+      setIsPhoto(question.mode === QuestionMode.Photo);
     });
-  }, [transitionTo]);
+  }, [fromNextQuestionToQuestion]);
 
 
   useEffect(() => {
@@ -109,7 +114,9 @@ const Game: React.FC = () => {
     setClicked(true);
     setIsTimerActive(false);
     socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+    fromQuestionToResponse();
   };
+
 
   const handleNextQuestion = () => {
     setResetSelection(true);
@@ -121,37 +128,48 @@ const Game: React.FC = () => {
   const handleTimeUp = () => {
     if (!clicked) {
       socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
-      transitionTo(GameStates.GENERICRESPONSE);
+      fromQuestionToResponse();
     }
     setIsTimerActive(false);
   };
 
+  function getRandomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const selectPlayer = () => players.at(getRandomInt(0, players.length - 1));
 
   // Render delle page
   switch (actualState) {
 
-    // case GameStates.NEXTQUESTION:
-    //   break;
-    // case GameStates.GENERICRESPONSE:
-    //   break;
-    case GameStates.PERCULARE:
+    case GameStates.MOCK:
       break;
+    case GameStates.WHORESPONSE:
     case GameStates.WHOQUESTION:
-      break;
+      return (
+        <div className="paginator">
+          <Question question={question} selectedPlayer={selectPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <ImageList images={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
     case GameStates.THEMEQUESTION:
       break;
     case GameStates.THEMERESPONSE:
       break;
-    case GameStates.WHORESPONSE:
-      break;
     case GameStates.THEMERESULTFINAL:
       break;
 
-    case GameStates.GENERICQUESTION:
-    case GameStates.GENERICRESPONSE:
+    case GameStates.STANDARDQUESTION:
+    case GameStates.STANDARDRESPONSE:
       return (
         <div className="paginator">
-          <Question question={question} />
+          <Question question={question} selectedPlayer={selectPlayer} />
           <div className='inline'>
             <div className='label-container'>
               <p>Scegli un giocatore</p>
@@ -170,15 +188,21 @@ const Game: React.FC = () => {
         <div className="paginator">
           <div className="result-message text-center">
             {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Persona più votata</h3>)}
-            <img
-              src={playerImages[mostVotedPerson]}
-              alt={mostVotedPerson}
-              className="winnerImage"
-            />
-            <p>{mostVotedPerson}</p>
+            {!isPhoto ?
+              <img
+                src={playerImages[mostVotedPerson]}
+                alt={mostVotedPerson}
+                className="winnerImage"
+              /> :
+              <img
+                src={mostVotedPerson}
+                alt={mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}
+                className="winnerImage"
+              />}
+            <p>{mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}</p>
           </div>
           <div className='elegant-background image-container fill scrollable'>
-            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} />
+            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />
           </div>
           <div className="d-flex justify-content-center align-items-center">
             <button

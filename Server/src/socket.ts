@@ -1,11 +1,13 @@
 import * as c from './socketConsts.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
-import { AllQuestions, QuestionCategories } from './API/questions.js';
+import { AllQuestions, QuestionGenre } from './API/questions.js';
+import { Question } from './data/Question.js';
 
 export const actualGameManager = new GameManager();
+const apiUrl = ' https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
 
-function shuffle(array: string[]) {
+function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
     return [];
   }
@@ -14,6 +16,25 @@ function shuffle(array: string[]) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+// Funzione per ottenere gli URL delle immagini
+async function fetchImageUrls(apiUrl: string) {
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    // Restituire direttamente gli URL di download contenuti in "download_url"
+    return data.map((file: { download_url: string }) => file.download_url);
+  } catch (error) {
+    console.error('Errore nel fetch degli URL delle immagini:', error);
+    return [];
+  }
 }
 
 // Funzione per verificare se una lobby è da eliminare
@@ -129,20 +150,64 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
+    socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
       console.log('Categorie scelte: ', data.categories);
-      const newGame = actualGameManager.createGame(data.code, data.numQuestionsParam, data.admin);
+      actualGameManager.createGame(data.code, data.admin);
+
+      let photoUrls: string[] = [];
+      try {
+        photoUrls = await fetchImageUrls(apiUrl);
+      } catch (error) {
+        console.error('Error fetching image URLs:', error);
+      }
+      enum QuestionMode {
+        Standard,
+        Photo,
+        Who,
+        Theme
+      }
 
       const allSelectedQuestions = data.categories
-        .map(category => AllQuestions[category as QuestionCategories]) // Mappa le categorie alle domande
+        .map(category => {
+          const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
+
+          return questions.map((questionText) => {
+            let questionMode = QuestionMode.Standard;
+            let images: string[] = [];
+
+            // Determina il `mode` in base alla categoria o altre logiche
+            if (category === 'photo') {
+              questionMode = QuestionMode.Photo;
+
+              // Mescola l'array photoUrls in modo casuale
+              const shuffledImages = photoUrls.sort(() => 0.5 - Math.random());
+
+              // Prendi i primi 4 elementi dall'array mescolato
+              images = shuffledImages.slice(0, 4);
+            }
+            // else if (category === 'who'){
+            //   questionMode = QuestionMode.Who;
+            // }
+
+            // Crea l'istanza della classe `Question`
+            return new Question(
+              questionMode,
+              category as QuestionGenre,
+              questionText,
+              images
+            );
+          });
+        })
         .flat(); // Appiattisce l'array
 
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
 
+      console.log(allSelectedQuestions);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
-      socket.emit(c.RETURN_NEWGAME, { newGame })
+      const lobbyCode = data.code;
+      socket.emit(c.RETURN_NEWGAME, { lobbyCode })
     });
 
     socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
@@ -206,23 +271,28 @@ export function setupSocket(io: any) {
       io.to(data.lobbyCode).emit(c.INIZIA);
     });
 
+    //socket.on(c.VOTE_IMAGE) // TODO Una roba del genere
+
     socket.on(c.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
       console.log('Ho ricevuto il voto ', data);
 
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
       if (!thisGame) {
+        console.log('Force reset');
         socket.emit(c.FORCE_RESET);
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '') {
+      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '' || data.vote.startsWith('https')) {
         thisGame.castVote(data.voter, data.vote);
+        console.log('Data: ', thisGame.getWhatPlayersVoted());
         io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       }
 
 
       if (thisGame.didAllPlayersVote()) {
+        console.log('Tutti i giocatori hanno votato');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
@@ -245,12 +315,11 @@ export function setupSocket(io: any) {
       }
       // chiedo la prossima domanda, se posso altrimento partita finita
       const { value: question, done } = thisGame.getNextQuestion();
+
       if (!done) {
         thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
         const players = Object.keys(thisGame.players);
-        console.log(players);
         const images = thisGame.getImages();
-        console.log(images);
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images });
       } else {
         console.log('Game Over: no more questions.');
@@ -268,15 +337,14 @@ export function setupSocket(io: any) {
       }
     });
 
-    const getQuestionCategoriesAsStrings = (): string[] => {
-      return Object.values(QuestionCategories);
+    const getQuestionGenresAsStrings = (): string[] => {
+      return Object.values(QuestionGenre);
     }
 
     socket.on(c.REQUEST_CATEGORIES, () => {
-      //const categories = ["Cat 1", "Cat 2", "Cat 3"];
-      const categories = getQuestionCategoriesAsStrings();
-      console.log('Categorie da inviare: ', categories);
-      socket.emit(c.SEND_CATEGORIES, { categories });
+      const genres = getQuestionGenresAsStrings();
+      console.log('Generi da inviare: ', genres);
+      socket.emit(c.SEND_GENRES, { genres });
     });
 
     socket.on(c.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {

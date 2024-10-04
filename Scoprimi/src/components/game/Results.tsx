@@ -4,9 +4,14 @@ interface ResultsProps {
   voteRecap: { [key: string]: string };
   playerImages: { [key: string]: string };
   mostVotedPerson: string;
+  isPhoto: boolean;
 }
 
-const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPerson }) => (
+const todoShitFunction = (votestring: string) =>
+  votestring.substring(votestring.lastIndexOf('/') + 1).split('.')[0];
+
+
+const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPerson, isPhoto }) => (
   <div id="resultsContainer" className="text-center">
     <div id="resultMessageContainer">
       {
@@ -25,7 +30,7 @@ const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPer
                     <span
                       className={`status-pill-vote ${mostVotedPerson === vote ? 'my-bg-success' : 'my-bg-error'}`}
                     >
-                      {vote}
+                      {isPhoto ? todoShitFunction(vote) : vote}
                     </span>
                   </div>
                 )}

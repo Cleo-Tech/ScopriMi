@@ -58,6 +58,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   // Crea una nuova partita
   const handleCreateGame = () => {
     const code = generateLobbyCode();
+    console.log('eccoic');
 
     // Filtra le categorie selezionate
     const selected = categories.filter((_, index) => selectedCategories[index]);
@@ -65,18 +66,25 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     // Emette l'evento per creare la lobby
     socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
 
+    onClose();
+  };
+
+  useEffect(() => {
     // Ascolta il ritorno della creazione della partita
-    socket.on(c.RETURN_NEWGAME, () => {
-      const data = {
-        lobbyCode: code,
+    socket.on(c.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
+      const datatoSend = {
+        lobbyCode: data.lobbyCode,
         playerName: playerName,
         image: image,
       };
-      socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+      console.log(data);
+      socket.emit(c.REQUEST_TO_JOIN_LOBBY, datatoSend);
     });
 
-    onClose();
-  };
+    return () => {
+      socket.off(c.RETURN_NEWGAME);
+    };
+  }, [image, playerName]);
 
   // Effetto che invia un socket.emit quando la pagina si apre e riceve categorie
   useEffect(() => {
@@ -84,16 +92,16 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       console.log('Modal aperto per il giocatore:', playerName);
       socket.emit(c.REQUEST_CATEGORIES);
 
-      socket.on(c.SEND_CATEGORIES, (data: { categories: string[] }) => {
-        console.log('Categorie ricevute: ', data.categories);
-        setCategories(data.categories);
-        setSelectedCategories(new Array(data.categories.length).fill(false)); // Inizializza gli switch come non selezionati
+      socket.on(c.SEND_GENRES, (data: { genres: string[] }) => {
+        console.log('Categorie ricevute: ', data.genres);
+        setCategories(data.genres);
+        setSelectedCategories(new Array(data.genres.length).fill(false)); // Inizializza gli switch come non selezionati
       });
     }
 
     // Cleanup listener quando il modal si chiude
     return () => {
-      socket.off(c.SEND_CATEGORIES);
+      socket.off(c.SEND_GENRES);
     };
   }, [isOpen, playerName]);
 
