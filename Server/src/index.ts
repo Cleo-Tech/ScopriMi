@@ -15,7 +15,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       'http://localhost:5173', 'http://127.0.0.1:5173',
-      'https://scoprimi.onrender.com', 'https://preprod-scoprimi.onrender.com'
+      'https://scoprimi.onrender.com', 'https://preprod-scoprimi.onrender.com',
+      '*.cloudflareinsights.com'
     ],
     methods: ['GET', 'POST'],
     credentials: true
