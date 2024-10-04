@@ -2,11 +2,14 @@ import React from 'react';
 
 interface QuestionProps {
   question: string;
+  selectedPlayer: () => string;
 }
 
-const Question: React.FC<QuestionProps> = ({ question }) => (
+const placeholderChar = '$';
+
+const Question: React.FC<QuestionProps> = ({ question, selectedPlayer }) => (
   <div id="questionContainer">
-    <h4 id="question">{question}</h4>
+    <h4 id="question">{question.replace(placeholderChar, selectedPlayer)}</h4>
   </div>
 );
 

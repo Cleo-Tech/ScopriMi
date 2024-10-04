@@ -1,46 +1,55 @@
 /* eslint-disable no-unused-vars */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { QuestionMode } from '../../../Server/src/data/Question';
 
 // eslint-disable-next-line no-unused-vars
 enum GameStates {
   START = 'START',
   NEXTQUESTION = 'NEXTQUESTION',
-  GENERICQUESTION = 'GENERICQUESTION',
-  GENERICRESPONSE = 'GENERICRESPONSE',
+  // modalita standard
+  STANDARDQUESTION = 'STANDARDQUESTION',
+  STANDARDRESPONSE = 'STANDARDRESPONSE',
+  // modalita con votare chi farebbe cosa
   WHOQUESTION = 'WHOQUESTION',
   WHORESPONSE = 'WHORESPONSE',
+  // modalita con risposte a tema
   THEMEQUESTION = 'THEMEQUESTION',
   THEMERESPONSE = 'THEMERESPONSE',
+  // risultato a fine manche
   RESULTOUTCOME = 'RESULTOUTCOME',
+  // frase che esce a fine tema dopo x domande
   THEMERESULTFINAL = 'THEMERESULTFINAL',
-  PERCULARE = 'PERCULARE',
+  // DOPO CHE ESCE IL PODIO FARE USCIRE MOCK
   PODIUM = 'PODIUM',
+  MOCK = 'MOCK',
 }
 
 // Define states with possible transitions using the enum
 const states = {
-  [GameStates.NEXTQUESTION]: [GameStates.GENERICQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
+  [GameStates.NEXTQUESTION]: [GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
 
-  [GameStates.GENERICQUESTION]: [GameStates.GENERICRESPONSE],
-  [GameStates.GENERICRESPONSE]: [GameStates.RESULTOUTCOME],
+  [GameStates.STANDARDQUESTION]: [GameStates.STANDARDRESPONSE],
+  [GameStates.STANDARDRESPONSE]: [GameStates.RESULTOUTCOME],
 
   [GameStates.WHOQUESTION]: [GameStates.WHORESPONSE],
   [GameStates.WHORESPONSE]: [GameStates.RESULTOUTCOME],
 
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
-  [GameStates.THEMERESULTFINAL]: [GameStates.PERCULARE, GameStates.NEXTQUESTION, GameStates.PODIUM],
+  [GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PODIUM],
 
-  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.PERCULARE, GameStates.NEXTQUESTION, GameStates.PODIUM],
+  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PODIUM],
 
-  [GameStates.PODIUM]: [GameStates.PERCULARE],
-  [GameStates.PERCULARE]: [GameStates.NEXTQUESTION],
+  [GameStates.PODIUM]: [GameStates.MOCK],
+  [GameStates.MOCK]: [GameStates.NEXTQUESTION],
 };
 
 // Define the context type
 interface GameStateContextType {
   actualState: GameStates;
   transitionTo: (nextState: GameStates) => void;
+  fromNextQuestionToQuestion: (qstMode: QuestionMode) => void;
+  fromQuestionToResponse: () => void;
 }
 
 // Create the context
@@ -60,8 +69,42 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const fromNextQuestionToQuestion = (qstMode: QuestionMode) => {
+    switch (qstMode) {
+      case QuestionMode.Photo:
+        // TODO add ALL
+        transitionTo(GameStates.WHOQUESTION);
+        break;
+      case QuestionMode.Standard:
+        transitionTo(GameStates.STANDARDQUESTION);
+        break;
+      default:
+        console.error('non dovevi finire qua');
+        break;
+    }
+  };
+
+  const fromQuestionToResponse = () => {
+
+    switch (actualState) {
+      case GameStates.STANDARDQUESTION:
+        // TODO add ALL
+        transitionTo(GameStates.STANDARDRESPONSE);
+        break;
+      case GameStates.WHOQUESTION:
+        transitionTo(GameStates.WHORESPONSE);
+        break;
+      case GameStates.THEMEQUESTION:
+        transitionTo(GameStates.THEMERESPONSE);
+        break;
+      default:
+        console.error('non dovevi finire qua');
+        break;
+    }
+  };
+
   return (
-    <GameStateContext.Provider value={{ actualState, transitionTo }}>
+    <GameStateContext.Provider value={{ actualState, transitionTo, fromNextQuestionToQuestion, fromQuestionToResponse }}>
       {children}
     </GameStateContext.Provider>
   );

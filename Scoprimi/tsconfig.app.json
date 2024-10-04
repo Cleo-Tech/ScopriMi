@@ -26,8 +26,7 @@
   },
   "include": [
     "src",
-    "../Server/src/data",
-    "../Server/src/socketConsts.ts",
+    "../Server/src/**/*.ts", // Include tutti i file TypeScript in src
     "public",
   ]
 }

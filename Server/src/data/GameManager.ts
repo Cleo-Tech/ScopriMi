@@ -11,12 +11,11 @@ export class GameManager {
    * Creates a new game with the specified lobby code and number of questions.
    * 
    * @param {string} lobbyCode - The unique code for the lobby.
-   * @param {number} numQuestionsParam - The number of questions for the game.
    * @returns {Game | null} The created game instance or null if the lobby code already exists.
    */
-  createGame(lobbyCode: string, numQuestionsParam: number, admin: string): Game | null {
+  createGame(lobbyCode: string, admin: string): Game | null {
     if (!this.games[lobbyCode]) {
-      this.games[lobbyCode] = new Game(lobbyCode, numQuestionsParam, admin);
+      this.games[lobbyCode] = new Game(lobbyCode, admin);
       return this.games[lobbyCode];
     }
     console.error('Lobby code already exists.');

@@ -1,4 +1,5 @@
 import { Player } from "./Player.js";
+import { Question } from "./Question.js";
 
 /**
  * Represents a game in a lobby.
@@ -14,11 +15,9 @@ export class Game {
   public numOfVoters: number;
   // Current question index
   public currentQuestionIndex: number;
-  // Total number of questions in the game
-  public numQuestions: number;
   // List of questions for the game
-  public selectedQuestions: string[];
-  public iterator: Iterator<string>;
+  public selectedQuestions: Question[];
+  public iterator: Iterator<Question>;
   // Creation time of the lobby
   public creationTime: number;
   // Admin of the lobby (can start the game / remove a player from the lobby)
@@ -29,13 +28,12 @@ export class Game {
    * @param lobbyCode - Unique code for the lobby
    * @param numQuestions - Number of questions for the game
    */
-  constructor(lobbyCode: string, numQuestions: number, admin: string) {
+  constructor(lobbyCode: string, admin: string) {
     this.lobbyCode = lobbyCode;
     this.isGameStarted = false;
     this.players = {};
     this.numOfVoters = 0;
     this.currentQuestionIndex = 0;
-    this.numQuestions = numQuestions >= 5 ? numQuestions : 5; // Ensure at least 5 questions
     this.selectedQuestions = [];
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
@@ -126,30 +124,6 @@ export class Game {
   }
 
   /**
-   * Sets the number of questions for the game.
-   * @param num - Number of questions
-   */
-  setNumQuestions(num: number): void {
-    if (num >= 5) {
-      this.numQuestions = num;
-    } else {
-      console.error('The minimum number of questions is 5.');
-    }
-  }
-
-  /**
-   * Selects the questions for the game.
-   * @param questions - Array of available questions
-   */
-  selectQuestions(questions: string[]): void {
-    if (questions.length >= this.numQuestions) {
-      this.selectedQuestions = questions.slice(0, this.numQuestions);
-    } else {
-      console.error('Not enough questions available.');
-    }
-  }
-
-  /**
    * Records a player's vote.
    * @param playerName - Name of the player
    * @param vote - Name of the voted player
@@ -200,7 +174,7 @@ export class Game {
    * Gets the current question.
    * @returns The current question or null if there are no questions
    */
-  getCurrentQuestion(): string | null {
+  getCurrentQuestion(): Question | null {
     return this.selectedQuestions[this.currentQuestionIndex] || null;
   }
 
@@ -235,7 +209,7 @@ export class Game {
    * Returns the next result from the question iterator.
    * @returns The iterator result object
    */
-  getNextQuestion(): IteratorResult<string> {
+  getNextQuestion(): IteratorResult<Question> {
     return this.iterator.next();
   }
 
@@ -243,7 +217,7 @@ export class Game {
    * Creates an iterator for the selected questions.
    * @returns An iterator for the questions
    */
-  *createIterator(): IterableIterator<string> {
+  *createIterator(): IterableIterator<Question> {
     for (const question of this.selectedQuestions) {
       yield question;
     }
@@ -266,7 +240,7 @@ export class Game {
     const votes: { [key: string]: string } = {};
     Object.values(this.players).forEach(player => {
       // if (player.whatPlayerVoted !== '') {
-        votes[player.name] = player.whatPlayerVoted;
+      votes[player.name] = player.whatPlayerVoted;
       // }
     });
     return votes;

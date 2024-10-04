@@ -30,4 +30,4 @@ export const PLAYERS_WHO_VOTED: string = 'PLAYERS_WHO-VOTED';
 export const TEST_LOBBY: string = 'TEST_LOBBY';
 export const REMOVE_PLAYER: string = 'removePlayer';
 export const REQUEST_CATEGORIES: string = 'requestCategories';
-export const SEND_CATEGORIES: string = 'send_categories';
+export const SEND_GENRES: string = 'SEND_GENRES';
