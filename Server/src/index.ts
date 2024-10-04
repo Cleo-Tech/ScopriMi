@@ -17,8 +17,7 @@ const io = new Server(server, {
       'http://localhost:5173',
       'http://127.0.0.1:5173',
       'https://scoprimi.onrender.com',
-      'https://preprod-scoprimi.onrender.com',
-      'https://static.cloudflareinsights.com' // Aggiungi Cloudflare Insights
+      'https://preprod-scoprimi.onrender.com'
     ],
     methods: ['GET', 'POST'],
     credentials: true
