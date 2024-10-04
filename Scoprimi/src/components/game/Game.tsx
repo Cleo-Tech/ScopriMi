@@ -24,6 +24,7 @@ const Game: React.FC = () => {
   const [resetSelection, setResetSelection] = useState<boolean>(false);
   const [buttonClicked, setButtonClicked] = useState<boolean>(false); // Nuovo stato per il bottone
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
+  const [questionImages, setQuestionImages] = useState<string[]>([]);
 
   const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
   const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
@@ -47,6 +48,7 @@ const Game: React.FC = () => {
       setButtonClicked(false);
       setPlayersWhoVoted([]);
       fromNextQuestionToQuestion(question.mode);
+      setQuestionImages(question.images);
     });
   }, [fromNextQuestionToQuestion]);
 
@@ -149,12 +151,7 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <ImageList images={[
-            'https://www.geo.tv/assets/uploads/updates/2024-09-29/566514_7476378_updates.jpg',
-            'https://images.rockol.it/wAQnkZSCoxywstvx1lWXOmhWTNU=/645x482/smart/rockol-img/img/foto/upload/kanye-west.2018-05-24-13-13-07.jpg',
-            'https://www.trend-online.com/wp-content/uploads/2024/03/kanye-west-patrimonio.jpg',
-            'https://content.imageresizer.com/images/memes/Kanye-West-Stare-meme-10.jpg',
-          ]} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+          <ImageList images={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
     case GameStates.THEMEQUESTION:

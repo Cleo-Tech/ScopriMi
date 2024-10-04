@@ -30,7 +30,4 @@ export class Question {
     this.genre = questionGenre;
     this.images = images;
   }
-
-
-
 }

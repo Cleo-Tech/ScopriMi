@@ -310,12 +310,11 @@ export function setupSocket(io: any) {
       }
       // chiedo la prossima domanda, se posso altrimento partita finita
       const { value: question, done } = thisGame.getNextQuestion();
+
       if (!done) {
         thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
         const players = Object.keys(thisGame.players);
-        console.log(players);
         const images = thisGame.getImages();
-        console.log(images);
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images });
       } else {
         console.log('Game Over: no more questions.');
