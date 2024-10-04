@@ -5,6 +5,7 @@ import { AllQuestions, QuestionGenre } from './API/questions.js';
 import { Question } from './data/Question.js';
 
 export const actualGameManager = new GameManager();
+const apiUrl = ' https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
 
 function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
@@ -15,6 +16,25 @@ function shuffle(array: Question[]) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+// Funzione per ottenere gli URL delle immagini
+async function fetchImageUrls(apiUrl: string) {
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    // Restituire direttamente gli URL di download contenuti in "download_url"
+    return data.map((file: { download_url: string }) => file.download_url);
+  } catch (error) {
+    console.error('Errore nel fetch degli URL delle immagini:', error);
+    return [];
+  }
 }
 
 // Funzione per verificare se una lobby è da eliminare
@@ -130,13 +150,17 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(c.CREATE_LOBBY, (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
+    socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
       console.log('Categorie scelte: ', data.categories);
       const newGame = actualGameManager.createGame(data.code, data.admin);
 
-      const photoUrls = ["img1", "img2", "img3", "img4"]; // Simula gli URL delle immagini
-
+      let photoUrls: string[] = [];
+      try {
+        photoUrls = await fetchImageUrls(apiUrl);
+      } catch (error) {
+        console.error('Error fetching image URLs:', error);
+      }
       enum QuestionMode {
         Standard,
         Photo,

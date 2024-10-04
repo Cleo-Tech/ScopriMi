@@ -3,8 +3,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { useNavigate } from 'react-router-dom';
 
 // Funzione per ottenere gli URL delle immagini
-async function fetchImageUrls() {
-  const apiUrl = 'https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/profilePic';
+async function fetchImageUrls(apiUrl: string) {
 
   try {
     const response = await fetch(apiUrl);
@@ -35,7 +34,7 @@ const Login: React.FC<LoginProps> = ({ onButtonClick }) => {
   useEffect(() => {
     // Caricare le immagini al montaggio del componente
     const loadImages = async () => {
-      const imageUrls = await fetchImageUrls();
+      const imageUrls = await fetchImageUrls('https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/profilePic');
       console.log(imageUrls);
       setImages(imageUrls);
     };
