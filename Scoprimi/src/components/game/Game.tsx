@@ -127,16 +127,22 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
+  function getRandomInt(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const selectPlayer = () => players.at(getRandomInt(0, players.length - 1));
 
   // Render delle page
   switch (actualState) {
 
     case GameStates.MOCK:
       break;
+    case GameStates.WHORESPONSE:
     case GameStates.WHOQUESTION:
       return (
         <div className="paginator">
-          <Question question={question} />
+          <Question question={question} selectedPlayer={selectPlayer} />
           <div className='inline'>
             <div className='label-container'>
               <p>Scegli un giocatore</p>
@@ -155,8 +161,6 @@ const Game: React.FC = () => {
       break;
     case GameStates.THEMERESPONSE:
       break;
-    case GameStates.WHORESPONSE:
-      break;
     case GameStates.THEMERESULTFINAL:
       break;
 
@@ -164,7 +168,7 @@ const Game: React.FC = () => {
     case GameStates.STANDARDRESPONSE:
       return (
         <div className="paginator">
-          <Question question={question} />
+          <Question question={question} selectedPlayer={selectPlayer} />
           <div className='inline'>
             <div className='label-container'>
               <p>Scegli un giocatore</p>
