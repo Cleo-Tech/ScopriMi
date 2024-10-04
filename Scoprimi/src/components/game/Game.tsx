@@ -41,7 +41,8 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(c.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
-      console.log(selectedPlayer);
+      console.log('questions: ');
+      console.log(data.question.images);
       setClicked(false);
       setIsTimerActive(true);
       setQuestion(data.question.text);
@@ -49,9 +50,7 @@ const Game: React.FC = () => {
       setImages(data.images);
       setResetSelection(false);
       setButtonClicked(false);
-      console.log(playersWhoVoted);
       setPlayersWhoVoted([]);
-      console.log(playersWhoVoted);
       fromNextQuestionToQuestion(data.question.mode);
       setQuestionImages(data.question.images);
       // TODO fix veloce per 2 pagine di show_result
