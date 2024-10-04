@@ -10,6 +10,7 @@ import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
+import { QuestionMode } from '../../../../Server/src/data/Question';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -29,6 +30,7 @@ const Game: React.FC = () => {
   const { currentLobby, currentPlayer, setCurrentLobby } = useSession();
   const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
   const navigate = useNavigate();
+  const [isPhoto, setIsPhoto] = useState<boolean>(false);
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
@@ -49,6 +51,8 @@ const Game: React.FC = () => {
       setPlayersWhoVoted([]);
       fromNextQuestionToQuestion(question.mode);
       setQuestionImages(question.images);
+      // TODO fix veloce per 2 pagine di show_result
+      setIsPhoto(question.mode === QuestionMode.Photo);
     });
   }, [fromNextQuestionToQuestion]);
 
@@ -184,15 +188,21 @@ const Game: React.FC = () => {
         <div className="paginator">
           <div className="result-message text-center">
             {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Persona più votata</h3>)}
-            <img
-              src={playerImages[mostVotedPerson]}
-              alt={mostVotedPerson}
-              className="winnerImage"
-            />
-            <p>{mostVotedPerson}</p>
+            {!isPhoto ?
+              <img
+                src={playerImages[mostVotedPerson]}
+                alt={mostVotedPerson}
+                className="winnerImage"
+              /> :
+              <img
+                src={mostVotedPerson}
+                alt={mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}
+                className="winnerImage"
+              />}
+            <p>{mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}</p>
           </div>
           <div className='elegant-background image-container fill scrollable'>
-            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} />
+            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />
           </div>
           <div className="d-flex justify-content-center align-items-center">
             <button
