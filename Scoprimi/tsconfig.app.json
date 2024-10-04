@@ -27,6 +27,7 @@
   "include": [
     "src",
     "../Server/src/data",
+    "../Server/src/API/questions.ts",
     "../Server/src/socketConsts.ts",
     "public",
   ]
