@@ -321,7 +321,9 @@ export function setupSocket(io: any) {
         thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
         const players = Object.keys(thisGame.players);
         const images = thisGame.getImages();
-        io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images });
+        const keys = Object.keys(thisGame.players);
+        const selectedPlayer = keys[Math.floor(Math.random() * keys.length)];
+        io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         console.log('Game Over: no more questions.');
         console.log('Risultati finali:');
