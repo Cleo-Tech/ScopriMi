@@ -179,7 +179,12 @@ export function setupSocket(io: any) {
             // Determina il `mode` in base alla categoria o altre logiche
             if (category === 'photo') {
               questionMode = QuestionMode.Photo;
-              images = photoUrls.slice(0, 4); // Assegna un'immagine
+
+              // Mescola l'array photoUrls in modo casuale
+              const shuffledImages = photoUrls.sort(() => 0.5 - Math.random());
+
+              // Prendi i primi 4 elementi dall'array mescolato
+              images = shuffledImages.slice(0, 4);
             }
             // else if (category === 'who'){
             //   questionMode = QuestionMode.Who;
