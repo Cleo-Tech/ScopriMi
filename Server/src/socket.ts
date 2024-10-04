@@ -153,7 +153,7 @@ export function setupSocket(io: any) {
     socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
       console.log('Categorie scelte: ', data.categories);
-      const newGame = actualGameManager.createGame(data.code, data.admin);
+      actualGameManager.createGame(data.code, data.admin);
 
       let photoUrls: string[] = [];
       try {
