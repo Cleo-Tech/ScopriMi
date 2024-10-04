@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
-import { QuestionData, PlayerImages, PlayerScores, FinalResultData } from '../../ts/types';
+import { PlayerImages, PlayerScores, FinalResultData } from '../../ts/types';
 import { socket } from '../../ts/socketInit';
 import Timer from './Timer';
-import Question from './Question';
+import QuestionComponent from './QuestionComponent.js';
 import PlayerList from './PlayerList';
 import { useSession } from '../../contexts/SessionContext';
 import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
-import { QuestionMode } from '../../../../Server/src/data/Question';
+import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 
 const Game: React.FC = () => {
   const [question, setQuestion] = useState<string>('');
@@ -31,6 +31,7 @@ const Game: React.FC = () => {
   const { actualState, transitionTo, fromQuestionToResponse, fromNextQuestionToQuestion } = useGameState();
   const navigate = useNavigate();
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<string>('');
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
@@ -39,22 +40,23 @@ const Game: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    socket.on(c.SEND_QUESTION, ({ question, players, images }: QuestionData) => {
-      console.log(question, players, images);
+    socket.on(c.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
+      console.log(selectedPlayer);
       setClicked(false);
       setIsTimerActive(true);
-      setQuestion(question.text);
-      setPlayers(players);
-      setImages(images);
+      setQuestion(data.question.text);
+      setPlayers(data.players);
+      setImages(data.images);
       setResetSelection(false);
       setButtonClicked(false);
       setPlayersWhoVoted([]);
-      fromNextQuestionToQuestion(question.mode);
-      setQuestionImages(question.images);
+      fromNextQuestionToQuestion(data.question.mode);
+      setQuestionImages(data.question.images);
       // TODO fix veloce per 2 pagine di show_result
-      setIsPhoto(question.mode === QuestionMode.Photo);
+      setIsPhoto(data.question.mode === QuestionMode.Photo);
+      setSelectedPlayer(data.selectedPlayer);
     });
-  }, [fromNextQuestionToQuestion]);
+  }, [fromNextQuestionToQuestion, selectedPlayer]);
 
 
   useEffect(() => {
@@ -133,12 +135,6 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
-  function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  const selectPlayer = () => players.at(getRandomInt(0, players.length - 1));
-
   // Render delle page
   switch (actualState) {
 
@@ -148,7 +144,7 @@ const Game: React.FC = () => {
     case GameStates.WHOQUESTION:
       return (
         <div className="paginator">
-          <Question question={question} selectedPlayer={selectPlayer} />
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
           <div className='inline'>
             <div className='label-container'>
               <p>Scegli un giocatore</p>
@@ -169,7 +165,7 @@ const Game: React.FC = () => {
     case GameStates.STANDARDRESPONSE:
       return (
         <div className="paginator">
-          <Question question={question} selectedPlayer={selectPlayer} />
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
           <div className='inline'>
             <div className='label-container'>
               <p>Scegli un giocatore</p>
