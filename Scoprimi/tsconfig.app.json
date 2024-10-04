@@ -25,9 +25,9 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src",
+    // "src",
     "../Server/src/data",
-    "../Server/src/API/questions.ts",
+    // "../Server/src/API/questions.ts",
     "../Server/src/MiddleWare/**/*.ts",
     "public",
   ]
