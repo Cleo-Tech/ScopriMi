@@ -49,18 +49,21 @@ const Game: React.FC = () => {
       setImages(data.images);
       setResetSelection(false);
       setButtonClicked(false);
+      console.log(playersWhoVoted);
       setPlayersWhoVoted([]);
+      console.log(playersWhoVoted);
       fromNextQuestionToQuestion(data.question.mode);
       setQuestionImages(data.question.images);
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
     });
-  }, [fromNextQuestionToQuestion, selectedPlayer]);
+  }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
 
   useEffect(() => {
     socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
+      console.log(Object.keys(data.players));
       setPlayersWhoVoted(Object.keys(data.players));
     });
     return () => {

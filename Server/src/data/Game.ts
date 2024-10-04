@@ -239,9 +239,9 @@ export class Game {
   getWhatPlayersVoted(): { [key: string]: string } {
     const votes: { [key: string]: string } = {};
     Object.values(this.players).forEach(player => {
-      // if (player.whatPlayerVoted !== '') {
-      votes[player.name] = player.whatPlayerVoted;
-      // }
+      if (player.whatPlayerVoted !== '') {
+        votes[player.name] = player.whatPlayerVoted;
+      }
     });
     return votes;
   }
