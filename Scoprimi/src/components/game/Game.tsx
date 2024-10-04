@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/socketConsts';
+import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { QuestionData, PlayerImages, PlayerScores, FinalResultData } from '../../ts/types';
 import { socket } from '../../ts/socketInit';
 import Timer from './Timer';

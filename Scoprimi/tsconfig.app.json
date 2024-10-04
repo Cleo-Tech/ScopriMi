@@ -28,7 +28,7 @@
     "src",
     "../Server/src/data",
     "../Server/src/API/questions.ts",
-    "../Server/src/socketConsts.ts",
+    "../Server/src/MiddleWare/**/*.ts",
     "public",
   ]
 }

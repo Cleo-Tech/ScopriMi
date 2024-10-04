@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { socket } from '../../ts/socketInit';
-import * as c from '../../../../Server/src/socketConsts.js';
+import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { useSwipeable } from 'react-swipeable';
 
 interface NewGameModalProps {

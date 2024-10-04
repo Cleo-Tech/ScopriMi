@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/socketConsts.js';
+import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { socket } from '../../ts/socketInit.ts';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import LobbyList from '../common/LobbyList.tsx';

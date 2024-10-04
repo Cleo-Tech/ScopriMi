@@ -5,7 +5,7 @@ export enum QuestionMode {
   Theme
 }
 
-import { QuestionGenre } from "../API/questions";
+import { QuestionGenre } from "../MiddleWare/Types.js";
 
 // QuestionGenre (il genere di suddivisione del json nella domande)
 // -generic

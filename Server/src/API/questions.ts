@@ -4,15 +4,9 @@ import { readFile, rename, mkdir } from 'fs/promises';
 import { Express } from 'express-serve-static-core';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { QuestionGenre } from '../MiddleWare/Types';
 
 // Tutte le domande che vengono lette dal file json
-export enum QuestionGenre {
-  GENERIC = 'generic',
-  ADULT = 'adult',
-  PHOTO = 'photo',
-}
-
-// export let AllQuestions: string[];
 export let AllQuestions: { [key in QuestionGenre]: string[] }
 
 export const SetAllQuestions = async (): Promise<any> => {

@@ -1,8 +1,9 @@
-import * as c from './socketConsts.js';
+import * as c from './MiddleWare/socketConsts.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
-import { AllQuestions, QuestionGenre } from './API/questions.js';
+import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
+import { QuestionGenre } from './MiddleWare/Types.js';
 
 export const actualGameManager = new GameManager();
 const apiUrl = ' https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
