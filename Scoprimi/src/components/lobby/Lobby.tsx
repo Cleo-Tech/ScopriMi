@@ -148,6 +148,7 @@ const Lobby: React.FC = () => {
       <Alert text='Link copiato negli appunti' show={showAlert} onHide={() => setShowAlert(false)} />
       <button
         className='my-btn-login elegant-background'
+        style={{ width: '55px', height: '55px', padding: '0' }}
         onClick={() => handleShareLobby(currentLobby)}
       >
         <i className="fa-solid fa-share-from-square"></i>

@@ -5,12 +5,12 @@
   background-color: var(--elegant-background-color);
   border: none;
   border-radius: 50%;
-  width: 55px;
-  height: 55px;
+  width: auto;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: 1vw;
 }
 
 .my-btn-login i {
