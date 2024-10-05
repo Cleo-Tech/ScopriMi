@@ -153,13 +153,13 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <ImageList images={
-            [
-              'https://assets.vogue.com/photos/633a6fbd4956fb0b77008c17/4:3/w_2240,c_limit/Kanye-West-Paris-Couture-FW21-Shows-Photographed-by-Acielle---Styledumonde.jpg',
-                'https://i.ibb.co/hFZwRnq/IMG-20241005-WA0012.jpg',
- 'https://cdn.britannica.com/00/236500-050-06E93F4F/Kanye-West-2018.jpg'
-              , 'https://img.lemde.fr/2022/12/02/3/0/2066/1377/1440/960/60/0/a460b4e_1669995510739-kanye-west.jpg',
-            ]
+          <ImageList images={questionImages
+            // [
+            //   'https://assets.vogue.com/photos/633a6fbd4956fb0b77008c17/4:3/w_2240,c_limit/Kanye-West-Paris-Couture-FW21-Shows-Photographed-by-Acielle---Styledumonde.jpg',
+            //   'https://i.ibb.co/hFZwRnq/IMG-20241005-WA0012.jpg',
+            //   'https://cdn.britannica.com/00/236500-050-06E93F4F/Kanye-West-2018.jpg'
+            //   , 'https://img.lemde.fr/2022/12/02/3/0/2066/1377/1440/960/60/0/a460b4e_1669995510739-kanye-west.jpg',
+            // ]
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );

@@ -6,7 +6,7 @@ import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 
 export const actualGameManager = new GameManager();
-const apiUrl = ' https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
+const apiUrl = 'https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
 
 function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
@@ -31,7 +31,7 @@ async function fetchImageUrls(apiUrl: string) {
     const data = await response.json();
     console.log(data);
     // Restituire direttamente gli URL di download contenuti in "download_url"
-    return data.map((file: { download_url: string }) => file.download_url);
+    return data.map((file: { html_url: string }) => file.html_url);
   } catch (error) {
     console.error('Errore nel fetch degli URL delle immagini:', error);
     return [];
