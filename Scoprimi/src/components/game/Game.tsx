@@ -156,9 +156,9 @@ const Game: React.FC = () => {
           <ImageList images={
             [
               'https://assets.vogue.com/photos/633a6fbd4956fb0b77008c17/4:3/w_2240,c_limit/Kanye-West-Paris-Couture-FW21-Shows-Photographed-by-Acielle---Styledumonde.jpg',
-              'https://www.google.com/imgres?q=kanye%20west&imgurl=https%3A%2F%2Fassets.vogue.com%2Fphotos%2F633a6cf9e15addd21b68038a%2F1%3A1%2Fw_1999%2Ch_1999%2Cc_limit%2FKanye%2520West%2520Paris%2520Couture%2520FW21%2520Shows%2520Photographed%2520by%2520Acielle%2520_%2520Styledumonde.jpeg&imgrefurl=https%3A%2F%2Fwww.vogue.com%2Farticle%2Ftheres-no-one-thats-not-welcome-kanye-west-on-yzy-paris-and-his-three-phases-in-fashion&docid=oImDFM27PnjRXM&tbnid=UclKNp1z4fdmeM&vet=12ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECGYQAA..i&w=1999&h=1999&hcb=2&ved=2ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECGYQAA'
-              , 'https://www.google.com/imgres?q=kanye%20west&imgurl=https%3A%2F%2Fcdn.britannica.com%2F00%2F236500-050-06E93F4F%2FKanye-West-2018.jpg&imgrefurl=https%3A%2F%2Fwww.britannica.com%2Fbiography%2FKanye-West&docid=WSV2FW2n5BKnhM&tbnid=6t_7ZejDj1l3IM&vet=12ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECBkQAA..i&w=1600&h=1158&hcb=2&ved=2ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECBkQAA'
-              , 'https://www.google.com/imgres?q=kanye%20west&imgurl=https%3A%2F%2Fmedia.gqitalia.it%2Fphotos%2F5efc3ff8657d0a3f7c59a78d%2F4%3A3%2Fw_3552%2Ch_2664%2Cc_limit%2FGettyImages-1205196725.jpg&imgrefurl=https%3A%2F%2Fwww.gqitalia.it%2Fshow%2Farticle%2Fkanye-west-wash-us-in-the-blood-nuovo-singolo&docid=NTaQytFIZ9QSYM&tbnid=67EkabZDEGBo-M&vet=12ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECH8QAA..i&w=3552&h=2664&hcb=2&ved=2ahUKEwiH7o7-1_WIAxWj7wIHHZwfKqIQM3oECH8QAA',
+                'https://i.ibb.co/hFZwRnq/IMG-20241005-WA0012.jpg',
+ 'https://cdn.britannica.com/00/236500-050-06E93F4F/Kanye-West-2018.jpg'
+              , 'https://img.lemde.fr/2022/12/02/3/0/2066/1377/1440/960/60/0/a460b4e_1669995510739-kanye-west.jpg',
             ]
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
