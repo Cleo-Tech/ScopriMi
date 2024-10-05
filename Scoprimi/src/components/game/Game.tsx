@@ -156,10 +156,10 @@ const Game: React.FC = () => {
           <ImageList images={
             // questionImages
             [
-              'https://assets.vogue.com/photos/633a6fbd4956fb0b77008c17/4:3/w_2240,c_limit/Kanye-West-Paris-Couture-FW21-Shows-Photographed-by-Acielle---Styledumonde.jpg',
-              'https://i.ibb.co/hFZwRnq/IMG-20241005-WA0012.jpg',
-              'https://rawcdn.githack.com/Cleo-Tech/ScoprimiImages/64e47c48e318783f65006ff17b2cc340909e3916/questionImages/dog.jpg'
-              , 'https://img.lemde.fr/2022/12/02/3/0/2066/1377/1440/960/60/0/a460b4e_1669995510739-kanye-west.jpg',
+              'https://i.ibb.co/bRbrYT2/toilet.png',
+              'https://i.ibb.co/4ZZRWx7/pizza.jpg',
+              'https://i.ibb.co/C0dmy9V/pizza-cat.jpgg',
+              'https://i.ibb.co/ch2818j/dog.jpg'
             ]
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
