@@ -6,7 +6,7 @@ import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 
 export const actualGameManager = new GameManager();
-const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/search`;
+const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/image?tags=true`;
 
 function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
@@ -26,7 +26,7 @@ async function fetchImageUrls(apiUrl: string) {
       method: 'GET',
       headers: {
         'Authorization': 'Basic ' + Buffer.from(`${process.env.API_Key}:${process.env.API_Secret}`).toString('base64'),
-      }
+      },
     });
     if (!response.ok) {
       throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
