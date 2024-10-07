@@ -154,13 +154,13 @@ const Game: React.FC = () => {
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <ImageList images={
-            // questionImages
-            [
-              'https://i.ibb.co/bRbrYT2/toilet.png',
-              'https://i.ibb.co/4ZZRWx7/pizza.jpg',
-              'https://i.ibb.co/C0dmy9V/pizza-cat.jpgg',
-              'https://i.ibb.co/ch2818j/dog.jpg'
-            ]
+            questionImages
+            // [
+            //   'https://i.ibb.co/bRbrYT2/toilet.png',
+            //   'https://i.ibb.co/4ZZRWx7/pizza.jpg',
+            //   'https://i.ibb.co/C0dmy9V/pizza-cat.jpgg',
+            //   'https://i.ibb.co/ch2818j/dog.jpg'
+            // ]
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
@@ -202,10 +202,10 @@ const Game: React.FC = () => {
               /> :
               <img
                 src={mostVotedPerson}
-                alt={mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}
+                alt={mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('_')[0]}
                 className="winnerImage"
               />}
-            <p>{mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('.')[0]}</p>
+            <p>{mostVotedPerson.substring(mostVotedPerson.lastIndexOf('/') + 1).split('_')[0]}</p>
           </div>
           <div className='elegant-background image-container fill scrollable'>
             <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />

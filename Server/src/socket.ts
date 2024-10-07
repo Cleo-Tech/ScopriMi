@@ -6,7 +6,7 @@ import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 
 export const actualGameManager = new GameManager();
-const apiUrl = 'https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/questionImages';
+const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/search`;
 
 function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
@@ -21,17 +21,22 @@ function shuffle(array: Question[]) {
 
 // Funzione per ottenere gli URL delle immagini
 async function fetchImageUrls(apiUrl: string) {
-
   try {
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Basic ' + Buffer.from(`${process.env.API_Key}:${process.env.API_Secret}`).toString('base64'),
+      }
+    });
     if (!response.ok) {
       throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    let data = await response.json();
+    data = data['resources'];
     console.log(data);
-    // Restituire direttamente gli URL di download contenuti in "download_url"
-    return data.map((file: { html_url: string }) => file.html_url);
+    // Restituire direttamente gli URL di download contenuti in "secure_url"
+    return data.map((file: { secure_url: string }) => file.secure_url);
   } catch (error) {
     console.error('Errore nel fetch degli URL delle immagini:', error);
     return [];

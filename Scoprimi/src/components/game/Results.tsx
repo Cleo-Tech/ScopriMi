@@ -8,7 +8,7 @@ interface ResultsProps {
 }
 
 const todoShitFunction = (votestring: string) =>
-  votestring.substring(votestring.lastIndexOf('/') + 1).split('.')[0];
+  votestring.substring(votestring.lastIndexOf('/') + 1).split('_')[0];
 
 
 const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPerson, isPhoto }) => (
