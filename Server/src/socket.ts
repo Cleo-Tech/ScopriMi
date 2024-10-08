@@ -52,9 +52,11 @@ async function fetchImageUrls(apiUrl: string) {
 
     let data = await response.json();
     data = data['resources'];
-    console.log(data);
     // Restituire direttamente gli URL di download contenuti in "secure_url"
-    return data.map((file: { secure_url: string }) => file.secure_url);
+    return data.map((file: { secure_url: string, tags: string[] }) => ({
+      secure_url: file.secure_url,
+      tags: file.tags
+    }));
   } catch (error) {
     console.error('Errore nel fetch degli URL delle immagini:', error);
     return [];
@@ -179,9 +181,13 @@ export function setupSocket(io: any) {
       console.log('Categorie scelte: ', data.categories);
       actualGameManager.createGame(data.code, data.admin);
 
+
       let photoUrls: string[] = [];
       try {
         photoUrls = await fetchImageUrls(apiUrl);
+        console.log('____________________________________________________');
+        console.log(photoUrls);
+        console.log('____________________________________________________');
       } catch (error) {
         console.error('Error fetching image URLs:', error);
       }
@@ -199,18 +205,31 @@ export function setupSocket(io: any) {
           return questions.map((questionText) => {
             let questionMode = QuestionMode.Standard;
             // Ora la domanda nel JSON è del tipo: contesto$domanda -> prendo solo domanda
-            const formattedQuestion = getTextQuestion(questionText.toString());
+            const formattedQuestion = getTextQuestion(questionText);
             let images: string[] = [];
 
             // Determina il `mode` in base alla categoria o altre logiche
             if (category === 'photo') {
+              const context = getContextQuestion(questionText);
               questionMode = QuestionMode.Photo;
 
+              const funnyAndContextImages = photoUrls
+                .filter(p => ['funny', context].every(tag => p['tags'].includes(tag)))
+                .map(p => p['secure_url']);
+
+              const onlyContextImages = photoUrls
+                .filter(p => p['tags'].includes(context) && !p['tags'].includes('funny'))
+                .map(p => p['secure_url']);
+
               // Mescola l'array photoUrls in modo casuale
-              const shuffledImages = photoUrls.sort(() => 0.5 - Math.random());
+              const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+              const shuffledfunnyAndContextImages = funnyAndContextImages.sort(() => 0.5 - Math.random());
 
               // Prendi i primi 4 elementi dall'array mescolato
-              images = shuffledImages.slice(0, 4);
+              images = shuffledonlyContextImages.slice(0, 3);
+              images.push(shuffledfunnyAndContextImages[Math.floor(Math.random() * funnyAndContextImages.length)]);
+
+              images.sort(() => 0.5 - Math.random());
             }
             // else if (category === 'who'){
             //   questionMode = QuestionMode.Who;
