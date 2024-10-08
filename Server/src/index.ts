@@ -6,6 +6,7 @@ import cors from 'cors';
 // API
 import { setupAPI } from './API/setupAPI.js';
 import { SetAllQuestions } from './API/questions.js'
+import { setPhotoUrls } from './API/images.js';
 
 const app = express();
 app.use(cors());
@@ -33,6 +34,7 @@ async function init() {
     // setup
     SetAllQuestions();
     setupSocket(io);
+    await setPhotoUrls();
 
     server.listen(3001, () => {
       console.log('Server is running');
