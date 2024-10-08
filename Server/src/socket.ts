@@ -8,14 +8,16 @@ import { QuestionGenre } from './MiddleWare/Types.js';
 export const actualGameManager = new GameManager();
 const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/search`;
 
+// TODOshitImprove
 function getTextQuestion(input: string): string {
   const index = input.indexOf('£');
   if (index !== -1) {
     return input.substring(index + 1); // Restituisce tutto dopo il carattere £
   }
-  return '';
+  return input;
 }
 
+// TODOshitImprove
 function getContextQuestion(input: string): string {
   const index = input.indexOf('£');
   if (index !== -1) {
