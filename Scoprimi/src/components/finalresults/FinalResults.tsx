@@ -1,3 +1,4 @@
+import React from 'react';
 import { FinalResultData } from '../../ts/types';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -26,9 +27,16 @@ const FinalResults: React.FC = () => {
   const otherPlayers = sortedResults.slice(3);
 
   // Controlla se ci sono punteggi uguali nel podio
-  const sameScore1And2 = podium[0][1].score === podium[1][1].score;
-  const sameScore2And3 = podium[1][1].score === podium[2]?.[1]?.score;
-  const sameScore1And3 = podium[0][1].score === podium[2]?.[1]?.score;
+
+  let sameScore1And2 = false;
+  let sameScore2And3 = false;
+  let sameScore1And3 = false;
+
+  if (podium.length >= 2) {
+    sameScore1And2 = podium[0][1].score === podium[1][1].score;
+    sameScore2And3 = podium[1][1].score === podium[2]?.[1]?.score;
+    sameScore1And3 = podium[0][1].score === podium[2]?.[1]?.score;
+  }
 
   // Verifica se tutti e tre i punteggi sono uguali
   const allScoresEqual = sameScore1And2 && sameScore2And3;

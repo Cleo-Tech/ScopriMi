@@ -4,9 +4,27 @@ import { Game } from './data/Game.js';
 import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
+import { photoUrls } from './API/images.js';
 
 export const actualGameManager = new GameManager();
-const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/image?tags=true`;
+
+// TODOshitImprove
+function getTextQuestion(input: string): string {
+  const index = input.indexOf('£');
+  if (index !== -1) {
+    return input.substring(index + 1); // Restituisce tutto dopo il carattere £
+  }
+  return input;
+}
+
+// TODOshitImprove
+function getContextQuestion(input: string): string {
+  const index = input.indexOf('£');
+  if (index !== -1) {
+    return input.substring(0, index).trim(); // Restituisce tutto prima del carattere £ e rimuove eventuali spazi
+  }
+  return '';
+}
 
 function shuffle(array: Question[]) {
   if (!Array.isArray(array)) {
@@ -17,30 +35,6 @@ function shuffle(array: Question[]) {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
-}
-
-// Funzione per ottenere gli URL delle immagini
-async function fetchImageUrls(apiUrl: string) {
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Basic ' + Buffer.from(`${process.env.API_Key}:${process.env.API_Secret}`).toString('base64'),
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
-    }
-
-    let data = await response.json();
-    data = data['resources'];
-    console.log(data);
-    // Restituire direttamente gli URL di download contenuti in "secure_url"
-    return data.map((file: { secure_url: string }) => file.secure_url);
-  } catch (error) {
-    console.error('Errore nel fetch degli URL delle immagini:', error);
-    return [];
-  }
 }
 
 // Funzione per verificare se una lobby è da eliminare
@@ -161,12 +155,6 @@ export function setupSocket(io: any) {
       console.log('Categorie scelte: ', data.categories);
       actualGameManager.createGame(data.code, data.admin);
 
-      let photoUrls: string[] = [];
-      try {
-        photoUrls = await fetchImageUrls(apiUrl);
-      } catch (error) {
-        console.error('Error fetching image URLs:', error);
-      }
       enum QuestionMode {
         Standard,
         Photo,
@@ -180,17 +168,32 @@ export function setupSocket(io: any) {
 
           return questions.map((questionText) => {
             let questionMode = QuestionMode.Standard;
+            // Ora la domanda nel JSON è del tipo: contesto$domanda -> prendo solo domanda
+            const formattedQuestion = getTextQuestion(questionText);
             let images: string[] = [];
 
             // Determina il `mode` in base alla categoria o altre logiche
             if (category === 'photo') {
+              const context = getContextQuestion(questionText);
               questionMode = QuestionMode.Photo;
 
+              const funnyAndContextImages = photoUrls
+                .filter(p => ['funny', context].every(tag => p['tags'].includes(tag)))
+                .map(p => p['secure_url']);
+
+              const onlyContextImages = photoUrls
+                .filter(p => p['tags'].includes(context) && !p['tags'].includes('funny'))
+                .map(p => p['secure_url']);
+
               // Mescola l'array photoUrls in modo casuale
-              const shuffledImages = photoUrls.sort(() => 0.5 - Math.random());
+              const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+              const shuffledfunnyAndContextImages = funnyAndContextImages.sort(() => 0.5 - Math.random());
 
               // Prendi i primi 4 elementi dall'array mescolato
-              images = shuffledImages.slice(0, 4);
+              images = shuffledonlyContextImages.slice(0, 3);
+              images.push(shuffledfunnyAndContextImages[Math.floor(Math.random() * funnyAndContextImages.length)]);
+
+              images.sort(() => 0.5 - Math.random());
             }
             // else if (category === 'who'){
             //   questionMode = QuestionMode.Who;
@@ -200,7 +203,7 @@ export function setupSocket(io: any) {
             return new Question(
               questionMode,
               category as QuestionGenre,
-              questionText,
+              formattedQuestion,
               images
             );
           });
