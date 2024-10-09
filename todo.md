@@ -26,9 +26,9 @@ Features:
 </br>
 
 - [ ] feedback pressione dellimmagine
-- [ ] finire di mettere domande e immagini [fede]
-- [ ] nella schermata di risultati della manche, con le foto, non appaiono i player che non hanno votato
-- [ ] Classifica con stessi colori/altezza/posizione a parita di punteggio
+- [ ] Finire di aggiungere domande per la modalità photo e relative immagini [Fede]
+- [x] Nella modalità photo se un giocatore non vota non compare, deve essere visualizzato invece "Utente non ha votato"
+- [ ] In caso di parità nel podio è necessario che le altezze del podio siano uguali e dello stesso colore, ad esempio se i primi tre giocatori hanno fatto lo stesso punteggio allora sono tutti oro (Manca solo da sistemare parità con secondo e terzo posto)
 
 ## v0.7.0
 
