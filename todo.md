@@ -25,10 +25,11 @@ Features:
   - [x] Domande con immagini
 </br>
 
-- [ ] feedback pressione dellimmagine
-- [ ] Finire di aggiungere domande per la modalità photo e relative immagini [Fede]
+- [ ] controllo con partita senza modalita
+- [ ] feedback pressione dell'immagine
+- [x] Finire di aggiungere domande per la modalità photo e relative immagini
 - [x] Nella modalità photo se un giocatore non vota non compare, deve essere visualizzato invece "Utente non ha votato"
-- [ ] In caso di parità nel podio è necessario che le altezze del podio siano uguali e dello stesso colore, ad esempio se i primi tre giocatori hanno fatto lo stesso punteggio allora sono tutti oro (Manca solo da sistemare parità con secondo e terzo posto)
+- [x] In caso di parità nel podio è necessario che le altezze del podio siano uguali e dello stesso colore, ad esempio se i primi tre giocatori hanno fatto lo stesso punteggio allora sono tutti oro
 
 ## v0.7.0
 
