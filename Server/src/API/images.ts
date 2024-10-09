@@ -1,4 +1,4 @@
-const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/image?tags=true`;
+const apiUrl = `https://api.cloudinary.com/v1_1/${process.env.cloud_name}/resources/image?tags=true&max_results=500`;
 
 export let photoUrls: any[];
 
