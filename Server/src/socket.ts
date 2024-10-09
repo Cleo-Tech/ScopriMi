@@ -293,7 +293,7 @@ export function setupSocket(io: any) {
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === '' || data.vote.startsWith('https')) {
+      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
         thisGame.castVote(data.voter, data.vote);
         console.log('Data: ', thisGame.getWhatPlayersVoted());
         io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
@@ -301,12 +301,13 @@ export function setupSocket(io: any) {
 
 
       if (thisGame.didAllPlayersVote()) {
-        console.log('Tutti i giocatori hanno votato');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
         const mostVotedPerson = thisGame.getMostVotedPerson();
-        thisGame.resetWhatPlayersVoted()
+        thisGame.resetWhatPlayersVoted();
+        console.log('Tutti i giocatori hanno votato: ', voteRecap);
+
         io.to(data.lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     });

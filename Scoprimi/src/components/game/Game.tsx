@@ -131,7 +131,7 @@ const Game: React.FC = () => {
 
   const handleTimeUp = () => {
     if (!clicked) {
-      socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: '' });
+      socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: null });
       fromQuestionToResponse();
     }
     setIsTimerActive(false);
@@ -155,12 +155,6 @@ const Game: React.FC = () => {
           </div>
           <ImageList images={
             questionImages
-            // [
-            //   'https://i.ibb.co/bRbrYT2/toilet.png',
-            //   'https://i.ibb.co/4ZZRWx7/pizza.jpg',
-            //   'https://i.ibb.co/C0dmy9V/pizza-cat.jpgg',
-            //   'https://i.ibb.co/ch2818j/dog.jpg'
-            // ]
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
@@ -193,7 +187,7 @@ const Game: React.FC = () => {
       return (
         <div className="paginator">
           <div className="result-message text-center">
-            {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Persona più votata</h3>)}
+            {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Scelta più votata:</h3>)}
             {!isPhoto ?
               <img
                 src={playerImages[mostVotedPerson]}

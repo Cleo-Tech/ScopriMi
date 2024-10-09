@@ -9,24 +9,19 @@ const FinalResults: React.FC = () => {
 
   // Ordinamento con tipizzazione
   const sortedResults = Object.entries(finalResults)
-    .sort(([, a], [, b]) => b.score - a.score); // Ordina per punteggio decrescente
+    .sort(([, a], [, b]) => b.score - a.score);
 
-  // Verifica se finalResults è definito
   if (!finalResults) {
     return <div className="text-center mt-5">Nessun risultato disponibile.</div>;
   }
 
-  // Estrai i primi 3 risultati per il podio
   const podium = sortedResults.slice(0, 3);
 
-  // Scambia le posizioni 0 e 1
   if (podium.length > 1) {
     [podium[0], podium[1]] = [podium[1], podium[0]];
   }
 
   const otherPlayers = sortedResults.slice(3);
-
-  // Controlla se ci sono punteggi uguali nel podio
 
   let sameScore1And2 = false;
   let sameScore2And3 = false;
@@ -38,7 +33,10 @@ const FinalResults: React.FC = () => {
     sameScore1And3 = podium[0][1].score === podium[2]?.[1]?.score;
   }
 
-  // Verifica se tutti e tre i punteggi sono uguali
+  console.log('sameScore1And2:', sameScore1And2);
+  console.log('sameScore2And3:', sameScore2And3);
+  console.log('sameScore1And3:', sameScore1And3);
+
   const allScoresEqual = sameScore1And2 && sameScore2And3;
 
   return (
@@ -48,27 +46,39 @@ const FinalResults: React.FC = () => {
 
         <div className='podium' style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', width: '100%' }}>
           {podium.map(([player, { score, image }], index) => {
-            // Imposta la stessa altezza se i punteggi sono uguali
             let heightStyle;
             if (allScoresEqual) {
-              heightStyle = { height: '7vh' }; // Tutti i punteggi uguali
+              heightStyle = { height: '7vh' };
             } else if (sameScore1And2 && index <= 1) {
-              heightStyle = { height: '7vh' }; // Primo e secondo posto uguali
+              heightStyle = { height: '7vh' };
             } else if (sameScore2And3 && index >= 1) {
-              heightStyle = { height: '6vh' }; // Secondo e terzo posto uguali
+              heightStyle = { height: '6vh' };
             } else if (sameScore1And2 && sameScore1And3 && index !== 1) {
-              heightStyle = { height: '7vh' }; // Primo secondo terzo posto uguali
+              heightStyle = { height: '7vh' };
             } else {
-              // Differenzia l'altezza se non ci sono pareggi
               heightStyle = index === 0 ? { height: '7vh' } : index === 1 ? { height: '8vh' } : { height: '6vh' };
             }
 
-            const backgroundColors = {
-              1: '#cda434', // Oro
-              0: '#8a9597', // Argento
-              2: '#cd7f32', // Bronzo
-            };
-            const backgroundColor = backgroundColors[index];
+            let backgroundColor;
+
+            // Assegna i colori in base alle condizioni
+            if (allScoresEqual) {
+              backgroundColor = '#cda434'; // Tutti oro
+            } else if (sameScore1And2 && !sameScore2And3) {
+              backgroundColor = index <= 1 ? '#cda434' : '#cd7f32'; // Primi due oro, terzo bronzo
+            } else if (sameScore2And3 && !sameScore1And2) {
+              // Se secondo e terzo hanno lo stesso punteggio, entrambi argento
+              backgroundColor = index === 0 ? '#cda434' : '#8a9597'; // Primo oro, secondo e terzo argento
+            } else {
+              // Altrimenti, applica i colori predefiniti
+              const backgroundColors = {
+                1: '#cda434', // Oro
+                0: '#8a9597', // Argento
+                2: '#cd7f32', // Bronzo
+              };
+              backgroundColor = backgroundColors[index];
+            }
+
             return (
               <div
                 key={player}

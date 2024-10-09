@@ -17,8 +17,9 @@ const ImageList: React.FC<ImageListProps> = ({ images, onVote, disabled, resetSe
   }, [resetSelection]);
 
   const handlePlayerClick = (imageUrl: string) => {
-    if (!disabled) {
+    if (!disabled && !clicked) {
       onVote(imageUrl);
+      setClicked(true);
     }
   };
 
@@ -31,7 +32,11 @@ const ImageList: React.FC<ImageListProps> = ({ images, onVote, disabled, resetSe
           className='image-question'
           alt={`image-${index}`}
           onClick={() => handlePlayerClick(imageUrl)}
-          style={{ cursor: clicked || disabled ? 'not-allowed' : 'pointer', opacity: clicked || disabled ? 0.5 : 1 }}
+          style={{
+            cursor: clicked || disabled ? 'not-allowed' : 'pointer',
+            opacity: clicked || disabled ? 0.5 : 1,
+            filter: clicked ? 'grayscale(100%)' : 'none' // Applica il bianco e nero se l'immagine è stata cliccata
+          }}
         />
       ))}
     </div>
