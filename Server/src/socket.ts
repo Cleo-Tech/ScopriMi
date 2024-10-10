@@ -177,23 +177,16 @@ export function setupSocket(io: any) {
               const context = getContextQuestion(questionText);
               questionMode = QuestionMode.Photo;
 
-              const funnyAndContextImages = photoUrls
-                .filter(p => ['funny', context].every(tag => p['tags'].includes(tag)))
-                .map(p => p['secure_url']);
-
               const onlyContextImages = photoUrls
-                .filter(p => p['tags'].includes(context) && !p['tags'].includes('funny'))
+                .filter(p => p['tags'].includes(context))
                 .map(p => p['secure_url']);
 
               // Mescola l'array photoUrls in modo casuale
               const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
-              const shuffledfunnyAndContextImages = funnyAndContextImages.sort(() => 0.5 - Math.random());
 
               // Prendi i primi 4 elementi dall'array mescolato
-              images = shuffledonlyContextImages.slice(0, 3);
-              images.push(shuffledfunnyAndContextImages[Math.floor(Math.random() * funnyAndContextImages.length)]);
+              images = shuffledonlyContextImages.slice(0, 4);
 
-              images.sort(() => 0.5 - Math.random());
             }
             // else if (category === 'who'){
             //   questionMode = QuestionMode.Who;
