@@ -25,7 +25,7 @@ Features:
   - [x] Domande con immagini
 </br>
 
-- [ ] controllo con partita senza modalita
+- [x] controllo con partita senza modalita
 - [x] feedback pressione dell'immagine
 - [x] Finire di aggiungere domande per la modalità photo e relative immagini
 - [x] Nella modalità photo se un giocatore non vota non compare, deve essere visualizzato invece "Utente non ha votato"
