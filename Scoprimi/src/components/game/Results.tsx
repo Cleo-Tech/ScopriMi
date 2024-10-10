@@ -7,8 +7,11 @@ interface ResultsProps {
   isPhoto: boolean;
 }
 
-const todoShitFunction = (votestring: string) =>
-  votestring.substring(votestring.lastIndexOf('/') + 1).split('_')[0];
+const todoShitFunction = (votestring: string) => {
+  const wordlList = votestring.substring(votestring.lastIndexOf('/') + 1).split('_').slice(0, -1);
+  return wordlList?.join(" ");
+}
+
 
 
 const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPerson, isPhoto }) => (

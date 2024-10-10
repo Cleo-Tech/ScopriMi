@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { useSwipeable } from 'react-swipeable';
+import Alert from '../common/Alert.js';
 
 interface NewGameModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const categoryLabels: { [key: string]: string } = {
     adult: 'Domande +18',
@@ -59,9 +61,14 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
 
   const handleCreateGame = () => {
     const code = generateLobbyCode();
-    console.log('eccoic');
 
     const selected = categories.filter((_, index) => selectedCategories[index]);
+
+    if (selected.length === 0) {
+      setShowAlert(true);
+      return;
+    }
+
 
     socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
 
@@ -116,45 +123,48 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   };
 
   return (
-    <div {...swipeHandlers} className={`bottom-modal ${isOpen ? 'open' : ''}`}>
-      <button className="btn-bottom-modal-close" onClick={onClose}><i className="fa-solid fa-xmark"></i></button>
-      <div className="paginator">
-        <div className="elegant-background">
-          <p>Numero di domande:</p>
-          <div className="counter mb-4">
-            <button className="btn-change-value my-bg-quartary" onClick={decrement}>-</button>
-            <input
-              type="number"
-              className="my-input stretch text-center input-question"
-              value={numQuestions}
-              onChange={(e) => handleInputChange(e.target.value)}
-              min="5"
-              max="50"
-              disabled
-            />
-            <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
-          </div>
-          <p>Categoria domande:</p>
-          {/* Render dinamico delle categorie con mappatura */}
-          {categories.map((category, index) => (
-            <div className="switch-container" key={index}>
-              <label className="switch">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories[index]}
-                  onChange={() => handleSwitchChange(index)}
-                />
-                <span className="slider round"></span>
-              </label>
-              <span className="switch-label">{categoryLabels[category] || category}</span>
+    <>
+      <Alert text='Scegli una categoria!' show={showAlert} onHide={() => setShowAlert(false)} />
+      <div {...swipeHandlers} className={`bottom-modal ${isOpen ? 'open' : ''}`}>
+        <button className="btn-bottom-modal-close" onClick={onClose}><i className="fa-solid fa-xmark"></i></button>
+        <div className="paginator">
+          <div className="elegant-background">
+            <p>Numero di domande:</p>
+            <div className="counter mb-4">
+              <button className="btn-change-value my-bg-quartary" onClick={decrement}>-</button>
+              <input
+                type="number"
+                className="my-input stretch text-center input-question"
+                value={numQuestions}
+                onChange={(e) => handleInputChange(e.target.value)}
+                min="5"
+                max="50"
+                disabled
+              />
+              <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
             </div>
-          ))}
-          <div className='counter pt-3'>
-            <button onClick={handleCreateGame} className="my-btn my-bg-quartary">Crea</button>
+            <p>Categoria domande:</p>
+            {/* Render dinamico delle categorie con mappatura */}
+            {categories.map((category, index) => (
+              <div className="switch-container" key={index}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories[index]}
+                    onChange={() => handleSwitchChange(index)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+                <span className="switch-label">{categoryLabels[category] || category}</span>
+              </div>
+            ))}
+            <div className='counter pt-3'>
+              <button onClick={handleCreateGame} className="my-btn my-bg-quartary">Crea</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

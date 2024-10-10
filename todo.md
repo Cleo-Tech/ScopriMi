@@ -26,7 +26,7 @@ Features:
 </br>
 
 - [ ] controllo con partita senza modalita
-- [ ] feedback pressione dell'immagine
+- [x] feedback pressione dell'immagine
 - [x] Finire di aggiungere domande per la modalità photo e relative immagini
 - [x] Nella modalità photo se un giocatore non vota non compare, deve essere visualizzato invece "Utente non ha votato"
 - [x] In caso di parità nel podio è necessario che le altezze del podio siano uguali e dello stesso colore, ad esempio se i primi tre giocatori hanno fatto lo stesso punteggio allora sono tutti oro
