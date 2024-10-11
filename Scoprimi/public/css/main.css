@@ -68,11 +68,12 @@ input::placeholder {
 .my-input {
   padding: 10px;
   border-radius: 15px;
-  background-color: var(--text-color) !important;
+  color: var(--text-color);
 }
 
 .input-question {
   color: black !important;
+  background-color: var(--text-color) !important;
 }
 
 .form-floating {
