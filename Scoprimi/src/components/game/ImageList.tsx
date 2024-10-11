@@ -36,8 +36,8 @@ const ImageList: React.FC<ImageListProps> = ({ images, onVote, disabled, resetSe
           onClick={() => handlePlayerClick(imageUrl)}
           style={{
             cursor: clicked || disabled ? 'not-allowed' : 'pointer',
-            opacity: clicked && selectedImage != imageUrl ? 0.5 : 1,
-            filter: clicked && selectedImage != imageUrl ? 'grayscale(100%)' : 'none' // Applica il bianco e nero se l'immagine è stata cliccata
+            opacity: clicked && selectedImage !== imageUrl ? 0.5 : 1,
+            filter: clicked && selectedImage !== imageUrl ? 'grayscale(100%)' : 'none', // Applica il bianco e nero se l'immagine è stata cliccata
           }}
         />
       ))}

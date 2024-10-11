@@ -1,4 +1,5 @@
 import React from 'react';
+import { todoShitFunction } from './Game';
 
 interface ResultsProps {
   voteRecap: { [key: string]: string };
@@ -6,12 +7,6 @@ interface ResultsProps {
   mostVotedPerson: string;
   isPhoto: boolean;
 }
-
-const todoShitFunction = (votestring: string) => {
-  const wordlList = votestring.substring(votestring.lastIndexOf('/') + 1).split('_').slice(0, -1);
-  return wordlList?.join(" ");
-}
-
 
 
 const Results: React.FC<ResultsProps> = ({ voteRecap, playerImages, mostVotedPerson, isPhoto }) => (
