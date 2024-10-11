@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
-const webServerBaseUrl = import.meta.env.NODE_ENV === 'production'
-  ? import.meta.env.VITE_BACKEND_URL
+const webServerBaseUrl = process.env.NODE_ENV === 'production'
+  ? process.env.VITE_BACKEND_URL
   : 'http://localhost:3001';
 
 const socket = io(webServerBaseUrl, {
