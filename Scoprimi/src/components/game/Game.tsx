@@ -15,9 +15,11 @@ import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
   const wordlList = votestring.substring(votestring.lastIndexOf('/') + 1).split('_');
-  if (wordlList.length === 1) { return wordlList[0].replace(/\.(.*)$/, ''); }   // Gestisce nel caso il filename non sia sburato come li rende cloudinary aggiungendo roba a caso dopo il nome. Ex. vedi il file 'fursuit.jpg'
+  if (wordlList.length === 1) {
+    return wordlList[0].replace(/\.(.*)$/, '');
+  }   // Gestisce nel caso il filename non sia sburato come li rende cloudinary aggiungendo roba a caso dopo il nome. Ex. vedi il file 'fursuit.jpg'
   wordlList.pop();
-  return wordlList?.join(" ");
+  return wordlList.join(' ');
 }
 
 const Game: React.FC = () => {
