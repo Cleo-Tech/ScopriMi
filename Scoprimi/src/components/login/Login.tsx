@@ -10,9 +10,7 @@ async function fetchImageUrls(apiUrl: string) {
     if (!response.ok) {
       throw new Error(`Errore nella richiesta: ${response.status} ${response.statusText}`);
     }
-
     const data = await response.json();
-    console.log(data);
     // Restituire direttamente gli URL di download contenuti in "download_url"
     return data.map((file: { download_url: string }) => file.download_url);
   } catch (error) {
@@ -35,7 +33,6 @@ const Login: React.FC<LoginProps> = ({ onButtonClick }) => {
     // Caricare le immagini al montaggio del componente
     const loadImages = async () => {
       const imageUrls = await fetchImageUrls('https://api.github.com/repos/Cleo-Tech/ScoprimiImages/contents/profilePic');
-      console.log(imageUrls);
       setImages(imageUrls);
     };
     loadImages();

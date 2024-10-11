@@ -54,7 +54,6 @@ const App = () => {
 
   return (
     <SessionProvider>
-
       <Router>
         <SocketListener />
         <PopStateProvider>
@@ -70,7 +69,6 @@ const App = () => {
           </Routes>
         </PopStateProvider>
       </Router>
-
     </SessionProvider >
   );
 };
