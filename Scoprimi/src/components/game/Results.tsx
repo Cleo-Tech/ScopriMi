@@ -1,5 +1,5 @@
 import React from 'react';
-import { todoShitFunction } from './Game'
+import { todoShitFunction } from './Game';
 
 interface ResultsProps {
   voteRecap: { [key: string]: string };
