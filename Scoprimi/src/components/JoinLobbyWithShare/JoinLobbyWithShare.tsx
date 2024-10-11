@@ -8,7 +8,7 @@ import Alert from '../common/Alert.js';
 
 const JoinLobbyWithShare = () => {
   const navigate = useNavigate();
-  const { lobbyCode } = useParams();
+  const { lobbyCode } = useParams<string>();
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const { currentPlayer, currentPlayerImage, setCurrentLobby } = useSession();
 
@@ -41,7 +41,10 @@ const JoinLobbyWithShare = () => {
   return (
     <>
       <Alert text='Cambia nome' show={showAlert} onHide={() => setShowAlert(false)} />
-      <Login onButtonClick={() => handleJoinGame(lobbyCode)} />
+
+      <Login onButtonClick={() =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        handleJoinGame(lobbyCode!)} />
     </>
   );
 };

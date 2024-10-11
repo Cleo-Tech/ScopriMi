@@ -98,7 +98,7 @@ const Game: React.FC = () => {
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
       setPlayers([]);
-      setCurrentLobby(undefined);
+      setCurrentLobby(null);
       socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};

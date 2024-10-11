@@ -11,7 +11,7 @@ import LobbyPlayer from './LobbyPlayer.tsx'; // Import del nuovo componente Play
 
 const Lobby: React.FC = () => {
 
-  const [game, setGame] = useState<Game | undefined>(undefined);
+  const [game, setGame] = useState<Game | null>(null);
   const { currentLobby, currentPlayer, setCurrentLobby, currentPlayerImage } = useSession();
   const [isReady, setIsReady] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -57,25 +57,27 @@ const Lobby: React.FC = () => {
     socket.emit(c.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
       console.log('Received data:', data);
       setGame(data);
-      setIsReady(data.players[currentPlayer].isReadyToGame);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
     socket.on(c.RENDER_LOBBY, (data: Game) => {
       console.log(data);
       setGame(data);
 
-      if (data.players[currentPlayer] === undefined || data.players[currentPlayer] === null) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (data.players[currentPlayer!] === null) {
         console.log('Devo uscire dalla lobby');
         navigate('/');
         return;
       }
-
-      setIsReady(data.players[currentPlayer].isReadyToGame);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
     socket.on(c.INIZIA, () => {
       setGame((prevGame) => {
-        if (!prevGame) { return undefined; }
+        if (!prevGame) { return null; }
         return Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame, {
           isGameStarted: true,
         });
@@ -90,7 +92,7 @@ const Lobby: React.FC = () => {
 
   const handleConfirmLeave = () => {
     socket.emit(c.EXIT_LOBBY, { currentPlayer, currentLobby });
-    setCurrentLobby(undefined);
+    setCurrentLobby(null);
     navigate('/');
   };
 
@@ -149,7 +151,8 @@ const Lobby: React.FC = () => {
       <button
         className='my-btn-login elegant-background'
         style={{ width: '55px', height: '55px', padding: '0' }}
-        onClick={() => handleShareLobby(currentLobby)}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onClick={() => handleShareLobby(currentLobby!)}
       >
         <i className="fa-solid fa-share-from-square"></i>
       </button>
@@ -168,7 +171,8 @@ const Lobby: React.FC = () => {
               image={player.image}
               isReadyToGame={player.isReadyToGame}
               admin={game.admin}
-              currentPlayer={currentPlayer}
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              currentPlayer={currentPlayer!}
               onRemove={handleRemovePlayer}
             />
           ))}

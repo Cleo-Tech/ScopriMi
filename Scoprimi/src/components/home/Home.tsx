@@ -84,7 +84,8 @@ const Home: React.FC = () => {
         onClick={() => navigate('/login')}
       >
         <img
-          src={currentPlayerImage}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          src={currentPlayerImage!}
           alt="Login"
           className="login-icon"
         />
@@ -129,8 +130,10 @@ const Home: React.FC = () => {
       <BottomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        playerName={currentPlayer}
-        image={currentPlayerImage}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        playerName={currentPlayer!}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        image={currentPlayerImage!}
       />
 
     </>

@@ -53,7 +53,16 @@ interface GameStateContextType {
 }
 
 // Create the context
-const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
+const GameStateContext = createContext<GameStateContextType | null>(null);
+
+// Custom hook to use the game state context
+const useGameState = () => {
+  const context = useContext(GameStateContext);
+  if (!context) {
+    throw new Error('useGameState must be used within a GameStateProvider');
+  }
+  return context;
+};
 
 // Game state provider component
 const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -110,14 +119,6 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   );
 };
 
-// Custom hook to use the game state context
-const useGameState = () => {
-  const context = useContext(GameStateContext);
-  if (!context) {
-    throw new Error('useGameState must be used within a GameStateProvider');
-  }
-  return context;
-};
 
 export { GameStateProvider, useGameState, GameStates };
 
