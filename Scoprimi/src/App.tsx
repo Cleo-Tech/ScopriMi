@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/home/Home';
 import Lobby from './components/lobby/Lobby';
@@ -8,7 +9,6 @@ import ProtectedRoute from './components/ProtectedRoutes';
 import ErrorPage from './components/ErrorPage';
 import FinalResults from './components/finalresults/FinalResults';
 import Login from './components/login/Login';
-import { useEffect, useState } from 'react';
 import { webServerBaseUrl } from './ts/socketInit';
 import Loader from './components/Loader';
 import SocketListener from './components/SocketListener';
@@ -17,7 +17,7 @@ import Page404 from './components/Page404';
 import { GameStateProvider } from './contexts/GameStateContext';
 
 const App = () => {
-  const [serviceUp, setServiceUp] = useState(null); // null: loading, true: up, false: down
+  const [serviceUp, setServiceUp] = useState<boolean | null>(null); // null: loading, true: up, false: down
 
   useEffect(() => {
     const checkServiceStatus = async () => {

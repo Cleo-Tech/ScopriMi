@@ -1,10 +1,9 @@
-
 import { useNavigate, useParams } from 'react-router-dom';
 import Login from '../login/Login';
 import { socket } from '../../ts/socketInit';
 import { useSession } from '../../contexts/SessionContext';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Alert from '../common/Alert.js';
 
 const JoinLobbyWithShare = () => {

@@ -19,7 +19,7 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
   const navigate = useNavigate();
   const location = useLocation();
   const { setCurrentLobby, currentLobby, currentPlayer } = useSession();
-  const [currentPage, setCurrentPage] = useState<string>(undefined);
+  const [currentPage, setCurrentPage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
 
