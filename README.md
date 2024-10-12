@@ -40,7 +40,6 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
 
 ## Funzionalità in arrivo👀
 - **Disegni✏️**: nuova modalità di gioco in cui è possibile disegnare / modificare un immagine basandosi su uno dei giocatori presenti
-- **Gestione lobby**: aggiunta di un admin per ogni lobby, con la possibilità di rimuovere giocatore e fare iniziare la partita
 - **Foto📷**: è possibile scattarsi una foto da usare durante la partita
 - **Tanto altro**: varie modifiche server-side, miglioramento UI/UX...
 
