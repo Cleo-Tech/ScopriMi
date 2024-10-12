@@ -66,7 +66,7 @@ const Lobby: React.FC = () => {
       setGame(data);
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (data.players[currentPlayer!] === null) {
+      if (data.players[currentPlayer!] === null || data.players[currentPlayer!] === undefined) {
         console.log('Devo uscire dalla lobby');
         navigate('/');
         return;
