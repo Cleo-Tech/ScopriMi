@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../Server/src/socketConsts';
+import * as c from '../../../Server/src/MiddleWare/socketConsts.js';
 import { socket } from '../ts/socketInit';
 
 // Questo pezzo di codice serve per forzare luscita dalla lobby a tutti i player.

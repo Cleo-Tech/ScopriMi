@@ -18,13 +18,17 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
 ## Immagini del Gioco
 
 <p>
-  <img src="images/Login.png" alt="Login" width="300" style="display:inline-block;" />
-  <img src="images/Home.png" alt="Home" width="300" style="display:inline-block;" />
-  <img src="images/Lobby.png" alt="Lobby" width="300" style="display:inline-block;" />
-  <img src="images/Game.png" alt="Game" width="300" style="display:inline-block;" />
-  <img src="images/Results.png" alt="Results" width="300" style="display:inline-block;" />
-  <img src="images/FinalResults.png" alt="Final Results" width="300" style="display:inline-block;" />
+  <img src="/images/Login.png" alt="Login" width="300" style="display:inline-block;" />
+  <img src="/images/Home.png" alt="Home" width="300" style="display:inline-block;" />
+  <img src="/images/LobbyMenu.png" alt="Lobby Menu" width="300" style="display:inline-block;" />
+  <img src="/images/Lobby.png" alt="Lobby" width="300" style="display:inline-block;" />
+  <img src="/images/Game.png" alt="Game" width="300" style="display:inline-block;" />
+  <img src="/images/Photo.png" alt="Photo" width="300" style="display:inline-block;" />
+  <img src="/images/Results.png" alt="Results" width="300" style="display:inline-block;" />
+  <img src="/images/FinalResults.png" alt="Final Results" width="300" style="display:inline-block;" />
 </p>
+
+
 
 
 
@@ -36,7 +40,6 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
 
 ## Funzionalità in arrivo👀
 - **Disegni✏️**: nuova modalità di gioco in cui è possibile disegnare / modificare un immagine basandosi su uno dei giocatori presenti
-- **Gestione lobby**: aggiunta di un admin per ogni lobby, con la possibilità di rimuovere giocatore e fare iniziare la partita
 - **Foto📷**: è possibile scattarsi una foto da usare durante la partita
 - **Tanto altro**: varie modifiche server-side, miglioramento UI/UX...
 

@@ -1,16 +1,16 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface SessionContextProps {
-  currentLobby: string | undefined;
-  setCurrentLobby: (lobby: string | undefined) => void;
-  currentPlayer: string | undefined;
-  setCurrentPlayer: (name: string | undefined) => void;
+  currentLobby: string | null;
+  setCurrentLobby: (lobby: string | null) => void;
+  currentPlayer: string | null;
+  setCurrentPlayer: (name: string | null) => void;
   isSetPlayer: boolean;
-  currentPlayerImage: string | undefined;
-  setCurrentPlayerImage: (image: string | undefined) => void;
+  currentPlayerImage: string | null;
+  setCurrentPlayerImage: (image: string | null) => void;
 }
 
-const SessionContext = createContext<SessionContextProps | undefined>(undefined);
+const SessionContext = createContext<SessionContextProps | null>(null);
 
 export const useSession = () => {
   const context = useContext(SessionContext);
@@ -22,11 +22,11 @@ export const useSession = () => {
 
 export const SessionProvider = ({ children }: { children: ReactNode }) => {
   // Stato della lobby
-  const [currentLobby, setCurrentLobby] = useState<string | undefined>(undefined);
+  const [currentLobby, setCurrentLobby] = useState<string | null>(null);
 
   // Stato del player
-  const [currentPlayer, setCurrentPlayer] = useState<string | undefined>(undefined);
-  const [currentPlayerImage, setCurrentPlayerImage] = useState<string | undefined>(undefined);
+  const [currentPlayer, setCurrentPlayer] = useState<string | null>(null);
+  const [currentPlayerImage, setCurrentPlayerImage] = useState<string | null>(null);
   const [isSetPlayer, setIsSetPlayer] = useState<boolean>(false);
 
   useEffect(() => {

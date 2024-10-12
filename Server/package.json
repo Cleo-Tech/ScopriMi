@@ -1,12 +1,12 @@
 {
-  "name": "Server",
-  "version": "0.4.0",
+  "name": "server",
+  "version": "0.6.0",
   "main": "index.ts",
   "type": "module",
   "scripts": {
     "build": "npm i && tsc && cpx \"src/questions.json\" dist/",
     "server": "node dist/index.js",
-    "start": "npm run build && node dist/start.js"
+    "start": "npm run build && node --env-file=.env dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -28,7 +28,6 @@
     "cpx2": "^7.0.1",
     "eslint": "^9.8.0",
     "globals": "^15.8.0",
-    "nodemon": "^3.1.4",
     "typescript": "^5.5.4"
   }
 }

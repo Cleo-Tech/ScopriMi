@@ -3,12 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSession } from './SessionContext';
 import { socket } from '../ts/socketInit';
 
-const PopStateContext = createContext<void>(undefined);
+const PopStateContext = createContext<void | null>(null);
 
 // Hook per usare il contesto
 export const useOnPopStateContext = () => {
   const context = useContext(PopStateContext);
-  if (context === undefined) {
+  if (context === null) {
     throw new Error('PopStateContext must be used within a PopStateProvider');
   }
   return context;
@@ -19,7 +19,7 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
   const navigate = useNavigate();
   const location = useLocation();
   const { setCurrentLobby, currentLobby, currentPlayer } = useSession();
-  const [currentPage, setCurrentPage] = useState<string>(undefined);
+  const [currentPage, setCurrentPage] = useState<string | null>(null);
 
   useEffect(() => {
 
@@ -31,7 +31,7 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
     } else if (pathname.includes('/game')) {
       setCurrentPage('game');
     } else {
-      setCurrentPage(undefined);
+      setCurrentPage(null);
     }
   }, [location.pathname]);
 
@@ -41,11 +41,11 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
     // e` una completa merda, stakka funzioni allinfinito una sopra
     // allaltra di handlepopstate
     const handlePopState = () => {
-      if (currentLobby !== undefined && currentPlayer !== undefined) {
+      if (currentLobby !== null && currentPlayer !== null) {
         if (currentPage === 'lobby') {
           console.log('@LOBBY');
           socket.emit('exitLobby', { currentPlayer, currentLobby });
-          setCurrentLobby(undefined);
+          setCurrentLobby(null);
           navigate('/', { replace: true });
         } else if (currentPage === 'game') {
           console.log('@GAME');
@@ -61,7 +61,7 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
   }, [currentPage, currentPlayer, currentLobby, navigate, setCurrentLobby]);
 
   return (
-    <PopStateContext.Provider value={undefined}>
+    <PopStateContext.Provider value={null}>
       {children}
     </PopStateContext.Provider>
   );

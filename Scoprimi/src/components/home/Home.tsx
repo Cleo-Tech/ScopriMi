@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/socketConsts.js';
+import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { socket } from '../../ts/socketInit.ts';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import LobbyList from '../common/LobbyList.tsx';
@@ -84,7 +84,8 @@ const Home: React.FC = () => {
         onClick={() => navigate('/login')}
       >
         <img
-          src={currentPlayerImage}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          src={currentPlayerImage!}
           alt="Login"
           className="login-icon"
         />
@@ -129,7 +130,12 @@ const Home: React.FC = () => {
       <BottomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        playerName={currentPlayer!}
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        image={currentPlayerImage!}
       />
+
     </>
   );
 };

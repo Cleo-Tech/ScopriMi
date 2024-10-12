@@ -11,7 +11,6 @@ interface PlayerListProps {
 
 const PlayerList: React.FC<PlayerListProps> = ({ players, images, onVote, disabled, resetSelection, playersWhoVoted }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
-
   useEffect(() => {
     if (resetSelection) {
       setSelectedPlayer(null); // Resetta la selezione quando `resetSelection` è vero

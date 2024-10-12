@@ -1,15 +1,14 @@
-
 import { useNavigate, useParams } from 'react-router-dom';
 import Login from '../login/Login';
 import { socket } from '../../ts/socketInit';
 import { useSession } from '../../contexts/SessionContext';
-import * as c from '../../../../Server/src/socketConsts.js';
-import { useEffect, useState } from 'react';
+import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import React, { useEffect, useState } from 'react';
 import Alert from '../common/Alert.js';
 
 const JoinLobbyWithShare = () => {
   const navigate = useNavigate();
-  const { lobbyCode } = useParams();
+  const { lobbyCode } = useParams<string>();
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const { currentPlayer, currentPlayerImage, setCurrentLobby } = useSession();
 
@@ -42,7 +41,10 @@ const JoinLobbyWithShare = () => {
   return (
     <>
       <Alert text='Cambia nome' show={showAlert} onHide={() => setShowAlert(false)} />
-      <Login onButtonClick={() => handleJoinGame(lobbyCode)} />
+
+      <Login onButtonClick={() =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        handleJoinGame(lobbyCode!)} />
     </>
   );
 };
