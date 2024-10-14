@@ -83,11 +83,11 @@ const FinalResults: React.FC = () => {
                 className={`podium-position position-${index + 1}`}
                 style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }}
               >
-                <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
+                <img className="image-player-podium" src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
                 <div style={{ height: heightStyle, backgroundColor, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}>
                   <p style={{ margin: '0' }}>{score}</p>
                 </div>
-                <p style={{ textAlign: 'center' }}>{player}</p>
+                <p className="name-podium" style={{ textAlign: 'center' }}>{player}</p>
               </div>
             );
           })}
@@ -96,19 +96,25 @@ const FinalResults: React.FC = () => {
         <div className="elegant-background mt-3 scrollable fill">
           <table className="my-table">
             <tbody>
-              {otherPlayers.map(([player, { score, image }]) => (
-                <tr key={player}>
+              {otherPlayers.map(([player, { score, image }], index, arr) => (
+                <tr
+                  className="player-row"
+                  key={player}
+                //style={{ animationDelay: `${(arr.length - index - 1) * 0.1}s` }} // Ordine inverso
+                >
                   <td>
                     <img
                       src={image}
                       alt={`${player} avatar`}
-                      style={{ width: '40px', height: '40px', borderRadius: '10%' }} />
+                      style={{ width: '40px', height: '40px', borderRadius: '10%' }}
+                    />
                   </td>
                   <td>{player}</td>
                   <td>{score}</td>
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
 
