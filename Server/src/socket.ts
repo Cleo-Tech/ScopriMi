@@ -327,12 +327,25 @@ export function setupSocket(io: any) {
         const selectedPlayer = keys[Math.floor(Math.random() * keys.length)];
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
-        console.log('Game Over: no more questions.');
-        console.log('Risultati finali:');
-
-        io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
-        actualGameManager.deleteGame(thisGame.lobbyCode);
+        const pages = [
+          { player: 'Giocatore 1', phrase: 'Frase per il giocatore 1' },
+          { player: 'Giocatore 2', phrase: 'Frase per il giocatore 2' },
+          { player: 'Giocatore 3', phrase: 'Frase per il giocatore 3' },
+        ];
+        io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
       }
+    });
+
+    socket.on(c.READY_FOR_PODIUM, (data: { lobbyCode: string; playerName: string }) => {
+      console.log('backend podium');
+      const thisGame = actualGameManager.getGame(data.lobbyCode);
+      if (!thisGame) {
+        socket.emit(c.FORCE_RESET);
+        return;
+      }
+      // TODO controlla tutti pronti
+      actualGameManager.deleteGame(thisGame.lobbyCode);
+      io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
 
     socket.on(c.REQUEST_RENDER_LOBBY, (lobbyCode: string, callback: (thisGame: Game) => void) => {

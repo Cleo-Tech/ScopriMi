@@ -1,6 +1,6 @@
 import React from 'react';
 import { FinalResultData } from '../../ts/types';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const defaultHeights = [
   '7vh',
@@ -32,8 +32,10 @@ function getPodiumStats(sameScore1And2, sameScore1And3, sameScore2And3, position
 
   return podiumArray;
 }
-const FinalResults: React.FC<{ finalResults: FinalResultData }> = ({ finalResults }) => {
+const FinalResults: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { finalResults } = location.state as { finalResults: FinalResultData };
 
   // Ordinamento con tipizzazione
   const sortedResults = Object.entries(finalResults)

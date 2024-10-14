@@ -14,6 +14,7 @@ import SocketListener from './components/SocketListener';
 import JoinLobbyWithShare from './components/JoinLobbyWithShare/JoinLobbyWithShare';
 import Page404 from './components/Page404';
 import { GameStateProvider } from './contexts/GameStateContext';
+import FinalResults from './components/finalresults/FinalResults';
 
 const App = () => {
   const [serviceUp, setServiceUp] = useState<boolean | null>(null); // null: loading, true: up, false: down
@@ -61,6 +62,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/lobby" element={<ProtectedRoute component={Lobby} />} />
             <Route path="/game" element={<ProtectedRoute component={GameWithState} />} />
+            <Route path="/final-results" element={<FinalResults />} />
             <Route path="/join/:lobbyCode" element={<JoinLobbyWithShare />} />
             <Route path="/error" element={<ErrorPage />} />
             <Route path="*" element={<Page404 />} />

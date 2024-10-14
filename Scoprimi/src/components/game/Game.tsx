@@ -11,7 +11,7 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
-import FinalResults from '../finalresults/FinalResults.js';
+import EndGameWrapper from './EndGameWrapper.js';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -36,7 +36,7 @@ const Game: React.FC = () => {
   const [clicked, setClicked] = useState<boolean>(false);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
   const [resetSelection, setResetSelection] = useState<boolean>(false);
-  const [buttonClicked, setButtonClicked] = useState<boolean>(false); // Nuovo stato per il bottone
+  const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
   const [questionImages, setQuestionImages] = useState<string[]>([]);
 
@@ -45,7 +45,8 @@ const Game: React.FC = () => {
   const navigate = useNavigate();
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
-  const [finalResults, setFinalResults] = useState<FinalResultData>();
+
+  const [pages, setPages] = useState<any>();
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
@@ -73,6 +74,12 @@ const Game: React.FC = () => {
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
+  useEffect(() => {
+    socket.on(c.ENDGAMEWRAPPER, (data: { pages }) => {
+      setPages(data.pages);
+      transitionTo(GameStates.PREPODIUMWRAP);
+    });
+  }, [transitionTo]);
 
   useEffect(() => {
     socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
@@ -99,11 +106,9 @@ const Game: React.FC = () => {
 
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
-      
-      // TODO ricordati di spostarlo
-      // setCurrentLobby(null);
-      // setPlayers([]);
-      // socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
+      setCurrentLobby(null);
+      setPlayers([]);
+      socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};
       Object.keys(data.playerScores).forEach(playerName => {
@@ -113,8 +118,7 @@ const Game: React.FC = () => {
         };
       });
 
-      setFinalResults(finalResults);
-      transitionTo(GameStates.PODIUM);
+      navigate('/final-results', { state: { finalResults } });
     });
 
     return () => {
@@ -237,11 +241,8 @@ const Game: React.FC = () => {
       );
 
     case GameStates.PREPODIUMWRAP:
-      break;
-    case GameStates.PODIUM:
       return (
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        <FinalResults finalResults={finalResults!} />
+        <EndGameWrapper pages={pages}></EndGameWrapper>
       );
 
     default:
