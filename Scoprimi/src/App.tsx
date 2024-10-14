@@ -7,7 +7,6 @@ import { SessionProvider } from './contexts/SessionContext';
 import { PopStateProvider } from './contexts/EventListener';
 import ProtectedRoute from './components/ProtectedRoutes';
 import ErrorPage from './components/ErrorPage';
-import FinalResults from './components/finalresults/FinalResults';
 import Login from './components/login/Login';
 import { webServerBaseUrl } from './ts/socketInit';
 import Loader from './components/Loader';
@@ -62,7 +61,6 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/lobby" element={<ProtectedRoute component={Lobby} />} />
             <Route path="/game" element={<ProtectedRoute component={GameWithState} />} />
-            <Route path="/final-results" element={<FinalResults />} />
             <Route path="/join/:lobbyCode" element={<JoinLobbyWithShare />} />
             <Route path="/error" element={<ErrorPage />} />
             <Route path="*" element={<Page404 />} />

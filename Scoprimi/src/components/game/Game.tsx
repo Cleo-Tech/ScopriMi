@@ -11,6 +11,7 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
+import FinalResults from '../finalresults/FinalResults.js';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -44,6 +45,7 @@ const Game: React.FC = () => {
   const navigate = useNavigate();
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+  const [finalResults, setFinalResults] = useState<FinalResultData>();
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
@@ -97,9 +99,11 @@ const Game: React.FC = () => {
 
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
-      setPlayers([]);
-      setCurrentLobby(null);
-      socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
+      
+      // TODO ricordati di spostarlo
+      // setCurrentLobby(null);
+      // setPlayers([]);
+      // socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};
       Object.keys(data.playerScores).forEach(playerName => {
@@ -108,8 +112,9 @@ const Game: React.FC = () => {
           image: data.playerImages[playerName],
         };
       });
-      console.log(finalResults);
-      navigate('/final-results', { state: { finalResults } });
+
+      setFinalResults(finalResults);
+      transitionTo(GameStates.PODIUM);
     });
 
     return () => {
@@ -117,7 +122,6 @@ const Game: React.FC = () => {
       socket.off(c.SHOW_RESULTS);
       socket.off(c.RESULT_MESSAGE);
       socket.off(c.GAME_OVER);
-      //socket.off(c.PLAYERS_WHO_VOTED); IDK
     };
   }, [currentLobby, currentPlayer, navigate, setCurrentLobby, transitionTo]);
 
@@ -136,7 +140,7 @@ const Game: React.FC = () => {
 
   const handleNextQuestion = () => {
     setResetSelection(true);
-    setButtonClicked(true); // Cambia lo stato del bottone
+    setButtonClicked(true);
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     transitionTo(GameStates.NEXTQUESTION);
   };
@@ -223,13 +227,21 @@ const Game: React.FC = () => {
               onClick={handleNextQuestion}
               style={{
                 width: '100%',
-                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268', // Cambia il colore al clic
+                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268', // Cambia il colore al click
               }}
             >
               Prosegui al prossimo turno
             </button>
           </div>
         </div>
+      );
+
+    case GameStates.PREPODIUMWRAP:
+      break;
+    case GameStates.PODIUM:
+      return (
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        <FinalResults finalResults={finalResults!} />
       );
 
     default:
