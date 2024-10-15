@@ -337,13 +337,15 @@ export function setupSocket(io: any) {
     });
 
     socket.on(c.READY_FOR_PODIUM, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('backend podium');
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(c.FORCE_RESET);
         return;
       }
-      // TODO controlla tutti pronti
+      thisGame.players[data.playerName].isReadyToPodiumm = true;
+      if (!thisGame.isAllPlayersReadyToPodium()) {
+        return;
+      }
       actualGameManager.deleteGame(thisGame.lobbyCode);
       io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });

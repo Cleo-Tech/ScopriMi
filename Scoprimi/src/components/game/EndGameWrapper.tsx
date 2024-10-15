@@ -3,7 +3,7 @@ import { useSession } from '../../contexts/SessionContext';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 
-// Tipo per le informazioni sul giocatore
+// Todo decidi che cazzo vuoi mandare alla page
 interface PlayerInfo {
   player: string;
   phrase: string;
@@ -17,22 +17,23 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const { currentPlayer, currentLobby } = useSession();
 
-  const handleSwipeLeft = () => {
+  async function handleSwipeLeft() {
     if (currentPage < pages.length - 1) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
 
       // Invio dell'evento quando si passa all'ultima pagina
       if (nextPage === pages.length - 1) {
-        console.log('Invio evento al server per il giocatore:', currentPlayer);
         const data = {
           lobbyCode: currentLobby,
           playerName: currentPlayer,
         };
-        socket.emit(c.READY_FOR_PODIUM, data);
+        setTimeout(() => {
+          socket.emit(c.READY_FOR_PODIUM, data);
+        }, 3000); // Esegui dopo 3 secondi (3000 ms)
       }
     }
-  };
+  }
 
   const handleSwipeRight = () => {
     if (currentPage > 0) {
@@ -40,6 +41,7 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
     }
   };
 
+  // TODO chiedi a zelo
   return (
     <div className="paginator end-game-wrapper">
       <div

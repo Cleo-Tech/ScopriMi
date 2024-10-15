@@ -206,6 +206,14 @@ export class Game {
   }
 
   /**
+   * Checks if all players are ready to podium.
+   * @returns True if all players are ready, otherwise false
+   */
+  isAllPlayersReadyToPodium(): boolean {
+    return Object.values(this.players).every(player => player.isReadyToPodiumm);
+  }
+
+  /**
    * Returns the next result from the question iterator.
    * @returns The iterator result object
    */
