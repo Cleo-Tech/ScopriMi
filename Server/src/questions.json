@@ -73,7 +73,10 @@
         "Chi verrebbe beccato a fare una gara di rutti durante una riunione aziendale?",
         "Chi è più probabile che evada le tasse?",
         "Chi fa sapere per ultimo se esce o meno quando c'è da uscire?",
-        "Chi spenderebbe 1000€ per un paio di scarpe"
+        "Chi spenderebbe 1000€ per un paio di scarpe",
+        "Chi è più probabile che resti sveglio tutta la notte a guardare una serie TV?",
+        "Chi è più probabile che faccia la figura più imbarazzante a una festa?",
+        "Chi è più probabile che cambi completamente lavoro da un giorno all’altro?"
     ],
     "adult": [
         "Chi è più probabile che venga arrestato per atti osceni in luogo pubblico?",
@@ -119,7 +122,8 @@
         "Chi proverebbe una spiagga per nudisti?",
         "Chi è più probabile che si apra OF?",
         "Chi andrebbe in coma etilico dopo un drink?",
-        "Chi andrebbe ad un party di Diddy?"
+        "Chi andrebbe ad un party di Diddy?",
+        "Chi è più probabile che confonda il nome del proprio partner durante il sesso?"
     ],
     "photo": [
         "animal£Quale animale regalerebbe $ alla sua anima gemella?",
@@ -135,6 +139,9 @@
         "tattoo£Che tatuaggio si farebbe $?",
         "lottery£Cosa farebbe $ se domani vincesse alla lotteria?",
         "island£Se $ dovesse passare una settimana da solo su un isola deserta, cosa porterebbe con sé?",
-        "concert£Di quale artista $ andrebbe al concerto?"
+        "concert£Di quale artista $ andrebbe al concerto?",
+        "superhero£Quale supereroe sceglierebbe $ per salvare il mondo?",
+        "foodDish£Quale piatto mangerebbe $ ogni giorno per il resto della vita?",
+        "crazyOutfit£Quale accessorio stravagante non potrebbe mancare nel guardaroba di $?"
     ]
 }
