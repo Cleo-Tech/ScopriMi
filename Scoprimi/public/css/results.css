@@ -17,6 +17,8 @@
   margin-right: auto;
   /* Rimuove margini extra del paragrafo */
   font-size: 3vw;
+  color: #ccc;
+  /* Colore leggermente grigio di default */
 }
 
 .text-left {
@@ -49,4 +51,13 @@
   display: block;
   text-align: center;
   margin-top: 2vw;
+}
+
+.font-semi-bold {
+  font-weight: 600;
+}
+
+.font-white {
+  color: #fff;
+  /* Testo bianco */
 }

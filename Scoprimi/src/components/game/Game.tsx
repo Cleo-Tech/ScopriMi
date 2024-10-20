@@ -199,22 +199,33 @@ const Game: React.FC = () => {
       return (
         <div className="paginator">
           <div className="result-message text-center">
-            {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Scelta più votata:</h3>)}
-            {!isPhoto ?
+            <h4>{question}</h4>
+            <p className="result-subtitle">
+              {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
+            </p>
+            {!isPhoto ? (
               <img
                 src={playerImages[mostVotedPerson]}
                 alt={mostVotedPerson}
                 className="winnerImage"
-              /> :
+              />
+            ) : (
               <img
                 src={mostVotedPerson}
                 alt={todoShitFunction(mostVotedPerson)}
                 className="winnerImage"
-              />}
+              />
+            )}
             <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
           </div>
-          <div className='elegant-background image-container fill scrollable'>
-            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />
+          <div className="elegant-background image-container fill scrollable">
+            <Results
+              curPlayer={currentPlayer}
+              mostVotedPerson={mostVotedPerson}
+              playerImages={playerImages}
+              voteRecap={voteRecap}
+              isPhoto={isPhoto}
+            />
           </div>
           <div className="d-flex justify-content-center align-items-center">
             <button
@@ -223,10 +234,10 @@ const Game: React.FC = () => {
               onClick={handleNextQuestion}
               style={{
                 width: '100%',
-                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268', // Cambia il colore al clic
+                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268',
               }}
             >
-              Prosegui al prossimo turno
+              Prosegui
             </button>
           </div>
         </div>
