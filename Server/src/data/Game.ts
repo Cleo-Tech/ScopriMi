@@ -78,7 +78,6 @@ export class Game {
       }
     }
 
-    console.log('MostVotedPerson: ', mostVotedPerson);
     this.resetVoters(); // Reset votes after the voting
     return mostVotedPerson;
   }
@@ -131,6 +130,10 @@ export class Game {
   castVote(playerName: string, vote: string): void {
     if (playerName in this.players) {
       this.players[playerName].whatPlayerVoted = vote; // Set the player's vote
+      // save the value inside the GAME for late state
+      // TODO valore "duplicato" per fare prima, potenzialmente ok
+      this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
+      this.currentQuestionIndex++;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
@@ -176,17 +179,6 @@ export class Game {
    */
   getCurrentQuestion(): Question | null {
     return this.selectedQuestions[this.currentQuestionIndex] || null;
-  }
-
-  /**
-   * Advances to the next question.
-   */
-  nextQuestion(): void {
-    if (this.currentQuestionIndex < this.selectedQuestions.length - 1) {
-      this.currentQuestionIndex++;
-    } else {
-      console.log('No more questions.');
-    }
   }
 
   /**
