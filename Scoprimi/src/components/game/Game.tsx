@@ -199,10 +199,11 @@ const Game: React.FC = () => {
       return (
         <div className="paginator">
           <div className="result-message text-center">
-            <h4>{question}</h4>
-            <p className="result-subtitle">
+            <h4 style={{ textAlign: 'left' }}>{selectedPlayer ? question.replace('$', selectedPlayer) : question}</h4>
+            <p className="result-subtitle" style={{ textAlign: 'left' }}>
               {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
             </p>
+
             {!isPhoto ? (
               <img
                 src={playerImages[mostVotedPerson]}
