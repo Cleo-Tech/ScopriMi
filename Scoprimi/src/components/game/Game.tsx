@@ -11,6 +11,7 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
+import QuestionList from './QuestionList'
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -154,8 +155,10 @@ const Game: React.FC = () => {
 
     case GameStates.MOCK:
       break;
-    case GameStates.WHORESPONSE:
-    case GameStates.WHOQUESTION:
+
+
+    case GameStates.PHOTOQUESTION:
+    case GameStates.PHOTORESPONSE:
       return (
         <div className="paginator">
           <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
@@ -170,6 +173,22 @@ const Game: React.FC = () => {
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
+
+    case GameStates.WHOQUESTION:
+    case GameStates.WHORESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
+
     case GameStates.THEMEQUESTION:
       break;
     case GameStates.THEMERESPONSE:

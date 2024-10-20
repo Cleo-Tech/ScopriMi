@@ -15,6 +15,9 @@ enum GameStates {
   // modalita con risposte a tema
   THEMEQUESTION = 'THEMEQUESTION',
   THEMERESPONSE = 'THEMERESPONSE',
+  // Modalità dove voti foto
+  PHOTOQUESTION = 'PHOTOQUESTION',
+  PHOTORESPONSE = 'PHOTORESPONSE',
   // risultato a fine manche
   RESULTOUTCOME = 'RESULTOUTCOME',
   // frase che esce a fine tema dopo x domande
@@ -26,13 +29,16 @@ enum GameStates {
 
 // Define states with possible transitions using the enum
 const states = {
-  [GameStates.NEXTQUESTION]: [GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION],
+  [GameStates.NEXTQUESTION]: [GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION],
 
   [GameStates.STANDARDQUESTION]: [GameStates.STANDARDRESPONSE],
   [GameStates.STANDARDRESPONSE]: [GameStates.RESULTOUTCOME],
 
   [GameStates.WHOQUESTION]: [GameStates.WHORESPONSE],
   [GameStates.WHORESPONSE]: [GameStates.RESULTOUTCOME],
+
+  [GameStates.PHOTOQUESTION]: [GameStates.PHOTORESPONSE],
+  [GameStates.PHOTORESPONSE]: [GameStates.RESULTOUTCOME],
 
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
@@ -82,11 +88,13 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     switch (qstMode) {
       case QuestionMode.Photo:
         // TODO add ALL
-        transitionTo(GameStates.WHOQUESTION);
+        transitionTo(GameStates.PHOTOQUESTION);
         break;
       case QuestionMode.Standard:
         transitionTo(GameStates.STANDARDQUESTION);
         break;
+      case QuestionMode.Who:
+        transitionTo(GameStates.WHOQUESTION);
       default:
         console.error('non dovevi finire qua');
         break;
@@ -102,6 +110,9 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         break;
       case GameStates.WHOQUESTION:
         transitionTo(GameStates.WHORESPONSE);
+        break;
+      case GameStates.PHOTOQUESTION:
+        transitionTo(GameStates.PHOTORESPONSE);
         break;
       case GameStates.THEMEQUESTION:
         transitionTo(GameStates.THEMERESPONSE);
