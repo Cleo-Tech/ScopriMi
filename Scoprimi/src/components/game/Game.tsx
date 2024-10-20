@@ -220,6 +220,7 @@ const Game: React.FC = () => {
           </div>
           <div className="elegant-background image-container fill scrollable">
             <Results
+              curPlayer={currentPlayer}
               mostVotedPerson={mostVotedPerson}
               playerImages={playerImages}
               voteRecap={voteRecap}
@@ -236,7 +237,7 @@ const Game: React.FC = () => {
                 backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268',
               }}
             >
-              Prosegui al prossimo turno
+              Prosegui
             </button>
           </div>
         </div>
