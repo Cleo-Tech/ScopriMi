@@ -325,11 +325,7 @@ export function setupSocket(io: any) {
         const selectedPlayer = keys[Math.floor(Math.random() * keys.length)];
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
-        const pages = [
-          { player: 'Giocatore 1', phrase: 'Frase per il giocatore 1' },
-          { player: 'Giocatore 2', phrase: 'Frase per il giocatore 2' },
-          { player: 'Giocatore 3', phrase: 'Frase per il giocatore 3' },
-        ];
+        const pages = thisGame.getAllPlayersSummary();
         io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
       }
     });

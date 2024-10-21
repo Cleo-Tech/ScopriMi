@@ -242,7 +242,7 @@ const Game: React.FC = () => {
 
     case GameStates.PREPODIUMWRAP:
       return (
-        <EndGameWrapper pages={pages}></EndGameWrapper>
+        <EndGameWrapper pages={pages} />
       );
 
     default:
