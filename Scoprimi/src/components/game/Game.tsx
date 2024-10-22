@@ -12,6 +12,7 @@ import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 import QuestionList from './QuestionList'
+import EndGameWrapper from './EndGameWrapper.js';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -36,7 +37,7 @@ const Game: React.FC = () => {
   const [clicked, setClicked] = useState<boolean>(false);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
   const [resetSelection, setResetSelection] = useState<boolean>(false);
-  const [buttonClicked, setButtonClicked] = useState<boolean>(false); // Nuovo stato per il bottone
+  const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
   const [questionImages, setQuestionImages] = useState<string[]>([]);
 
@@ -45,6 +46,8 @@ const Game: React.FC = () => {
   const navigate = useNavigate();
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+
+  const [pages, setPages] = useState<any>();
 
   const [isWho, setIsWho] = useState<boolean>(false);
 
@@ -75,6 +78,12 @@ const Game: React.FC = () => {
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
+  useEffect(() => {
+    socket.on(c.ENDGAMEWRAPPER, (data: { pages }) => {
+      setPages(data.pages);
+      transitionTo(GameStates.PREPODIUMWRAP);
+    });
+  }, [transitionTo]);
 
   useEffect(() => {
     socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
@@ -101,8 +110,8 @@ const Game: React.FC = () => {
 
     socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
-      setPlayers([]);
       setCurrentLobby(null);
+      setPlayers([]);
       socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};
@@ -112,7 +121,7 @@ const Game: React.FC = () => {
           image: data.playerImages[playerName],
         };
       });
-      console.log(finalResults);
+
       navigate('/final-results', { state: { finalResults } });
     });
 
@@ -121,7 +130,6 @@ const Game: React.FC = () => {
       socket.off(c.SHOW_RESULTS);
       socket.off(c.RESULT_MESSAGE);
       socket.off(c.GAME_OVER);
-      //socket.off(c.PLAYERS_WHO_VOTED); IDK
     };
   }, [currentLobby, currentPlayer, navigate, setCurrentLobby, transitionTo]);
 
@@ -140,7 +148,7 @@ const Game: React.FC = () => {
 
   const handleNextQuestion = () => {
     setResetSelection(true);
-    setButtonClicked(true); // Cambia lo stato del bottone
+    setButtonClicked(true);
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     transitionTo(GameStates.NEXTQUESTION);
   };
@@ -221,7 +229,10 @@ const Game: React.FC = () => {
       return (
         <div className="paginator">
           <div className="result-message text-center">
-            {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Scelta più votata:</h3>)}
+            <h4 style={{ textAlign: 'left' }}>{selectedPlayer ? question.replace('$', selectedPlayer) : question}</h4>
+            <p className="result-subtitle" style={{ textAlign: 'left' }}>
+              {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
+            </p>
             {isWho ? <h4>{mostVotedPerson}</h4> : (
               isPhoto ?
                 <img
@@ -238,8 +249,14 @@ const Game: React.FC = () => {
             )}
             <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
           </div>
-          <div className='elegant-background image-container fill scrollable'>
-            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />
+          <div className="elegant-background image-container fill scrollable">
+            <Results
+              curPlayer={currentPlayer}
+              mostVotedPerson={mostVotedPerson}
+              playerImages={playerImages}
+              voteRecap={voteRecap}
+              isPhoto={isPhoto}
+            />
           </div>
           <div className="d-flex justify-content-center align-items-center">
             <button
@@ -248,13 +265,18 @@ const Game: React.FC = () => {
               onClick={handleNextQuestion}
               style={{
                 width: '100%',
-                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268', // Cambia il colore al clic
+                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268',
               }}
             >
-              Prosegui al prossimo turno
+              Prosegui
             </button>
           </div>
         </div>
+      );
+
+    case GameStates.PREPODIUMWRAP:
+      return (
+        <EndGameWrapper pages={pages} />
       );
 
     default:

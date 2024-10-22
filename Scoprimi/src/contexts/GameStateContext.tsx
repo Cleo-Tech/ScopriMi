@@ -20,6 +20,8 @@ enum GameStates {
   PHOTORESPONSE = 'PHOTORESPONSE',
   // risultato a fine manche
   RESULTOUTCOME = 'RESULTOUTCOME',
+  // mario party-spotify wrap
+  PREPODIUMWRAP = 'WRAP',
   // frase che esce a fine tema dopo x domande
   THEMERESULTFINAL = 'THEMERESULTFINAL',
   // DOPO CHE ESCE IL PODIO FARE USCIRE MOCK
@@ -29,7 +31,12 @@ enum GameStates {
 
 // Define states with possible transitions using the enum
 const states = {
-  [GameStates.NEXTQUESTION]: [GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION],
+  [GameStates.NEXTQUESTION]: [
+    // il gioco continua
+    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION,
+    // il gioco finisce
+    GameStates.PREPODIUMWRAP, GameStates.PODIUM,
+  ],
 
   [GameStates.STANDARDQUESTION]: [GameStates.STANDARDRESPONSE],
   [GameStates.STANDARDRESPONSE]: [GameStates.RESULTOUTCOME],
@@ -42,9 +49,12 @@ const states = {
 
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
-  [GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PODIUM],
+  [GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PREPODIUMWRAP],
 
-  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PODIUM],
+  // TOGLI GameStates.PODIUM
+  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.MOCK, GameStates.NEXTQUESTION],
+
+  [GameStates.PREPODIUMWRAP]: [GameStates.PODIUM],
 
   [GameStates.PODIUM]: [GameStates.MOCK],
   [GameStates.MOCK]: [GameStates.NEXTQUESTION],

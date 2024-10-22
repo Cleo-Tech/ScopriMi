@@ -7,7 +7,6 @@ import { SessionProvider } from './contexts/SessionContext';
 import { PopStateProvider } from './contexts/EventListener';
 import ProtectedRoute from './components/ProtectedRoutes';
 import ErrorPage from './components/ErrorPage';
-import FinalResults from './components/finalresults/FinalResults';
 import Login from './components/login/Login';
 import { webServerBaseUrl } from './ts/socketInit';
 import Loader from './components/Loader';
@@ -15,6 +14,7 @@ import SocketListener from './components/SocketListener';
 import JoinLobbyWithShare from './components/JoinLobbyWithShare/JoinLobbyWithShare';
 import Page404 from './components/Page404';
 import { GameStateProvider } from './contexts/GameStateContext';
+import FinalResults from './components/finalresults/FinalResults';
 
 const App = () => {
   const [serviceUp, setServiceUp] = useState<boolean | null>(null); // null: loading, true: up, false: down
