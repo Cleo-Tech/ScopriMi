@@ -23,3 +23,7 @@
   padding: 0.5vh 1vw;
   border-radius: 10px;
 }
+
+.result-subtitle {
+  font-size: 0.9rem;
+}
