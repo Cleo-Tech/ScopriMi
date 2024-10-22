@@ -11,7 +11,7 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
-import QuestionList from './QuestionList'
+import QuestionList from './QuestionList';
 import EndGameWrapper from './EndGameWrapper.js';
 
 // Funzione per il parsing di filename di immagini

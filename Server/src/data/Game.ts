@@ -336,7 +336,8 @@ export class Game {
         playerWithMinVotes = player;
       }
     }
-
+    if (playerWithMinVotes.startsWith('http'))
+      return '';
     return playerWithMinVotes;
   }
 
@@ -361,7 +362,8 @@ export class Game {
         playerWithMaxVotes = player;
       }
     }
-
+    if (playerWithMaxVotes.startsWith('http'))
+      return '';
     return playerWithMaxVotes;
   }
 
