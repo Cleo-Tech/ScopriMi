@@ -134,7 +134,6 @@ export class Game {
       // save the value inside the GAME for late state
       // TODO valore "duplicato" per fare prima, potenzialmente ok
       this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
-      this.currentQuestionIndex++;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
@@ -373,12 +372,14 @@ export class Game {
 
     for (const qst of this.selectedQuestions) {
       if (qst.mode === QuestionMode.Photo) {
-        for (const vote of Object.values(qst.whatPlayersVoted)) {
-          totalVotes[vote] = (totalVotes[vote] || 0) + 1;
+        for (const [voter, vote] of Object.entries(qst.whatPlayersVoted)) {
+          if (vote === qst.winner) {
+            totalVotes[voter] = (totalVotes[voter] || 0) + 1;
+          }
         }
       }
     }
-
+    console.log(totalVotes);
     // Trova il giocatore con il numero massimo di voti nelle domande "photo"
     let maxVotes = 0;
     let playerWithMaxPhotoVotes = '';

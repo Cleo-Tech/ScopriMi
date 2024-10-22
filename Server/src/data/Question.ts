@@ -24,6 +24,7 @@ export class Question {
   public text: string;
   public images: string[];
   public whatPlayersVoted: { [key: string]: string };
+  public winner: string;
 
   constructor(questionMode: QuestionMode, questionGenre: QuestionGenre, question: string, images: string[]) {
     this.mode = questionMode;

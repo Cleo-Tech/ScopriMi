@@ -299,7 +299,8 @@ export function setupSocket(io: any) {
         const mostVotedPerson = thisGame.getMostVotedPerson();
         thisGame.resetWhatPlayersVoted();
         console.log('Tutti i giocatori hanno votato: ', voteRecap);
-
+        thisGame.selectedQuestions[thisGame.currentQuestionIndex].winner = mostVotedPerson;
+        thisGame.currentQuestionIndex++;
         io.to(data.lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     });
@@ -327,9 +328,6 @@ export function setupSocket(io: any) {
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         const pages = thisGame.getAllPlayersSummary();
-        console.log('-----------------');
-        console.log(pages);
-        console.log('-----------------');
         io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
       }
     });
