@@ -285,14 +285,14 @@ export class Game {
   // PREPODIUM //
   // --------- //
 
-  getAllPlayersSummary(): { player: string; phrase: string }[] {
-    const playersSummary: { player: string; phrase: string }[] = [];
+  getAllPlayersSummary(): { player: Player; phrase: string }[] {
+    const playersSummary: { player: Player; phrase: string }[] = [];
     let player = '';
 
     player = this.getMostVotedPlayer();
     if (player !== '') {
       playersSummary.push({
-        player: player,
+        player: this.players[player],
         phrase: 'Sei la persona piu votata, sei la star!',
       });
     }
@@ -300,7 +300,7 @@ export class Game {
     player = this.getLeastVotedPlayer();
     if (player !== '') {
       playersSummary.push({
-        player: player,
+        player: this.players[player],
         phrase: 'AYO, nessuno ti sta votando!',
       });
     }
@@ -308,7 +308,7 @@ export class Game {
     player = this.getPlayerWithMostPhotoVotes();
     if (player !== '') {
       playersSummary.push({
-        player: player,
+        player: this.players[player],
         phrase: 'Il cecchino delle foto!',
       });
     }

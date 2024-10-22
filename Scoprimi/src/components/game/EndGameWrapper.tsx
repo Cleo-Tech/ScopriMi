@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useSession } from '../../contexts/SessionContext';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { Player } from '../../../../Server/src/data/Player.js';
 
-// Todo decidi che cazzo vuoi mandare alla page
 interface PlayerInfo {
-  player: string;
+  player: Player;
   phrase: string;
 }
 
@@ -41,11 +41,25 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
     }
   };
 
-  // TODO chiedi a zelo
+
+  const swipeAreaStyle: React.CSSProperties = {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+  };
+
+  const navigationStyle: React.CSSProperties = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '20px',
+  };
+
   return (
-    <div className="paginator end-game-wrapper">
+    <div className='paginator'>
       <div
-        className="swipe-area"
+        style={swipeAreaStyle}
         onTouchStart={(e) => {
           const startX = e.touches[0].clientX;
           const handleTouchMove = (e: TouchEvent) => {
@@ -59,22 +73,33 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
             }
           };
           document.addEventListener('touchmove', handleTouchMove);
-          document.addEventListener('touchend', () => {
-            document.removeEventListener('touchmove', handleTouchMove);
-          }, { once: true });
+          document.addEventListener(
+            'touchend',
+            () => {
+              document.removeEventListener('touchmove', handleTouchMove);
+            },
+            { once: true },
+          );
         }}
       >
-        <div className="player-info">
-          <h2>{pages[currentPage].player}</h2>
-          <p>{pages[currentPage].phrase}</p>
+        <div>
+          <h2 className='mt-5 mb-5'>{pages[currentPage].phrase}</h2>
+          <h2 className='mt-5'>{pages[currentPage].player.name}</h2>
+          <img style={{ height: '70vw' }} src={pages[currentPage].player.image} className='mt-5' />
         </div>
       </div>
 
-      <div className="navigation">
-        <button onClick={handleSwipeRight} disabled={currentPage === 0}>
+      <div className={'lobby-button-group'} style={navigationStyle}>
+        <button className='my-btn my-bg-elegant-backgorund'
+          onClick={handleSwipeRight}
+          disabled={currentPage === 0}
+        >
           Indietro
         </button>
-        <button onClick={handleSwipeLeft} disabled={currentPage === pages.length - 1}>
+        <button className='my-btn my-bg-elegant-backgorund'
+          onClick={handleSwipeLeft}
+          disabled={currentPage === pages.length - 1}
+        >
           Avanti
         </button>
       </div>
