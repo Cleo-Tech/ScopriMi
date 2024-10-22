@@ -372,7 +372,7 @@ export class Game {
     const totalVotes: { [key: string]: number } = {};
 
     for (const qst of this.selectedQuestions) {
-      if (qst.mode === QuestionMode.Who) {
+      if (qst.mode === QuestionMode.Photo) {
         for (const vote of Object.values(qst.whatPlayersVoted)) {
           totalVotes[vote] = (totalVotes[vote] || 0) + 1;
         }

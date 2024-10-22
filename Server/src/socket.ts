@@ -190,6 +190,7 @@ export function setupSocket(io: any) {
             }
             else if (category === 'who') {
               questionMode = QuestionMode.Who;
+
             }
 
             // Crea l'istanza della classe `Question`
