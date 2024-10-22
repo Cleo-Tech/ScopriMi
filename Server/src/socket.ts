@@ -188,9 +188,9 @@ export function setupSocket(io: any) {
               images = shuffledonlyContextImages.slice(0, 4);
 
             }
-            // else if (category === 'who'){
-            //   questionMode = QuestionMode.Who;
-            // }
+            else if (category === 'who') {
+              questionMode = QuestionMode.Who;
+            }
 
             // Crea l'istanza della classe `Question`
             return new Question(

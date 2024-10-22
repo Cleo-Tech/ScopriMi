@@ -46,6 +46,8 @@ const Game: React.FC = () => {
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
 
+  const [isWho, setIsWho] = useState<boolean>(false);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
@@ -69,6 +71,7 @@ const Game: React.FC = () => {
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
+      setIsWho(data.question.mode === QuestionMode.Who);
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
@@ -185,7 +188,7 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+          <QuestionList questions={questionWho} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
 
@@ -219,17 +222,20 @@ const Game: React.FC = () => {
         <div className="paginator">
           <div className="result-message text-center">
             {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Scelta più votata:</h3>)}
-            {!isPhoto ?
-              <img
-                src={playerImages[mostVotedPerson]}
-                alt={mostVotedPerson}
-                className="winnerImage"
-              /> :
-              <img
-                src={mostVotedPerson}
-                alt={todoShitFunction(mostVotedPerson)}
-                className="winnerImage"
-              />}
+            {isWho ? <h4>{mostVotedPerson}</h4> : (
+              isPhoto ?
+                <img
+                  src={mostVotedPerson}
+                  alt={todoShitFunction(mostVotedPerson)}
+                  className="winnerImage"
+                />
+                :
+                <img
+                  src={playerImages[mostVotedPerson]}
+                  alt={mostVotedPerson}
+                  className="winnerImage"
+                />
+            )}
             <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
           </div>
           <div className='elegant-background image-container fill scrollable'>

@@ -9,7 +9,7 @@ interface QuestionListProps {
 
 const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled, resetSelection }) => {
   const [clicked, setClicked] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(String);
+  const [selectedQuestion, setSelectedQuestion] = useState(String);
 
   useEffect(() => {
     if (resetSelection) {
@@ -21,25 +21,22 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
     if (!disabled && !clicked) {
       onVote(question);
       setClicked(true);
-      setSelectedImage(question);
+      setSelectedQuestion(question);
     }
   };
 
   return (
     <div className='elegant-background-images fill'>
       {questions.map((question, index) => (
-        <img
+        <h4
           key={index}
-          src={question}
-          className='image-question'
-          alt={`image-${index}`}
-          onClick={() => handlePlayerClick(question)}
           style={{
             cursor: clicked || disabled ? 'not-allowed' : 'pointer',
-            opacity: clicked && selectedImage !== question ? 0.5 : 1,
-            filter: clicked && selectedImage !== question ? 'grayscale(100%)' : 'none', // Applica il bianco e nero se l'immagine è stata cliccata
-          }}
-        />
+            color: selectedQuestion === question ? 'green' : 'red',
+          }}>
+          {question}
+        </h4>
+
       ))}
     </div>
   );
