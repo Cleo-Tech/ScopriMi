@@ -205,7 +205,6 @@ export function setupSocket(io: any) {
 
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
 
-      console.log(allSelectedQuestions);
       const lobbies = actualGameManager.listGames();
       io.emit(c.RENDER_LOBBIES, { lobbies });
       const lobbyCode = data.code;
@@ -288,7 +287,6 @@ export function setupSocket(io: any) {
 
       if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
         thisGame.castVote(data.voter, data.vote);
-        console.log('Data: ', thisGame.getWhatPlayersVoted());
         io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       }
 
@@ -327,12 +325,24 @@ export function setupSocket(io: any) {
         const selectedPlayer = keys[Math.floor(Math.random() * keys.length)];
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
-        console.log('Game Over: no more questions.');
-        console.log('Risultati finali:');
-
-        io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
-        actualGameManager.deleteGame(thisGame.lobbyCode);
+        const pages = thisGame.getAllPlayersSummary();
+        io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
       }
+    });
+
+    socket.on(c.READY_FOR_PODIUM, (data: { lobbyCode: string; playerName: string }) => {
+      const thisGame = actualGameManager.getGame(data.lobbyCode);
+      if (!thisGame) {
+        socket.emit(c.FORCE_RESET);
+        return;
+      }
+      thisGame.players[data.playerName].isReadyToPodiumm = true;
+      if (!thisGame.isAllPlayersReadyToPodium()) {
+        return;
+      }
+      console.log(thisGame.selectedQuestions);
+      actualGameManager.deleteGame(thisGame.lobbyCode);
+      io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
 
     socket.on(c.REQUEST_RENDER_LOBBY, (lobbyCode: string, callback: (thisGame: Game) => void) => {

@@ -31,3 +31,5 @@ export const TEST_LOBBY: string = 'TEST_LOBBY';
 export const REMOVE_PLAYER: string = 'removePlayer';
 export const REQUEST_CATEGORIES: string = 'requestCategories';
 export const SEND_GENRES: string = 'SEND_GENRES';
+export const ENDGAMEWRAPPER: string = 'ENDGAMEWRAPPER';
+export const READY_FOR_PODIUM: string = 'READY_FOR_PODIUM';
