@@ -105,6 +105,7 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         break;
       case QuestionMode.Who:
         transitionTo(GameStates.WHOQUESTION);
+        break;
       default:
         console.error('non dovevi finire qua');
         break;
