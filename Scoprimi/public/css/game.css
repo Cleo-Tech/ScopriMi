@@ -33,6 +33,14 @@
   font-size: 5vw;
   font-weight: 500;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.textualAnswer p {
+  padding: 1vh 0px;
+  margin-bottom: 0px;
 }
 
 .sbu {

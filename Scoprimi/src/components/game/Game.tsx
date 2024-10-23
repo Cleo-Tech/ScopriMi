@@ -195,7 +195,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
@@ -234,7 +234,7 @@ const Game: React.FC = () => {
             <p className="result-subtitle" style={{ textAlign: 'left' }}>
               {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
             </p>
-            {isWho ? <h4>{mostVotedPerson}</h4> : (       // Da fixare, fa un pò cagare
+            {isWho ? <h4>{mostVotedPerson}</h4> : ( // Da fixare, fa un pò cagare
               isPhoto ?
                 <img
                   src={mostVotedPerson}
