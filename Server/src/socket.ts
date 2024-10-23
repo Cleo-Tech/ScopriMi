@@ -339,7 +339,12 @@ export function setupSocket(io: any) {
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         const pages = thisGame.getAllPlayersSummary();
-        io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
+        if (pages.length > 0) {
+          io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
+        } else {
+          actualGameManager.deleteGame(thisGame.lobbyCode);
+          io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
+        }
       }
     });
 
@@ -353,7 +358,7 @@ export function setupSocket(io: any) {
       if (!thisGame.isAllPlayersReadyToPodium()) {
         return;
       }
-      console.log(thisGame.selectedQuestions);
+
       actualGameManager.deleteGame(thisGame.lobbyCode);
       io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
