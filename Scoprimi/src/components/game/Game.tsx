@@ -196,7 +196,7 @@ const Game: React.FC = () => {
             </div>
             <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <QuestionList questions={['']} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
 

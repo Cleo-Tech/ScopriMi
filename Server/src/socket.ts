@@ -6,6 +6,11 @@ import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
 
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
+
+
 export const actualGameManager = new GameManager();
 
 // TODOshitImprove
@@ -191,6 +196,10 @@ export function setupSocket(io: any) {
             else if (category === 'who') {
               questionMode = QuestionMode.Who;
 
+              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+              who_questions.sort(() => 0.5 - Math.random());
+              images = who_questions.slice(0, 4);
+              console.log(images);
             }
 
             // Crea l'istanza della classe `Question`

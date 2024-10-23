@@ -30,9 +30,10 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
       {questions.map((question, index) => (
         <h4
           key={index}
+          onClick={() => handlePlayerClick(question)}
           style={{
             cursor: clicked || disabled ? 'not-allowed' : 'pointer',
-            color: selectedQuestion === question ? 'green' : 'red',
+            color: selectedQuestion === question ? 'green' : '',
           }}>
           {question}
         </h4>
