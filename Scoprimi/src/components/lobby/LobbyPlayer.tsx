@@ -78,7 +78,6 @@ const LobbyPlayer: React.FC<PlayerProps> = ({ name, image, isReadyToGame, admin,
             {isReadyToGame ? 'Pronto' : 'Non pronto'}
           </span>
         )}
-        <div className="tab-icon"></div>
       </div>
       {showDeleteBtn && (
         <div className="action-button delete" onClick={handleDelete}>

@@ -131,36 +131,3 @@
   right: 0;
   /* Fissa il pulsante a destra */
 }
-
-.swipeable .tab-icon,
-.swipeable .tab-icon:before,
-.swipeable .tab-icon:after {
-  background: #666;
-  /* Colore della tab-icon */
-}
-
-.swipeable .tab-icon {
-  position: absolute;
-  top: 50%;
-  right: calc(24px / 2 - 1px);
-  margin-top: -1px;
-  margin-right: 1px;
-  width: 2px;
-  height: 2px;
-}
-
-.swipeable .tab-icon:before,
-.swipeable .tab-icon:after {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 100%;
-}
-
-.swipeable .tab-icon:before {
-  top: -4px;
-}
-
-.swipeable .tab-icon:after {
-  top: 4px;
-}
