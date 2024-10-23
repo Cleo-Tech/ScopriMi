@@ -196,7 +196,7 @@ export function setupSocket(io: any) {
             else if (category === 'who') {
               questionMode = QuestionMode.Who;
 
-              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
               who_questions.sort(() => 0.5 - Math.random());
               images = who_questions.slice(0, 4);
               console.log(images);
@@ -295,13 +295,15 @@ export function setupSocket(io: any) {
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
-        thisGame.castVote(data.voter, data.vote);
-        io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
-      }
+      //if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
+      thisGame.castVote(data.voter, data.vote);
+      io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
+      //}
 
+      console.log(thisGame.players);
 
       if (thisGame.didAllPlayersVote()) {
+        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();

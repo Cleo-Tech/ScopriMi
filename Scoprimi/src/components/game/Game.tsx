@@ -101,6 +101,7 @@ const Game: React.FC = () => {
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
     }) => {
+      console.log('Madonna sburra');
       setVoteRecap(data.voteRecap);
       setPlayerImages(data.playerImages);
       setMostVotedPerson(data.mostVotedPerson);
