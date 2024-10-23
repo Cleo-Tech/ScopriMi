@@ -320,10 +320,15 @@ export class Game {
     const totalVotes: { [key: string]: number } = {};
 
     for (const qst of this.selectedQuestions) {
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who)
+        continue;
       for (const vote of Object.values(qst.whatPlayersVoted)) {
         totalVotes[vote] = (totalVotes[vote] || 0) + 1;
       }
     }
+
+    if (totalVotes.length === 0)
+      return '';
 
     // Trova il giocatore con il numero minimo di voti
     let minVotes = Infinity;
@@ -335,8 +340,6 @@ export class Game {
         playerWithMinVotes = player;
       }
     }
-    if (playerWithMinVotes.startsWith('http'))
-      return '';
     return playerWithMinVotes;
   }
 
@@ -345,11 +348,16 @@ export class Game {
 
     // Itera su tutte le domande selezionate
     for (const qst of this.selectedQuestions) {
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who)
+        continue;
       // Itera su tutti i voti dei giocatori per la domanda corrente
       for (const vote of Object.values(qst.whatPlayersVoted)) {
         totalVotes[vote] = (totalVotes[vote] || 0) + 1;
       }
     }
+
+    if (totalVotes.length === 0)
+      return '';
 
     // Trova il giocatore con il numero massimo di voti
     let maxVotes = 0;
@@ -361,8 +369,6 @@ export class Game {
         playerWithMaxVotes = player;
       }
     }
-    if (playerWithMaxVotes.startsWith('http'))
-      return '';
     return playerWithMaxVotes;
   }
 
@@ -379,7 +385,7 @@ export class Game {
         }
       }
     }
-    console.log(totalVotes);
+
     // Trova il giocatore con il numero massimo di voti nelle domande "photo"
     let maxVotes = 0;
     let playerWithMaxPhotoVotes = '';

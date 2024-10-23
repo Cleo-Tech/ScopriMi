@@ -101,6 +101,7 @@ const Game: React.FC = () => {
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
     }) => {
+      console.log('Madonna sburra');
       setVoteRecap(data.voteRecap);
       setPlayerImages(data.playerImages);
       setMostVotedPerson(data.mostVotedPerson);
@@ -194,9 +195,9 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          <QuestionList questions={['']} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
 
@@ -233,7 +234,7 @@ const Game: React.FC = () => {
             <p className="result-subtitle" style={{ textAlign: 'left' }}>
               {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
             </p>
-            {isWho ? <h4>{mostVotedPerson}</h4> : (       // Da fixare, fa un pò cagare
+            {isWho ? <h4>{mostVotedPerson}</h4> : ( // Da fixare, fa un pò cagare
               isPhoto ?
                 <img
                   src={mostVotedPerson}
@@ -247,7 +248,7 @@ const Game: React.FC = () => {
                   className="winnerImage"
                 />
             )}
-            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
+            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : !isWho ? mostVotedPerson : ''}</p>
           </div>
           <div className="elegant-background image-container fill scrollable">
             <Results

@@ -26,17 +26,18 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
   };
 
   return (
-    <div className='elegant-background-images fill'>
+    <div className='fill sbu'>
       {questions.map((question, index) => (
-        <h4
-          key={index}
-          style={{
-            cursor: clicked || disabled ? 'not-allowed' : 'pointer',
-            color: selectedQuestion === question ? 'green' : 'red',
-          }}>
-          {question}
-        </h4>
-
+        <div className='textualAnswer elegant-background' key={index}>
+          <p
+            onClick={() => handlePlayerClick(question)}
+            style={{
+              cursor: clicked || disabled ? 'not-allowed' : 'pointer',
+              color: selectedQuestion === question ? 'green' : '',
+            }}>
+            {question}
+          </p>
+        </div>
       ))}
     </div>
   );

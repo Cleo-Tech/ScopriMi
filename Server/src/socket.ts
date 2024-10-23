@@ -6,6 +6,11 @@ import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
 
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
+
+
 export const actualGameManager = new GameManager();
 
 // TODOshitImprove
@@ -191,6 +196,10 @@ export function setupSocket(io: any) {
             else if (category === 'who') {
               questionMode = QuestionMode.Who;
 
+              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+              who_questions.sort(() => 0.5 - Math.random());
+              images = who_questions.slice(0, 4);
+              console.log(images);
             }
 
             // Crea l'istanza della classe `Question`
@@ -286,13 +295,15 @@ export function setupSocket(io: any) {
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
-        thisGame.castVote(data.voter, data.vote);
-        io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
-      }
+      //if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
+      thisGame.castVote(data.voter, data.vote);
+      io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
+      //}
 
+      console.log(thisGame.players);
 
       if (thisGame.didAllPlayersVote()) {
+        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
@@ -328,7 +339,12 @@ export function setupSocket(io: any) {
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         const pages = thisGame.getAllPlayersSummary();
-        io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
+        if (pages.length > 0) {
+          io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
+        } else {
+          actualGameManager.deleteGame(thisGame.lobbyCode);
+          io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
+        }
       }
     });
 
@@ -342,7 +358,7 @@ export function setupSocket(io: any) {
       if (!thisGame.isAllPlayersReadyToPodium()) {
         return;
       }
-      console.log(thisGame.selectedQuestions);
+
       actualGameManager.deleteGame(thisGame.lobbyCode);
       io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
