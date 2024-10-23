@@ -248,7 +248,7 @@ const Game: React.FC = () => {
                   className="winnerImage"
                 />
             )}
-            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
+            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : !isWho ? mostVotedPerson : ''}</p>
           </div>
           <div className="elegant-background image-container fill scrollable">
             <Results
