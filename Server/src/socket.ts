@@ -188,9 +188,10 @@ export function setupSocket(io: any) {
               images = shuffledonlyContextImages.slice(0, 4);
 
             }
-            // else if (category === 'who'){
-            //   questionMode = QuestionMode.Who;
-            // }
+            else if (category === 'who') {
+              questionMode = QuestionMode.Who;
+
+            }
 
             // Crea l'istanza della classe `Question`
             return new Question(
@@ -298,7 +299,8 @@ export function setupSocket(io: any) {
         const mostVotedPerson = thisGame.getMostVotedPerson();
         thisGame.resetWhatPlayersVoted();
         console.log('Tutti i giocatori hanno votato: ', voteRecap);
-
+        thisGame.selectedQuestions[thisGame.currentQuestionIndex].winner = mostVotedPerson;
+        thisGame.currentQuestionIndex++;
         io.to(data.lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     });

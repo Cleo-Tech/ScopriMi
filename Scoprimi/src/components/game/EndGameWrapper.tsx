@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSession } from '../../contexts/SessionContext';
 import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
@@ -17,21 +17,24 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const { currentPlayer, currentLobby } = useSession();
 
+
+  // Effetto per inviare l'evento quando si passa all'ultima pagina
+  useEffect(() => {
+    if (currentPage === pages.length - 1) {
+      const data = {
+        lobbyCode: currentLobby,
+        playerName: currentPlayer,
+      };
+      setTimeout(() => {
+        socket.emit(c.READY_FOR_PODIUM, data);
+      }, 3000); // Esegui dopo 3 secondi (3000 ms)
+    }
+  }, [currentLobby, currentPage, currentPlayer, pages.length]);
+
   async function handleSwipeLeft() {
     if (currentPage < pages.length - 1) {
       const nextPage = currentPage + 1;
       setCurrentPage(nextPage);
-
-      // Invio dell'evento quando si passa all'ultima pagina
-      if (nextPage === pages.length - 1) {
-        const data = {
-          lobbyCode: currentLobby,
-          playerName: currentPlayer,
-        };
-        setTimeout(() => {
-          socket.emit(c.READY_FOR_PODIUM, data);
-        }, 3000); // Esegui dopo 3 secondi (3000 ms)
-      }
     }
   }
 

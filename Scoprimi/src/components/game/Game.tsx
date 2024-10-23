@@ -11,6 +11,7 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
+import QuestionList from './QuestionList';
 import EndGameWrapper from './EndGameWrapper.js';
 
 // Funzione per il parsing di filename di immagini
@@ -48,6 +49,8 @@ const Game: React.FC = () => {
 
   const [pages, setPages] = useState<any>();
 
+  const [isWho, setIsWho] = useState<boolean>(false);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
@@ -71,6 +74,7 @@ const Game: React.FC = () => {
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
+      setIsWho(data.question.mode === QuestionMode.Who);
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
@@ -162,8 +166,10 @@ const Game: React.FC = () => {
 
     case GameStates.MOCK:
       break;
-    case GameStates.WHORESPONSE:
-    case GameStates.WHOQUESTION:
+
+
+    case GameStates.PHOTOQUESTION:
+    case GameStates.PHOTORESPONSE:
       return (
         <div className="paginator">
           <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
@@ -178,6 +184,22 @@ const Game: React.FC = () => {
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
+
+    case GameStates.WHOQUESTION:
+    case GameStates.WHORESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <QuestionList questions={['']} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
+
     case GameStates.THEMEQUESTION:
       break;
     case GameStates.THEMERESPONSE:
@@ -211,19 +233,19 @@ const Game: React.FC = () => {
             <p className="result-subtitle" style={{ textAlign: 'left' }}>
               {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
             </p>
-
-            {!isPhoto ? (
-              <img
-                src={playerImages[mostVotedPerson]}
-                alt={mostVotedPerson}
-                className="winnerImage"
-              />
-            ) : (
-              <img
-                src={mostVotedPerson}
-                alt={todoShitFunction(mostVotedPerson)}
-                className="winnerImage"
-              />
+            {isWho ? <h4>{mostVotedPerson}</h4> : (       // Da fixare, fa un pò cagare
+              isPhoto ?
+                <img
+                  src={mostVotedPerson}
+                  alt={todoShitFunction(mostVotedPerson)}
+                  className="winnerImage"
+                />
+                :
+                <img
+                  src={playerImages[mostVotedPerson]}
+                  alt={mostVotedPerson}
+                  className="winnerImage"
+                />
             )}
             <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
           </div>

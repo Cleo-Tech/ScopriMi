@@ -21,6 +21,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     adult: 'Domande +18',
     photo: 'Fotografie',
     generic: 'Domande Standard',
+    who: 'Who questions',
   };
 
   const increment = () => {

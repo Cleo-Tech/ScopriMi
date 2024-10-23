@@ -134,7 +134,6 @@ export class Game {
       // save the value inside the GAME for late state
       // TODO valore "duplicato" per fare prima, potenzialmente ok
       this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
-      this.currentQuestionIndex++;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
@@ -336,7 +335,8 @@ export class Game {
         playerWithMinVotes = player;
       }
     }
-
+    if (playerWithMinVotes.startsWith('http'))
+      return '';
     return playerWithMinVotes;
   }
 
@@ -361,7 +361,8 @@ export class Game {
         playerWithMaxVotes = player;
       }
     }
-
+    if (playerWithMaxVotes.startsWith('http'))
+      return '';
     return playerWithMaxVotes;
   }
 
@@ -370,13 +371,15 @@ export class Game {
     const totalVotes: { [key: string]: number } = {};
 
     for (const qst of this.selectedQuestions) {
-      if (qst.mode === QuestionMode.Who) {
-        for (const vote of Object.values(qst.whatPlayersVoted)) {
-          totalVotes[vote] = (totalVotes[vote] || 0) + 1;
+      if (qst.mode === QuestionMode.Photo) {
+        for (const [voter, vote] of Object.entries(qst.whatPlayersVoted)) {
+          if (vote === qst.winner) {
+            totalVotes[voter] = (totalVotes[voter] || 0) + 1;
+          }
         }
       }
     }
-
+    console.log(totalVotes);
     // Trova il giocatore con il numero massimo di voti nelle domande "photo"
     let maxVotes = 0;
     let playerWithMaxPhotoVotes = '';

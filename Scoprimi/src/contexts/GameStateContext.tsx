@@ -15,6 +15,9 @@ enum GameStates {
   // modalita con risposte a tema
   THEMEQUESTION = 'THEMEQUESTION',
   THEMERESPONSE = 'THEMERESPONSE',
+  // Modalità dove voti foto
+  PHOTOQUESTION = 'PHOTOQUESTION',
+  PHOTORESPONSE = 'PHOTORESPONSE',
   // risultato a fine manche
   RESULTOUTCOME = 'RESULTOUTCOME',
   // mario party-spotify wrap
@@ -30,7 +33,7 @@ enum GameStates {
 const states = {
   [GameStates.NEXTQUESTION]: [
     // il gioco continua
-    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.THEMEQUESTION,
+    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION,
     // il gioco finisce
     GameStates.PREPODIUMWRAP, GameStates.PODIUM,
   ],
@@ -40,6 +43,9 @@ const states = {
 
   [GameStates.WHOQUESTION]: [GameStates.WHORESPONSE],
   [GameStates.WHORESPONSE]: [GameStates.RESULTOUTCOME],
+
+  [GameStates.PHOTOQUESTION]: [GameStates.PHOTORESPONSE],
+  [GameStates.PHOTORESPONSE]: [GameStates.RESULTOUTCOME],
 
   [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
   [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
@@ -92,10 +98,13 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     switch (qstMode) {
       case QuestionMode.Photo:
         // TODO add ALL
-        transitionTo(GameStates.WHOQUESTION);
+        transitionTo(GameStates.PHOTOQUESTION);
         break;
       case QuestionMode.Standard:
         transitionTo(GameStates.STANDARDQUESTION);
+        break;
+      case QuestionMode.Who:
+        transitionTo(GameStates.WHOQUESTION);
         break;
       default:
         console.error('non dovevi finire qua');
@@ -112,6 +121,9 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         break;
       case GameStates.WHOQUESTION:
         transitionTo(GameStates.WHORESPONSE);
+        break;
+      case GameStates.PHOTOQUESTION:
+        transitionTo(GameStates.PHOTORESPONSE);
         break;
       case GameStates.THEMEQUESTION:
         transitionTo(GameStates.THEMERESPONSE);
