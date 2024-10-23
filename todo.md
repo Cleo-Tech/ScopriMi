@@ -1,7 +1,7 @@
 ## v0.7.0
 
 - [ ] Frasi relative all'andamento di un giocatore
-  - [ ] Frasi per perculare giocatore a fine game (Ex. se vince arriva ultimo print "vince sei una sega" o "vince top rimasto"). Risultati alla mario party / wrapper Spotify (discutere con zelo grafica)
+  - [x] Frasi per perculare giocatore a fine game (Ex. se vince arriva ultimo print "vince sei una sega" o "vince top rimasto"). Risultati alla mario party / wrapper Spotify (discutere con zelo grafica)
   - [ ] Frasi a fine categoria domande (Ex. dopo ultima domanda su sesso con Mux al primo posto print "Mux sei proprio una porca")
 </br>
 
