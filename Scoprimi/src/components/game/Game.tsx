@@ -233,7 +233,7 @@ const Game: React.FC = () => {
             <p className="result-subtitle" style={{ textAlign: 'left' }}>
               {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
             </p>
-            {isWho ? <h4>{mostVotedPerson}</h4> : (
+            {isWho ? <h4>{mostVotedPerson}</h4> : (       // Da fixare, fa un pò cagare
               isPhoto ?
                 <img
                   src={mostVotedPerson}
