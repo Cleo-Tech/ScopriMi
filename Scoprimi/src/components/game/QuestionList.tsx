@@ -26,7 +26,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
   };
 
   return (
-    <div className='fill sbu'>
+    <div className='fill textualAnswerContainer'>
       {questions.map((question, index) => (
         <div
           className='textualAnswer elegant-background'
