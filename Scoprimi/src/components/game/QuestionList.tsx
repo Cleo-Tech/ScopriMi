@@ -37,7 +37,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
             style={{
               cursor: clicked || disabled ? 'not-allowed' : 'pointer',
               color: selectedQuestion === question ? 'var(  --background-color)' : '',
-              opacity: selectedQuestion !== question ? '50%' : '',
+              opacity: clicked && selectedQuestion !== question ? 0.5 : 1,
             }}>
             {question}
           </p>
