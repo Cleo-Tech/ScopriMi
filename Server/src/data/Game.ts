@@ -99,9 +99,10 @@ export class Game {
    * @param socketId - Socket ID of the player
    * @param image - URL of the player's image
    */
-  addPlayer(playerName: string, socketId: string, image: string): void {
+  addPlayer(playerName: string, socketId: string, image: string): Player {
     if (!(playerName in this.players)) {
       this.players[playerName] = new Player(playerName, socketId, image);
+      return this.players[playerName];
     }
   }
 
