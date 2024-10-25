@@ -134,7 +134,9 @@ export class Game {
       this.players[playerName].whatPlayerVoted = vote; // Set the player's vote
       // save the value inside the GAME for late state
       // TODO valore "duplicato" per fare prima, potenzialmente ok
-      this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
+      // TODO fix this nigga
+      if (this.selectedQuestions.length !== 0)
+        this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
