@@ -29,13 +29,15 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
     <div className='fill textualAnswerContainer'>
       {questions.map((question, index) => (
         <div
+          onClick={() => handlePlayerClick(question)}
           className='textualAnswer elegant-background'
           key={index}
-          style={{ backgroundColor: selectedQuestion === question ? 'var(--success-color)' : '', }}>
+          style={{
+            cursor: clicked || disabled ? 'not-allowed' : 'pointer',
+            backgroundColor: selectedQuestion === question ? 'var(--success-color)' : '',
+          }}>
           <p
-            onClick={() => handlePlayerClick(question)}
             style={{
-              cursor: clicked || disabled ? 'not-allowed' : 'pointer',
               color: selectedQuestion === question ? 'var(  --background-color)' : '',
               opacity: clicked && selectedQuestion !== question ? 0.5 : 1,
             }}>

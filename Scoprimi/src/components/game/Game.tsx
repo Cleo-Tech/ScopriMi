@@ -195,7 +195,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
