@@ -99,9 +99,10 @@ export class Game {
    * @param socketId - Socket ID of the player
    * @param image - URL of the player's image
    */
-  addPlayer(playerName: string, socketId: string, image: string): void {
+  addPlayer(playerName: string, socketId: string, image: string): Player {
     if (!(playerName in this.players)) {
       this.players[playerName] = new Player(playerName, socketId, image);
+      return this.players[playerName];
     }
   }
 
@@ -133,7 +134,9 @@ export class Game {
       this.players[playerName].whatPlayerVoted = vote; // Set the player's vote
       // save the value inside the GAME for late state
       // TODO valore "duplicato" per fare prima, potenzialmente ok
-      this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
+      // TODO fix this nigga
+      if (this.selectedQuestions.length !== 0)
+        this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
