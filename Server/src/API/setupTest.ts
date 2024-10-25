@@ -1,9 +1,30 @@
 import { Express } from 'express-serve-static-core';
+import { Request, Response, NextFunction } from 'express';
 import { GameManager } from "../data/GameManager.js";
+import { performance, PerformanceObserver } from 'perf_hooks';
 
 export function setupTest(app: Express) {
-  // Endpoint per avviare il test
-  app.post('/api/start-test', async (req, res) => {
+
+
+  const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.headers['authorization'];
+    if (token && token === process.env.SECRET_TOKEN) {
+      next();
+    } else {
+      res.status(403).json({ error: 'Accesso non autorizzato' });
+    }
+  };
+
+  app.post('/api/start-test', authMiddleware, async (req, res) => {
+
+    // Crea un osservatore per il monitoraggio delle performance
+    const obs = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        console.log(`${entry.name}: ${entry.duration} ms`);
+      }
+    });
+    obs.observe({ entryTypes: ['measure'] });
+
     const { numGames, numPlayers, numRounds } = req.query;
 
     // Converti i parametri in numeri
@@ -12,7 +33,10 @@ export function setupTest(app: Express) {
     const numRoundsParsed = parseInt(numRounds as string, 10);
 
     try {
+      performance.mark('start');
       const result = await mainTest(numGamesParsed, numPlayersParsed, numRoundsParsed);
+      performance.mark('end');
+      performance.measure('someFunction', 'start', 'end');
       res.status(200).json({ message: result });
     } catch (error) {
       res.status(500).json({ error: "Errore durante l'esecuzione del test", details: error });
