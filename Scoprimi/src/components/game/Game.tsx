@@ -51,6 +51,19 @@ const Game: React.FC = () => {
 
   const [isWho, setIsWho] = useState<boolean>(false);
 
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = 'Sicuro di voler uscire?'; // Messaggio non personalizzabile, ma appare una finestra di dialogo di conferma.
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
