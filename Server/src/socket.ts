@@ -388,17 +388,13 @@ export function setupSocket(io: any) {
         return;
       }
       thisGame.addPlayer(data.playerName, socket.id, data.image);
-    })
-
-    socket.on(c.LEAVE_ROOM, (data: { playerName: string, lobbyCode: string }) => {
-      socket.leave(data.lobbyCode);
-    })
+    });
 
     socket.on(c.REMOVE_PLAYER, (data: { playerName: string, currentLobby: string }) => {
       const thisGame = actualGameManager.getGame(data.currentLobby);
       thisGame.removePlayer(data.playerName);
       io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
-    })
+    });
 
     socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
       myExitLobby(socket, io, data);

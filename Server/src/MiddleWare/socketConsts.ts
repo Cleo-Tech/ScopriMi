@@ -23,7 +23,6 @@ export const ERROR_SAME_NAME: string = 'errorSameName';
 export const PLAYER_CAN_JOIN: string = 'playerCanJoin';
 export const JOIN_ROOM: string = 'joinROOM';
 export const EXIT_LOBBY: string = 'exitLobby';
-export const LEAVE_ROOM: string = 'LeaveROOM';
 export const FORCE_RESET: string = 'FORCE_RESET';
 export const RETURN_NEWGAME: string = 'RETURN_NEWGAME';
 export const PLAYERS_WHO_VOTED: string = 'PLAYERS_WHO-VOTED';
