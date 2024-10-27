@@ -3,6 +3,7 @@ import { socket } from '../../ts/socketInit';
 import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
 import { useSwipeable } from 'react-swipeable';
 import Alert from '../common/Alert.js';
+import { useSession } from '../../contexts/SessionContext';
 
 interface NewGameModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const { currentPlayer } = useSession();
 
   const categoryLabels: { [key: string]: string } = {
     adult: 'Domande +18',
@@ -62,17 +64,12 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
 
   const handleCreateGame = () => {
     const code = generateLobbyCode();
-
     const selected = categories.filter((_, index) => selectedCategories[index]);
-
     if (selected.length === 0) {
       setShowAlert(true);
       return;
     }
-
-
-    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
-
+    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
     onClose();
   };
 
@@ -83,7 +80,6 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
         playerName: playerName,
         image: image,
       };
-      console.log(data);
       socket.emit(c.REQUEST_TO_JOIN_LOBBY, datatoSend);
     });
 

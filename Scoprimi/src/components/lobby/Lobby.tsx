@@ -87,6 +87,7 @@ const Lobby: React.FC = () => {
 
     return () => {
       socket.off(c.INIZIA);
+      socket.off(c.RENDER_LOBBY);
     };
   }, [currentLobby, navigate, currentPlayer]);
 
