@@ -97,7 +97,7 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const fromNextQuestionToQuestion = (qstMode: QuestionMode) => {
     switch (qstMode) {
       case QuestionMode.Photo:
-        // TODO add ALL
+        // TODO FIX THIS SHIIIIIIIT
         transitionTo(GameStates.PHOTOQUESTION);
         break;
       case QuestionMode.Standard:
@@ -105,6 +105,9 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         break;
       case QuestionMode.Who:
         transitionTo(GameStates.WHOQUESTION);
+        break;
+      case QuestionMode.CustomWho:
+        transitionTo(GameStates.CUSTOMQUESTION);
         break;
       default:
         console.error('non dovevi finire qua');
@@ -116,7 +119,7 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     switch (actualState) {
       case GameStates.STANDARDQUESTION:
-        // TODO add ALL
+        // TODO FIX THIS 
         transitionTo(GameStates.STANDARDRESPONSE);
         break;
       case GameStates.WHOQUESTION:

@@ -13,6 +13,7 @@ import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 import QuestionList from './QuestionList';
 import EndGameWrapper from './EndGameWrapper.js';
+import CustomAnswer from './CustomAnswer.js';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -215,6 +216,9 @@ const Game: React.FC = () => {
       );
 
     case GameStates.CUSTOMQUESTION:
+      const handleSubmit = (answer: string) => {
+        socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
+      };
       return (
         <div className="paginator">
           <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
@@ -222,9 +226,10 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Inserisci una risposta</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           {/* Componente per inserire la domanda custom (diddy smash) */}
+          <CustomAnswer handleSubmit={handleSubmit} />
         </div>
       );
     case GameStates.CUSTOMRESPONSE:
@@ -235,7 +240,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           {/* Componente per votare le risposte custom () */}
           <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />

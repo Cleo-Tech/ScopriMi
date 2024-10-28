@@ -155,6 +155,10 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
+    socket.on(c.SEND_CUSTOM_ANSWER, (data: { answer: string, /* DA FINIRE */ }) => {
+
+    });
+
     // TODO check params on react
     socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);

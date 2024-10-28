@@ -33,3 +33,4 @@ export const REQUEST_CATEGORIES: string = 'requestCategories';
 export const SEND_GENRES: string = 'SEND_GENRES';
 export const ENDGAMEWRAPPER: string = 'ENDGAMEWRAPPER';
 export const READY_FOR_PODIUM: string = 'READY_FOR_PODIUM';
+export const SEND_CUSTOM_ANSWER: string = 'SEND_CUSTOM_ANSWER';
