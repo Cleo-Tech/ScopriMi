@@ -65,6 +65,17 @@ const Game: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    socket.on(c.PUSSY, (data: { answers: string[] }) => {
+      setQuestionImages(data.answers);
+      fromQuestionToResponse();
+    });
+
+    return () => {
+      socket.off(c.PUSSY);
+    };
+  }, [fromQuestionToResponse]);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
@@ -176,6 +187,11 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
+  const handleSubmit = (answer: string) => {
+    console.log('ciao');
+    socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
+  };
+
   // Render delle page
   switch (actualState) {
 
@@ -216,9 +232,6 @@ const Game: React.FC = () => {
       );
 
     case GameStates.CUSTOMQUESTION:
-      const handleSubmit = (answer: string) => {
-        socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
-      };
       return (
         <div className="paginator">
           <QuestionComponent question={question} selectedPlayer={selectedPlayer} />

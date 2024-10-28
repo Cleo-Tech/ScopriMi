@@ -9,7 +9,6 @@ import { photoUrls } from './API/images.js';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-import { randomInt } from 'crypto';
 import { QuestionMode } from './data/Question.js';
 
 export const actualGameManager = new GameManager();
@@ -155,10 +154,6 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    socket.on(c.SEND_CUSTOM_ANSWER, (data: { answer: string, /* DA FINIRE */ }) => {
-
-    });
-
     // TODO check params on react
     socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
@@ -222,6 +217,25 @@ export function setupSocket(io: any) {
       io.emit(c.RENDER_LOBBIES, { lobbies });
       const lobbyCode = data.code;
       socket.emit(c.RETURN_NEWGAME, { lobbyCode })
+    });
+
+    socket.on(c.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      if (!thisGame) {
+        console.error('non esiste questa lobby');
+        socket.emit(c.FORCE_RESET);
+        return;
+      }
+
+      thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
+
+      console.log(thisGame.selectedQuestions);
+
+      // TODO non va con i valori mancanti non va;
+      if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
+        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
+        io.to(data.currentLobby).emit(c.PUSSY, { answers: images });
+      }
     });
 
     socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
