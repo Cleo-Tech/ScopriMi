@@ -61,3 +61,40 @@
   color: #fff;
   /* Testo bianco */
 }
+
+@keyframes slideInAndGrow {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+    /* Sposta il podio verso il basso */
+    height: 0;
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    /* Torna alla posizione originale */
+    height: 100%;
+  }
+}
+
+.podium-position {
+  animation: slideInAndGrow 1s ease-out forwards;
+  opacity: 0;
+  height: 0;
+}
+
+.podium-position.position-3 {
+  animation-delay: 0s;
+  /* Terzo posto */
+}
+
+.podium-position.position-1 {
+  animation-delay: 1s;
+  /* Secondo posto */
+}
+
+.podium-position.position-2 {
+  animation-delay: 2s;
+  /* Primo posto */
+}
