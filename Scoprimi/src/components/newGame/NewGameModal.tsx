@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { socket } from '../../ts/socketInit';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { useSwipeable } from 'react-swipeable';
 import Alert from '../common/Alert.js';
 import { useSession } from '../../contexts/SessionContext';
@@ -69,31 +69,31 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       setShowAlert(true);
       return;
     }
-    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
+    socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
     onClose();
   };
 
   useEffect(() => {
-    socket.on(c.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
+    socket.on(SocketEvents.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
       const datatoSend = {
         lobbyCode: data.lobbyCode,
         playerName: playerName,
         image: image,
       };
-      socket.emit(c.REQUEST_TO_JOIN_LOBBY, datatoSend);
+      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
     });
 
     return () => {
-      socket.off(c.RETURN_NEWGAME);
+      socket.off(SocketEvents.RETURN_NEWGAME);
     };
   }, [image, playerName]);
 
   useEffect(() => {
     if (isOpen) {
       console.log('Modal aperto per il giocatore:', playerName);
-      socket.emit(c.REQUEST_CATEGORIES);
+      socket.emit(SocketEvents.REQUEST_CATEGORIES);
 
-      socket.on(c.SEND_GENRES, (data: { genres: string[] }) => {
+      socket.on(SocketEvents.SEND_GENRES, (data: { genres: string[] }) => {
         console.log('Categorie ricevute: ', data.genres);
         setCategories(data.genres);
         setSelectedCategories(new Array(data.genres.length).fill(false));
@@ -101,7 +101,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
     }
 
     return () => {
-      socket.off(c.SEND_GENRES);
+      socket.off(SocketEvents.SEND_GENRES);
     };
   }, [isOpen, playerName]);
 
