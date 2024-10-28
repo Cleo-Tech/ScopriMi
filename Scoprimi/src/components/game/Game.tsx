@@ -214,10 +214,33 @@ const Game: React.FC = () => {
         </div>
       );
 
-    case GameStates.THEMEQUESTION:
-      break;
-    case GameStates.THEMERESPONSE:
-      break;
+    case GameStates.CUSTOMQUESTION:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Inserisci una risposta</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          {/* Componente per inserire la domanda custom (diddy smash) */}
+        </div>
+      );
+    case GameStates.CUSTOMRESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          {/* Componente per votare le risposte custom () */}
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
     case GameStates.THEMERESULTFINAL:
       break;
 

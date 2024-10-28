@@ -9,7 +9,8 @@ import { photoUrls } from './API/images.js';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-
+import { randomInt } from 'crypto';
+import { QuestionMode } from './data/Question.js';
 
 export const actualGameManager = new GameManager();
 
@@ -160,13 +161,6 @@ export function setupSocket(io: any) {
       console.log('Categorie scelte: ', data.categories);
       actualGameManager.createGame(data.code, data.admin);
 
-      enum QuestionMode {
-        Standard,
-        Photo,
-        Who,
-        Theme
-      }
-
       const allSelectedQuestions = data.categories
         .map(category => {
           const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
@@ -194,12 +188,17 @@ export function setupSocket(io: any) {
 
             }
             else if (category === 'who') {
-              questionMode = QuestionMode.Who;
+              if (false) {
+                questionMode = QuestionMode.Who;
+                const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+                who_questions.sort(() => 0.5 - Math.random());
+                images = who_questions.slice(0, 4);
+                console.log(images);
+              } else {
+                questionMode = QuestionMode.CustomWho;
+                images = [];
+              }
 
-              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-              who_questions.sort(() => 0.5 - Math.random());
-              images = who_questions.slice(0, 4);
-              console.log(images);
             }
 
             // Crea l'istanza della classe `Question`

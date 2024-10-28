@@ -13,8 +13,8 @@ enum GameStates {
   WHOQUESTION = 'WHOQUESTION',
   WHORESPONSE = 'WHORESPONSE',
   // modalita con risposte a tema
-  THEMEQUESTION = 'THEMEQUESTION',
-  THEMERESPONSE = 'THEMERESPONSE',
+  CUSTOMQUESTION = 'CUSTOMQUESTION',
+  CUSTOMRESPONSE = 'CUSTOMRESPONSE',
   // Modalità dove voti foto
   PHOTOQUESTION = 'PHOTOQUESTION',
   PHOTORESPONSE = 'PHOTORESPONSE',
@@ -33,7 +33,7 @@ enum GameStates {
 const states = {
   [GameStates.NEXTQUESTION]: [
     // il gioco continua
-    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION,
+    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.CUSTOMQUESTION,
     // il gioco finisce
     GameStates.PREPODIUMWRAP, GameStates.PODIUM,
   ],
@@ -47,12 +47,12 @@ const states = {
   [GameStates.PHOTOQUESTION]: [GameStates.PHOTORESPONSE],
   [GameStates.PHOTORESPONSE]: [GameStates.RESULTOUTCOME],
 
-  [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
-  [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
-  [GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PREPODIUMWRAP],
+  [GameStates.CUSTOMQUESTION]: [GameStates.CUSTOMRESPONSE],
+  [GameStates.CUSTOMRESPONSE]: [GameStates.RESULTOUTCOME],
+  //[GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PREPODIUMWRAP],
 
   // TOGLI GameStates.PODIUM
-  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.MOCK, GameStates.NEXTQUESTION],
+  [GameStates.RESULTOUTCOME]: [GameStates.PREPODIUMWRAP, GameStates.MOCK, GameStates.NEXTQUESTION],
 
   [GameStates.PREPODIUMWRAP]: [GameStates.PODIUM],
 
@@ -125,8 +125,8 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       case GameStates.PHOTOQUESTION:
         transitionTo(GameStates.PHOTORESPONSE);
         break;
-      case GameStates.THEMEQUESTION:
-        transitionTo(GameStates.THEMERESPONSE);
+      case GameStates.CUSTOMQUESTION:
+        transitionTo(GameStates.CUSTOMRESPONSE);
         break;
       default:
         console.error('non dovevi finire qua');
