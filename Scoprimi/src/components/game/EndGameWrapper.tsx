@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from '../../contexts/SessionContext';
 import { socket } from '../../ts/socketInit';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { Player } from '../../../../Server/src/data/Player.js';
 
 interface PlayerInfo {
@@ -26,7 +26,7 @@ const EndGameWrapper: React.FC<EndGameWrapperProps> = ({ pages }) => {
         playerName: currentPlayer,
       };
       setTimeout(() => {
-        socket.emit(c.READY_FOR_PODIUM, data);
+        socket.emit(SocketEvents.READY_FOR_PODIUM, data);
       }, 3000); // Esegui dopo 3 secondi (3000 ms)
     }
   }, [currentLobby, currentPage, currentPlayer, pages.length]);

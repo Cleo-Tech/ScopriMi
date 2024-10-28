@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { PlayerImages, PlayerScores, FinalResultData } from '../../ts/types';
 import { socket } from '../../ts/socketInit';
 import Timer from './Timer';
@@ -66,12 +66,12 @@ const Game: React.FC = () => {
 
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
-    socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(SocketEvents.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    socket.on(c.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
+    socket.on(SocketEvents.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
       console.log('questions: ');
       console.log(data.question.images);
       setClicked(false);
@@ -92,24 +92,24 @@ const Game: React.FC = () => {
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
   useEffect(() => {
-    socket.on(c.ENDGAMEWRAPPER, (data: { pages }) => {
+    socket.on(SocketEvents.ENDGAMEWRAPPER, (data: { pages }) => {
       setPages(data.pages);
       transitionTo(GameStates.PREPODIUMWRAP);
     });
   }, [transitionTo]);
 
   useEffect(() => {
-    socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
+    socket.on(SocketEvents.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
       console.log(Object.keys(data.players));
       setPlayersWhoVoted(Object.keys(data.players));
     });
     return () => {
-      socket.off(c.PLAYERS_WHO_VOTED);
+      socket.off(SocketEvents.PLAYERS_WHO_VOTED);
     };
   }, []);
 
   useEffect(() => {
-    socket.on(c.SHOW_RESULTS, (data: {
+    socket.on(SocketEvents.SHOW_RESULTS, (data: {
       voteRecap: { [key: string]: string },
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
@@ -122,11 +122,11 @@ const Game: React.FC = () => {
       transitionTo(GameStates.RESULTOUTCOME);
     });
 
-    socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
+    socket.on(SocketEvents.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
       setCurrentLobby(null);
       setPlayers([]);
-      socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
+      socket.emit(SocketEvents.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};
       Object.keys(data.playerScores).forEach(playerName => {
@@ -140,10 +140,10 @@ const Game: React.FC = () => {
     });
 
     return () => {
-      socket.off(c.SEND_QUESTION);
-      socket.off(c.SHOW_RESULTS);
-      socket.off(c.RESULT_MESSAGE);
-      socket.off(c.GAME_OVER);
+      socket.off(SocketEvents.SEND_QUESTION);
+      socket.off(SocketEvents.SHOW_RESULTS);
+      socket.off(SocketEvents.RESULT_MESSAGE);
+      socket.off(SocketEvents.GAME_OVER);
     };
   }, [currentLobby, currentPlayer, navigate, setCurrentLobby, transitionTo]);
 
@@ -155,7 +155,7 @@ const Game: React.FC = () => {
     }
     setClicked(true);
     setIsTimerActive(false);
-    socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+    socket.emit(SocketEvents.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
     fromQuestionToResponse();
   };
 
@@ -163,13 +163,13 @@ const Game: React.FC = () => {
   const handleNextQuestion = () => {
     setResetSelection(true);
     setButtonClicked(true);
-    socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(SocketEvents.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     transitionTo(GameStates.NEXTQUESTION);
   };
 
   const handleTimeUp = () => {
     if (!clicked) {
-      socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: null });
+      socket.emit(SocketEvents.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: null });
       fromQuestionToResponse();
     }
     setIsTimerActive(false);

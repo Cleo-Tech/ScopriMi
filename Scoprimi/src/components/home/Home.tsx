@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { socket } from '../../ts/socketInit.ts';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import LobbyList from '../common/LobbyList.tsx';
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
       playerName: currentPlayer,
       image: currentPlayerImage,
     };
-    socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+    socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, data);
   }
 
   function filterLobbies(event: React.ChangeEvent<HTMLInputElement>) {
@@ -49,12 +49,12 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    socket.emit(c.REQUEST_RENDER_LOBBIES);
-    socket.on(c.RENDER_LOBBIES, ({ lobbies }) => {
+    socket.emit(SocketEvents.REQUEST_RENDER_LOBBIES);
+    socket.on(SocketEvents.RENDER_LOBBIES, ({ lobbies }) => {
       setLobbies(lobbies);
     });
 
-    socket.on(c.PLAYER_CAN_JOIN, (data) => {
+    socket.on(SocketEvents.PLAYER_CAN_JOIN, (data) => {
       if (data.canJoin) {
         setCurrentLobby(data.lobbyCode);
         navigate('/lobby');
@@ -64,8 +64,8 @@ const Home: React.FC = () => {
     });
 
     return () => {
-      socket.off(c.RENDER_LOBBIES);
-      socket.off(c.PLAYER_CAN_JOIN);
+      socket.off(SocketEvents.RENDER_LOBBIES);
+      socket.off(SocketEvents.PLAYER_CAN_JOIN);
     };
   }, [navigate, setCurrentLobby]);
 
