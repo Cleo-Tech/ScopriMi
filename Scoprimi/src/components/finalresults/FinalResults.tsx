@@ -71,9 +71,16 @@ const FinalResults: React.FC = () => {
       <div id="gameOverMessage" className="paginator">
         <h2 className="">Classifica</h2>
 
-        <div className='podium' style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', width: '100%' }}>
+        <div
+          className="podium"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: '10px',
+            width: '100%',
+          }}
+        >
           {podium.map(([player, { score, image }], index) => {
-
             const heightStyle = actualHeight[index];
             const backgroundColor = actualColors[index];
 
@@ -81,10 +88,33 @@ const FinalResults: React.FC = () => {
               <div
                 key={player}
                 className={`podium-position position-${index + 1}`}
-                style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'center', flex: '1 1 0%', margin: '0 10px' }}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  flex: '1 1 0%',
+                  margin: '0 10px',
+                  opacity: 0, // Inizialmente invisibile, gestito dall'animazione
+                  height: 0, // Altezza iniziale, crescerà con l'animazione
+                }}
               >
-                <img src={image} alt={`${player} avatar`} style={{ height: '70px' }} />
-                <div style={{ height: heightStyle, backgroundColor, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', borderRadius: '10px' }}>
+                <img
+                  src={image}
+                  alt={`${player} avatar`}
+                  style={{ height: '70px' }}
+                />
+                <div
+                  style={{
+                    height: heightStyle,
+                    backgroundColor,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                    borderRadius: '10px',
+                  }}
+                >
                   <p style={{ margin: '0' }}>{score}</p>
                 </div>
                 <p style={{ textAlign: 'center' }}>{player}</p>
@@ -102,7 +132,12 @@ const FinalResults: React.FC = () => {
                     <img
                       src={image}
                       alt={`${player} avatar`}
-                      style={{ width: '40px', height: '40px', borderRadius: '10%' }} />
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '10%',
+                      }}
+                    />
                   </td>
                   <td>{player}</td>
                   <td>{score}</td>
@@ -113,7 +148,7 @@ const FinalResults: React.FC = () => {
         </div>
 
         <button
-          className='my-btn mt-3 my-bg-puss'
+          className="my-btn mt-3 my-bg-puss"
           onClick={() => navigate('/')}
         >
           Torna alla homepage
@@ -121,6 +156,7 @@ const FinalResults: React.FC = () => {
       </div>
     </>
   );
+
 };
 
 export default FinalResults;
