@@ -1,6 +1,7 @@
 import React from 'react';
 import { FinalResultData } from '../../ts/types';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { socket } from '../../ts/socketInit';
 
 const defaultHeights = [
   '7vh',
@@ -13,6 +14,10 @@ const defaultColors = [
   '#cda434', // Oro
   '#cd7f32', // Bronzo
 ];
+
+function TODOREMATCH() {
+  socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
+}
 
 function getPodiumStats(sameScore1And2, sameScore1And3, sameScore2And3, positionsArray) {
   let podiumArray = [...positionsArray];
@@ -112,11 +117,18 @@ const FinalResults: React.FC = () => {
           </table>
         </div>
 
+
         <button
           className='my-btn mt-3 my-bg-puss'
           onClick={() => navigate('/')}
         >
           Torna alla homepage
+        </button>
+        <button
+          className='my-btn mt-3 my-bg-puss'
+          onClick={() => TODOREMATCH}
+        >
+          Gioca ancora
         </button>
       </div>
     </>
