@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { socket } from '../../ts/socketInit.ts';
 import { useSession } from '../../contexts/SessionContext.tsx';
 import LobbyList from '../common/LobbyList.tsx';
@@ -33,7 +33,7 @@ const Lobby: React.FC = () => {
 
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
-          socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+          socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, data);
           setLoading(false);
         }, 5000);
 
@@ -54,14 +54,14 @@ const Lobby: React.FC = () => {
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
-    socket.emit(c.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
+    socket.emit(SocketEvents.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
       console.log('Received data:', data);
       setGame(data);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
-    socket.on(c.RENDER_LOBBY, (data: Game) => {
+    socket.on(SocketEvents.RENDER_LOBBY, (data: Game) => {
       console.log(data);
       setGame(data);
 
@@ -75,7 +75,7 @@ const Lobby: React.FC = () => {
       setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
-    socket.on(c.INIZIA, () => {
+    socket.on(SocketEvents.INIZIA, () => {
       setGame((prevGame) => {
         if (!prevGame) { return null; }
         return Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame, {
@@ -86,12 +86,13 @@ const Lobby: React.FC = () => {
     });
 
     return () => {
-      socket.off(c.INIZIA);
+      socket.off(SocketEvents.INIZIA);
+      socket.off(SocketEvents.RENDER_LOBBY);
     };
   }, [currentLobby, navigate, currentPlayer]);
 
   const handleConfirmLeave = () => {
-    socket.emit(c.EXIT_LOBBY, { currentPlayer, currentLobby });
+    socket.emit(SocketEvents.EXIT_LOBBY, { currentPlayer, currentLobby });
     setCurrentLobby(null);
     navigate('/');
   };
@@ -99,12 +100,12 @@ const Lobby: React.FC = () => {
   const toggleReady = () => {
     const newReadyState = !isReady;
     setIsReady(newReadyState);
-    socket.emit(c.TOGGLE_IS_READY_TO_GAME, { lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(SocketEvents.TOGGLE_IS_READY_TO_GAME, { lobbyCode: currentLobby, playerName: currentPlayer });
   };
 
   const handleRemovePlayer = (playerName: string) => {
     console.log('Admin is removing the player:', playerName);
-    socket.emit(c.REMOVE_PLAYER, { playerName, currentLobby });
+    socket.emit(SocketEvents.REMOVE_PLAYER, { playerName, currentLobby });
     console.log('Io sono il giocatore: ', currentPlayer);
   };
 

@@ -1,10 +1,15 @@
-import * as c from './MiddleWare/socketConsts.js';
+import { SocketEvents } from './MiddleWare/SocketEvents.js';
 import { GameManager } from './data/GameManager.js';
 import { Game } from './data/Game.js';
 import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
+
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
+
 
 export const actualGameManager = new GameManager();
 
@@ -48,7 +53,7 @@ function checkLobbiesAge(io: any) {
       console.log(`Lobby da eliminare: ${lobby.lobbyCode}`);
       actualGameManager.deleteGame(lobby.lobbyCode);
       const lobbies = actualGameManager.listGames();
-      io.emit(c.RENDER_LOBBIES, { lobbies });
+      io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
     }
   });
 }
@@ -58,7 +63,7 @@ function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: st
   console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
 
   if (!thisGame) {
-    socket.emit(c.FORCE_RESET);
+    socket.emit(SocketEvents.FORCE_RESET);
     return;
   }
 
@@ -81,8 +86,8 @@ function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: st
 
   const lobbies = actualGameManager.listGames();
   socket.leave(data.currentLobby);
-  io.emit(c.RENDER_LOBBIES, { lobbies });
-  io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+  io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+  io.to(data.currentLobby).emit(SocketEvents.RENDER_LOBBY, thisGame);
 }
 
 function mydisconnect(socket, io) {
@@ -91,7 +96,7 @@ function mydisconnect(socket, io) {
   for (const lobbyCode of actualGameManager.listLobbiesCode()) {
     const game = actualGameManager.getGame(lobbyCode);
     if (!game) {
-      socket.emit(c.FORCE_RESET);
+      socket.emit(SocketEvents.FORCE_RESET);
       return;
     }
     const playerName = Object.keys(game.players).find(name => game.players[name].socketId === socket.id);
@@ -110,7 +115,7 @@ function mydisconnect(socket, io) {
       //   console.log(`Deleting empty lobby ${lobbyCode}`);
       //   actualGameManager.deleteGame(lobbyCode);
       //   const lobbies = actualGameManager.listGames();
-      //   io.emit(c.RENDER_LOBBIES, { lobbies });
+      //   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
       //   break;
       // }
 
@@ -121,7 +126,7 @@ function mydisconnect(socket, io) {
         const playerImages = game.getImages();
         const mostVotedPerson = game.getMostVotedPerson();
         game.resetWhatPlayersVoted();
-        io.to(lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
+        io.to(lobbyCode).emit(SocketEvents.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     }
   }
@@ -131,7 +136,7 @@ function mydisconnect(socket, io) {
 
 
 export function setupSocket(io: any) {
-  io.on(c.CONNECTION, (socket: any) => {
+  io.on(SocketEvents.CONNECTION, (socket: any) => {
 
     console.log(`Client connected: ${socket.id}`);
     // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
@@ -139,9 +144,9 @@ export function setupSocket(io: any) {
 
     socket.on('mydisconnet', () => mydisconnect(socket, io));
 
-    socket.on(c.DISCONNECT, () => mydisconnect(socket, io));
+    socket.on(SocketEvents.DISCONNECT, () => mydisconnect(socket, io));
 
-    socket.on(c.TEST_LOBBY, (data: { lobbyCode: string }, callback: (arg0: boolean) => void) => {
+    socket.on(SocketEvents.TEST_LOBBY, (data: { lobbyCode: string }, callback: (arg0: boolean) => void) => {
       const game = actualGameManager.getGame(data.lobbyCode);
       if (game && !game.isGameStarted) {
         callback(true);
@@ -150,7 +155,7 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(c.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
+    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
       console.log('Categorie scelte: ', data.categories);
       actualGameManager.createGame(data.code, data.admin);
@@ -188,9 +193,14 @@ export function setupSocket(io: any) {
               images = shuffledonlyContextImages.slice(0, 4);
 
             }
-            // else if (category === 'who'){
-            //   questionMode = QuestionMode.Who;
-            // }
+            else if (category === 'who') {
+              questionMode = QuestionMode.Who;
+
+              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+              who_questions.sort(() => 0.5 - Math.random());
+              images = who_questions.slice(0, 4);
+              console.log(images);
+            }
 
             // Crea l'istanza della classe `Question`
             return new Question(
@@ -205,28 +215,27 @@ export function setupSocket(io: any) {
 
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
 
-      console.log(allSelectedQuestions);
       const lobbies = actualGameManager.listGames();
-      io.emit(c.RENDER_LOBBIES, { lobbies });
+      io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
       const lobbyCode = data.code;
-      socket.emit(c.RETURN_NEWGAME, { lobbyCode })
+      socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode })
     });
 
-    socket.on(c.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
+    socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
         const code = data.lobbyCode;
         const game = actualGameManager.getGame(code);
 
         if (!game) {
           console.error('non esiste questa lobby');
-          socket.emit(c.FORCE_RESET);
+          socket.emit(SocketEvents.FORCE_RESET);
           return;
         }
 
         // Controlla se il giocatore esiste già
         if (Object.keys(game.players).includes(data.playerName)) {
           console.log(`Player with name ${data.playerName} already exists in lobby ${data.lobbyCode}`);
-          socket.emit(c.PLAYER_CAN_JOIN, { canJoin: false, lobbyCode: code, playerName: data.playerName });
+          socket.emit(SocketEvents.PLAYER_CAN_JOIN, { canJoin: false, lobbyCode: code, playerName: data.playerName });
           return;
         }
 
@@ -240,27 +249,27 @@ export function setupSocket(io: any) {
 
         game.addPlayer(data.playerName, socket.id, data.image);
         socket.join(code);
-        socket.emit(c.PLAYER_CAN_JOIN, { canJoin: true, lobbyCode: code, playerName: data.playerName });
-        io.to(code).emit(c.RENDER_LOBBY, game);
+        socket.emit(SocketEvents.PLAYER_CAN_JOIN, { canJoin: true, lobbyCode: code, playerName: data.playerName });
+        io.to(code).emit(SocketEvents.RENDER_LOBBY, game);
         const lobbies = actualGameManager.listGames();
-        io.emit(c.RENDER_LOBBIES, { lobbies });
+        io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
       }
     });
 
-    socket.on(c.REQUEST_RENDER_LOBBIES, () => {
+    socket.on(SocketEvents.REQUEST_RENDER_LOBBIES, () => {
       const lobbies = actualGameManager.listGames();
-      socket.emit(c.RENDER_LOBBIES, { lobbies });
+      socket.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
     });
 
-    socket.on(c.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
+    socket.on(SocketEvents.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
       console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
-        socket.emit(c.FORCE_RESET);
+        socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
       thisGame.toggleIsReadyToGame(data.playerName);
-      io.to(data.lobbyCode).emit(c.RENDER_LOBBY, thisGame);
+      io.to(data.lobbyCode).emit(SocketEvents.RENDER_LOBBY, thisGame);
       if (!thisGame.isAllPlayersReadyToGame() ||
         process.env.NODE_ENV === 'production' && Object.keys(thisGame.players).length < 2) {
         return;
@@ -268,47 +277,49 @@ export function setupSocket(io: any) {
 
       thisGame.isGameStarted = true;
       const lobbies = actualGameManager.listGames();
-      io.emit(c.RENDER_LOBBIES, { lobbies });
+      io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
       console.log(`Inizia partita - ${data.lobbyCode}`);
-      io.to(data.lobbyCode).emit(c.INIZIA);
+      io.to(data.lobbyCode).emit(SocketEvents.INIZIA);
     });
 
-    //socket.on(c.VOTE_IMAGE) // TODO Una roba del genere
+    //socket.on(SocketEvents.VOTE_IMAGE) // TODO Una roba del genere
 
-    socket.on(c.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
+    socket.on(SocketEvents.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
       console.log('Ho ricevuto il voto ', data);
 
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
       if (!thisGame) {
         console.log('Force reset');
-        socket.emit(c.FORCE_RESET);
+        socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
 
-      if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
-        thisGame.castVote(data.voter, data.vote);
-        console.log('Data: ', thisGame.getWhatPlayersVoted());
-        io.to(data.lobbyCode).emit(c.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
-      }
+      //if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
+      thisGame.castVote(data.voter, data.vote);
+      io.to(data.lobbyCode).emit(SocketEvents.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
+      //}
 
+      console.log(thisGame.players);
 
       if (thisGame.didAllPlayersVote()) {
+        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
         const mostVotedPerson = thisGame.getMostVotedPerson();
         thisGame.resetWhatPlayersVoted();
         console.log('Tutti i giocatori hanno votato: ', voteRecap);
-
-        io.to(data.lobbyCode).emit(c.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
+        thisGame.selectedQuestions[thisGame.currentQuestionIndex].winner = mostVotedPerson;
+        thisGame.currentQuestionIndex++;
+        io.to(data.lobbyCode).emit(SocketEvents.SHOW_RESULTS, { players, voteRecap, playerImages, mostVotedPerson });
       }
     });
 
-    socket.on(c.READY_FOR_NEXT_QUESTION, (data: { lobbyCode: string; playerName: string }) => {
+    socket.on(SocketEvents.READY_FOR_NEXT_QUESTION, (data: { lobbyCode: string; playerName: string }) => {
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
-        socket.emit(c.FORCE_RESET);
+        socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
       thisGame.setReadyForNextQuestion(data.playerName);
@@ -325,17 +336,34 @@ export function setupSocket(io: any) {
         const images = thisGame.getImages();
         const keys = Object.keys(thisGame.players);
         const selectedPlayer = keys[Math.floor(Math.random() * keys.length)];
-        io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
+        io.to(data.lobbyCode).emit(SocketEvents.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
-        console.log('Game Over: no more questions.');
-        console.log('Risultati finali:');
-
-        io.to(data.lobbyCode).emit(c.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
-        actualGameManager.deleteGame(thisGame.lobbyCode);
+        const pages = thisGame.getAllPlayersSummary();
+        if (pages.length > 0) {
+          io.to(data.lobbyCode).emit(SocketEvents.ENDGAMEWRAPPER, { pages });
+        } else {
+          actualGameManager.deleteGame(thisGame.lobbyCode);
+          io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
+        }
       }
     });
 
-    socket.on(c.REQUEST_RENDER_LOBBY, (lobbyCode: string, callback: (thisGame: Game) => void) => {
+    socket.on(SocketEvents.READY_FOR_PODIUM, (data: { lobbyCode: string; playerName: string }) => {
+      const thisGame = actualGameManager.getGame(data.lobbyCode);
+      if (!thisGame) {
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
+      }
+      thisGame.players[data.playerName].isReadyToPodiumm = true;
+      if (!thisGame.isAllPlayersReadyToPodium()) {
+        return;
+      }
+
+      actualGameManager.deleteGame(thisGame.lobbyCode);
+      io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
+    });
+
+    socket.on(SocketEvents.REQUEST_RENDER_LOBBY, (lobbyCode: string, callback: (thisGame: Game) => void) => {
       const thisGame = actualGameManager.getGame(lobbyCode);
       if (thisGame) {
         callback(thisGame);
@@ -346,33 +374,33 @@ export function setupSocket(io: any) {
       return Object.values(QuestionGenre);
     }
 
-    socket.on(c.REQUEST_CATEGORIES, () => {
+    socket.on(SocketEvents.REQUEST_CATEGORIES, () => {
       const genres = getQuestionGenresAsStrings();
       console.log('Generi da inviare: ', genres);
-      socket.emit(c.SEND_GENRES, { genres });
+      socket.emit(SocketEvents.SEND_GENRES, { genres });
     });
 
-    socket.on(c.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {
+    socket.on(SocketEvents.JOIN_ROOM, (data: { playerName: string, lobbyCode: string, image: string }) => {
       socket.join(data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
-        socket.emit(c.FORCE_RESET);
+        socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
       thisGame.addPlayer(data.playerName, socket.id, data.image);
     })
 
-    socket.on(c.LEAVE_ROOM, (data: { playerName: string, lobbyCode: string }) => {
+    socket.on(SocketEvents.LEAVE_ROOM, (data: { playerName: string, lobbyCode: string }) => {
       socket.leave(data.lobbyCode);
     })
 
-    socket.on(c.REMOVE_PLAYER, (data: { playerName: string, currentLobby: string }) => {
+    socket.on(SocketEvents.REMOVE_PLAYER, (data: { playerName: string, currentLobby: string }) => {
       const thisGame = actualGameManager.getGame(data.currentLobby);
       thisGame.removePlayer(data.playerName);
-      io.to(data.currentLobby).emit(c.RENDER_LOBBY, thisGame);
+      io.to(data.currentLobby).emit(SocketEvents.RENDER_LOBBY, thisGame);
     })
 
-    socket.on(c.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
+    socket.on(SocketEvents.EXIT_LOBBY, (data: { currentPlayer: string; currentLobby: string; }) => {
       myExitLobby(socket, io, data);
     });
 

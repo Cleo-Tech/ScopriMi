@@ -13,6 +13,8 @@ export class Player {
   public readyForNextQuestion: boolean;
   // chi ha votato
   public whatPlayerVoted: string;
+  // pronto a vedere il podio
+  public isReadyToPodiumm: boolean;
 
   constructor(name: string, socketId: string, image: string) {
     this.name = name;
@@ -22,5 +24,6 @@ export class Player {
     this.isReadyToGame = false;
     this.readyForNextQuestion = false;
     this.whatPlayerVoted = '';
+    this.isReadyToPodiumm = false;
   }
 }

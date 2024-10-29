@@ -23,11 +23,14 @@ export class Question {
   public genre: QuestionGenre;
   public text: string;
   public images: string[];
+  public whatPlayersVoted: { [key: string]: string };
+  public winner: string;
 
   constructor(questionMode: QuestionMode, questionGenre: QuestionGenre, question: string, images: string[]) {
     this.mode = questionMode;
     this.text = question;
     this.genre = questionGenre;
     this.images = images;
+    this.whatPlayersVoted = {};
   }
 }
