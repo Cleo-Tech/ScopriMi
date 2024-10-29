@@ -188,7 +188,7 @@ export function setupSocket(io: any) {
 
             }
             else if (category === 'who') {
-              if (false) {    // Change to percentage when ready for deployment
+              if (randomInt(0, 100) > 60 /*false*/) {    // Change to percentage when ready for deployment
                 questionMode = QuestionMode.Who;
                 const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
                 who_questions.sort(() => 0.5 - Math.random());
