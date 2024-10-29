@@ -228,20 +228,13 @@ export function setupSocket(io: any) {
         socket.emit(c.FORCE_RESET);
         return;
       }
-      console.log('---------------');
-      console.log(data.answer);
-      console.log('---------------');
+
       // Se la domande è vuota gliene do un di default
-      if (data.answer.trim().length === 0 || data.answer === undefined) {
+      if (data.answer.trim().length === 0) {
         data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
       }
-      console.log('---------------');
-      console.log(data.answer);
-      console.log('---------------');
 
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
-
-      console.log(thisGame.selectedQuestions);
 
       // TODO non va con i valori mancanti non va;
       if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
@@ -368,6 +361,8 @@ export function setupSocket(io: any) {
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         const pages = thisGame.getAllPlayersSummary();
+        console.log('pages');
+        console.log(pages);
         if (pages.length > 0) {
           io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
         } else {
