@@ -99,7 +99,7 @@ const Game: React.FC = () => {
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
-      setIsWho(data.question.mode === QuestionMode.Who);
+      setIsWho(data.question.mode === QuestionMode.Who || data.question.mode === QuestionMode.CustomWho);
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
@@ -188,7 +188,7 @@ const Game: React.FC = () => {
   };
 
   const handleSubmit = (answer: string) => {
-    console.log('ciao');
+    console.log('Ho letto una risposta custom');
     socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
   };
 

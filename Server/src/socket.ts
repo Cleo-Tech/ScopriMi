@@ -10,6 +10,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
 import { QuestionMode } from './data/Question.js';
+import { randomInt } from 'crypto';
 
 export const actualGameManager = new GameManager();
 
@@ -187,7 +188,7 @@ export function setupSocket(io: any) {
 
             }
             else if (category === 'who') {
-              if (false) {
+              if (false) {    // Change to percentage when ready for deployment
                 questionMode = QuestionMode.Who;
                 const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
                 who_questions.sort(() => 0.5 - Math.random());
@@ -220,11 +221,17 @@ export function setupSocket(io: any) {
     });
 
     socket.on(c.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
+      const defaultAnswers = ["No vabbè", "Type shiii", "Rizz approved", "Cassone"];  // Si potrebbe pensare di leggere da answer.json
       const thisGame = actualGameManager.getGame(data.currentLobby);
       if (!thisGame) {
         console.error('non esiste questa lobby');
         socket.emit(c.FORCE_RESET);
         return;
+      }
+
+      // Se la domande è vuota gliene do un di default
+      if (data.answer.trim().length === 0) {
+        data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
       }
 
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
