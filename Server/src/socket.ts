@@ -361,8 +361,6 @@ export function setupSocket(io: any) {
         io.to(data.lobbyCode).emit(c.SEND_QUESTION, { question, players, images, selectedPlayer });
       } else {
         const pages = thisGame.getAllPlayersSummary();
-        console.log('pages');
-        console.log(pages);
         if (pages.length > 0) {
           io.to(data.lobbyCode).emit(c.ENDGAMEWRAPPER, { pages });
         } else {
