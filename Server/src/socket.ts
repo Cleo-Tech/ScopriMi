@@ -228,11 +228,16 @@ export function setupSocket(io: any) {
         socket.emit(c.FORCE_RESET);
         return;
       }
-
+      console.log('---------------');
+      console.log(data.answer);
+      console.log('---------------');
       // Se la domande è vuota gliene do un di default
-      if (data.answer.trim().length === 0) {
+      if (data.answer.trim().length === 0 || data.answer === undefined) {
         data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
       }
+      console.log('---------------');
+      console.log(data.answer);
+      console.log('---------------');
 
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
 

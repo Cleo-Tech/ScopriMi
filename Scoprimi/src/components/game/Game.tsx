@@ -187,6 +187,12 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
+  const handleTimeUpCostomWho = () => {
+    console.log('Ho letto una risposta custom');
+    socket.emit(c.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
+    setIsTimerActive(false);
+  };
+
   const handleSubmit = (answer: string) => {
     console.log('Ho letto una risposta custom');
     socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
@@ -239,9 +245,8 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Inserisci una risposta</p>
             </div>
-            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={25} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
           </div>
-          {/* Componente per inserire la domanda custom (diddy smash) */}
           <CustomAnswer handleSubmit={handleSubmit} />
         </div>
       );
@@ -253,9 +258,8 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={2500} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
-          {/* Componente per votare le risposte custom () */}
           <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );

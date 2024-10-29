@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface CustomAnswerProps {
   handleSubmit: (arg0: string) => void;
 }
 
 const CustomAnswer: React.FC<CustomAnswerProps> = ({ handleSubmit }) => {
-  const [answer, setAnswer] = useState(String);
+  const [answer, setAnswer] = useState<string>('');
   const [btnClicked, setBtnClicked] = useState(false);
 
-
   const handleClick = () => {
-    console.log('Hai cliccato!');
     setBtnClicked(true);
   };
 
@@ -34,7 +32,7 @@ const CustomAnswer: React.FC<CustomAnswerProps> = ({ handleSubmit }) => {
         style={{
           backgroundColor: btnClicked ? 'var(--disabled-color)' : 'var(--success-color)',
         }}
-        disabled={btnClicked ? true : false}   // Gestisce il problema del voto multiplo, ma resta da fixare nel backend!!
+        disabled={btnClicked ? true : false} // Gestisce il problema del voto multiplo, ma resta da fixare nel backend!!
       >
         Conferma
       </button>

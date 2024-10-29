@@ -118,6 +118,9 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const fromQuestionToResponse = () => {
 
     switch (actualState) {
+      // TODO lol bella merda
+      case GameStates.CUSTOMRESPONSE:
+        break;
       case GameStates.STANDARDQUESTION:
         // TODO FIX THIS 
         transitionTo(GameStates.STANDARDRESPONSE);
