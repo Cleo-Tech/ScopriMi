@@ -120,7 +120,8 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
 
   const lobbies = actualGameManager.listGames();
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
-
+  const lobbyCode = data.code;
+  socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
 }
 
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
@@ -238,8 +239,7 @@ export function setupSocket(io: any) {
         myCreateLobby(socket, io, dataCreateLobby);
         thisGame.nextGame = data.code;
       }
-      const lobbyCode = data.code;
-      socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
+      // return del new game?
     });
 
     // TODO check params on react
