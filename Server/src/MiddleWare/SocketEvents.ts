@@ -34,4 +34,5 @@ export enum SocketEvents {
   SEND_GENRES = 'SEND_GENRES',
   ENDGAMEWRAPPER = 'ENDGAMEWRAPPER',
   READY_FOR_PODIUM = 'READY_FOR_PODIUM',
+  SET_NEXT_GAME = 'set_next_game',
 }

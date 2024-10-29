@@ -23,6 +23,8 @@ export class Game {
   public creationTime: number;
   // Admin of the lobby (can start the game / remove a player from the lobby)
   public admin: string;
+  // nextGame
+  public nextGame: string | undefined;
 
   /**
    * Creates an instance of the game.
@@ -39,6 +41,7 @@ export class Game {
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
     this.admin = admin;
+    this.nextGame = undefined;
   }
 
   /**
