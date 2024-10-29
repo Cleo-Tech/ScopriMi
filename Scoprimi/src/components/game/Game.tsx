@@ -124,7 +124,6 @@ const Game: React.FC = () => {
 
     socket.on(SocketEvents.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
-      setCurrentLobby(null);
       setPlayers([]);
       socket.emit(SocketEvents.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
