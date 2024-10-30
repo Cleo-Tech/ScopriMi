@@ -124,6 +124,7 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
   socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
 }
 
+
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
   const thisGame = actualGameManager.getGame(data.currentLobby);
   console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
@@ -212,7 +213,7 @@ export function setupSocket(io: any) {
   io.on(SocketEvents.CONNECTION, (socket: any) => {
 
     console.log(`Client connected: ${socket.id}`);
-    // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
+
     setInterval(() => checkLobbiesAge(io), 10 * 1000);
 
     socket.on('mydisconnet', () => mydisconnect(socket, io));
@@ -243,16 +244,14 @@ export function setupSocket(io: any) {
       }
 
       if (thisGame.nextGame === undefined) {
-        // crea lobby
+        // la lobby non esiste, crea lobby
         // e qua ci va il valore thisGame.nextGame 
-
         myCreateLobby(socket, io, dataCreateLobby);
         thisGame.nextGame = codeTmp;
       } else {
-        // TODO Roba del cantiere della sburra
-        socket.emit(SocketEvents.ASK_TO_JOIN, thisGame.nextGame);
+        // gia esiste il game, gli restituisco quello che esiste
+        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: thisGame.nextGame });
       }
-      // return del new game?
     });
 
     // TODO check params on react
