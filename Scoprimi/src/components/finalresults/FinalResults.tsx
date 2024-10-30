@@ -44,9 +44,33 @@ const FinalResults: React.FC = () => {
 
   // Cantiere della sburra
 
+  function generateLobbyCode() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return code;
+  }
+
   function TODOREMATCH() {
     socket.emit(SocketEvents.SET_NEXT_GAME, { code: currentLobby, playerName: currentPlayer, image: currentPlayerImage });
   }
+
+  useEffect(() => {
+    console.log('Lazza pelato');
+    socket.on(SocketEvents.ASK_TO_JOIN, (data) => {
+      console.log('Ancora Lazza pelato ', data);
+
+      const datatoSend = {
+        lobbyCode: data,
+        playerName: currentPlayer,
+        image: currentPlayerImage,
+      };
+      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
+
+    });
+  }, [currentPlayer, currentPlayerImage]);
 
   useEffect(() => {
     socket.on(SocketEvents.PLAYER_CAN_JOIN, (data) => {

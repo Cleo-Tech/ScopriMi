@@ -198,8 +198,15 @@ function mydisconnect(socket, io) {
   }
 }
 
-
-
+// QUII
+function generateLobbyCode() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
 
 export function setupSocket(io: any) {
   io.on(SocketEvents.CONNECTION, (socket: any) => {
@@ -227,17 +234,23 @@ export function setupSocket(io: any) {
         return;
       }
 
+      const codeTmp = generateLobbyCode();
+      const dataCreateLobby = {
+        code: codeTmp,
+        numQuestionsParam: 5,
+        categories: ['generic'],
+        admin: data.playerName,
+      }
+
       if (thisGame.nextGame === undefined) {
         // crea lobby
         // e qua ci va il valore thisGame.nextGame 
-        const dataCreateLobby = {
-          code: '123456',
-          numQuestionsParam: 5,
-          categories: ['generic'],
-          admin: data.playerName,
-        }
+
         myCreateLobby(socket, io, dataCreateLobby);
-        thisGame.nextGame = data.code;
+        thisGame.nextGame = codeTmp;
+      } else {
+        // TODO Roba del cantiere della sburra
+        socket.emit(SocketEvents.ASK_TO_JOIN, thisGame.nextGame);
       }
       // return del new game?
     });
