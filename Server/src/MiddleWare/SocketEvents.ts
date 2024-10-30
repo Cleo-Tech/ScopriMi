@@ -35,4 +35,5 @@ export enum SocketEvents {
   ENDGAMEWRAPPER = 'ENDGAMEWRAPPER',
   READY_FOR_PODIUM = 'READY_FOR_PODIUM',
   SET_NEXT_GAME = 'set_next_game',
+  ASK_TO_JOIN = 'ASK_TO_JOIN'
 }
