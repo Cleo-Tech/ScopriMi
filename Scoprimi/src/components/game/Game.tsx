@@ -72,8 +72,6 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(SocketEvents.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
-      console.log('questions: ');
-      console.log(data.question.images);
       setClicked(false);
       setIsTimerActive(true);
       setQuestion(data.question.text);
@@ -100,7 +98,6 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(SocketEvents.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
-      console.log(Object.keys(data.players));
       setPlayersWhoVoted(Object.keys(data.players));
     });
     return () => {
@@ -114,7 +111,6 @@ const Game: React.FC = () => {
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
     }) => {
-      console.log('Madonna sburra');
       setVoteRecap(data.voteRecap);
       setPlayerImages(data.playerImages);
       setMostVotedPerson(data.mostVotedPerson);
@@ -124,7 +120,6 @@ const Game: React.FC = () => {
 
     socket.on(SocketEvents.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
-      setCurrentLobby(null);
       setPlayers([]);
       socket.emit(SocketEvents.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 

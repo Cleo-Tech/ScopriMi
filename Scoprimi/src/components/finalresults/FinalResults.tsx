@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FinalResultData } from '../../ts/types';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { socket } from '../../ts/socketInit';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents';
+import { useSession } from '../../contexts/SessionContext';
+import Alert from '../common/Alert';
 
 const defaultHeights = [
   '7vh',
@@ -13,6 +17,7 @@ const defaultColors = [
   '#cda434', // Oro
   '#cd7f32', // Bronzo
 ];
+
 
 function getPodiumStats(sameScore1And2, sameScore1And3, sameScore2And3, positionsArray) {
   let podiumArray = [...positionsArray];
@@ -36,6 +41,44 @@ const FinalResults: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { finalResults } = location.state as { finalResults: FinalResultData };
+  const { currentPlayer, setCurrentLobby, currentPlayerImage, currentLobby } = useSession();
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+
+  function TODOREMATCH() {
+    socket.emit(SocketEvents.SET_NEXT_GAME, { code: currentLobby, playerName: currentPlayer, image: currentPlayerImage });
+  }
+
+  useEffect(() => {
+    socket.on(SocketEvents.PLAYER_CAN_JOIN, (data) => {
+      if (data.canJoin) {
+        setCurrentLobby(data.lobbyCode);
+        navigate('/lobby');
+      } else {
+        setShowAlert(true);
+      }
+    });
+
+    return () => {
+      socket.off(SocketEvents.PLAYER_CAN_JOIN);
+    };
+  }, [navigate, setCurrentLobby]);
+
+  useEffect(() => {
+    socket.on(SocketEvents.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
+      // TODO
+      const datatoSend = {
+        lobbyCode: data.lobbyCode,
+        playerName: currentPlayer,
+        image: currentPlayerImage,
+      };
+      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
+    });
+
+    return () => {
+      socket.off(SocketEvents.RETURN_NEWGAME);
+    };
+  }, [currentPlayer, currentPlayerImage]);
+
 
   // Ordinamento con tipizzazione
   const sortedResults = Object.entries(finalResults)
@@ -68,6 +111,7 @@ const FinalResults: React.FC = () => {
 
   return (
     <>
+      <Alert text='Sei già in questa lobby' show={showAlert} onHide={() => setShowAlert(false)} />
       <div id="gameOverMessage" className="paginator">
         <h2 className="">Classifica</h2>
 
@@ -147,11 +191,18 @@ const FinalResults: React.FC = () => {
           </table>
         </div>
 
+
         <button
           className="my-btn mt-3 my-bg-puss"
           onClick={() => navigate('/')}
         >
           Torna alla homepage
+        </button>
+        <button
+          className='my-btn mt-3 my-bg-puss'
+          onClick={TODOREMATCH}
+        >
+          Gioca ancora
         </button>
       </div>
     </>

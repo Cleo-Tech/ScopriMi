@@ -21,7 +21,6 @@ const Lobby: React.FC = () => {
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      console.log('dentro alla funzione');
       if (!document.hidden) {
 
         const data = {
@@ -55,7 +54,6 @@ const Lobby: React.FC = () => {
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
     socket.emit(SocketEvents.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
-      console.log('Received data:', data);
       setGame(data);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       setIsReady(data.players[currentPlayer!].isReadyToGame);
@@ -106,7 +104,6 @@ const Lobby: React.FC = () => {
   const handleRemovePlayer = (playerName: string) => {
     console.log('Admin is removing the player:', playerName);
     socket.emit(SocketEvents.REMOVE_PLAYER, { playerName, currentLobby });
-    console.log('Io sono il giocatore: ', currentPlayer);
   };
 
   const handleCancelLeave = () => {

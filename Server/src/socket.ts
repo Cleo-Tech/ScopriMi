@@ -5,6 +5,7 @@ import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
+import { QuestionMode } from './data/Question.js';
 
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -57,6 +58,66 @@ function checkLobbiesAge(io: any) {
     }
   });
 }
+
+function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string }) {
+  console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
+  actualGameManager.createGame(data.code, data.admin);
+  const thisGame = actualGameManager.getGame(data.code);
+  thisGame.gamesGenre = data.categories;
+
+  const allSelectedQuestions = data.categories
+    .map(category => {
+      const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
+
+      return questions.map((questionText) => {
+        let questionMode = QuestionMode.Standard;
+        // Ora la domanda nel JSON è del tipo: contesto$domanda -> prendo solo domanda
+        const formattedQuestion = getTextQuestion(questionText);
+        let images: string[] = [];
+
+        // Determina il `mode` in base alla categoria o altre logiche
+        if (category === 'photo') {
+          const context = getContextQuestion(questionText);
+          questionMode = QuestionMode.Photo;
+
+          const onlyContextImages = photoUrls
+            .filter(p => p['tags'].includes(context))
+            .map(p => p['secure_url']);
+
+          // Mescola l'array photoUrls in modo casuale
+          const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+
+          // Prendi i primi 4 elementi dall'array mescolato
+          images = shuffledonlyContextImages.slice(0, 4);
+
+        }
+        else if (category === 'who') {
+          questionMode = QuestionMode.Who;
+
+          const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+          who_questions.sort(() => 0.5 - Math.random());
+          images = who_questions.slice(0, 4);
+        }
+
+        // Crea l'istanza della classe `Question`
+        return new Question(
+          questionMode,
+          category as QuestionGenre,
+          formattedQuestion,
+          images
+        );
+      });
+    })
+    .flat(); // Appiattisce l'array
+
+  actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+
+  const lobbies = actualGameManager.listGames();
+  io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+  const lobbyCode = data.code;
+  socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
+}
+
 
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
   const thisGame = actualGameManager.getGame(data.currentLobby);
@@ -132,14 +193,21 @@ function mydisconnect(socket, io) {
   }
 }
 
-
-
+// QUII
+function generateLobbyCode() {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
 
 export function setupSocket(io: any) {
   io.on(SocketEvents.CONNECTION, (socket: any) => {
 
     console.log(`Client connected: ${socket.id}`);
-    // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
+
     setInterval(() => checkLobbiesAge(io), 10 * 1000);
 
     socket.on('mydisconnet', () => mydisconnect(socket, io));
@@ -154,71 +222,36 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    // TODO check params on react
-    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
-      console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
-      console.log('Categorie scelte: ', data.categories);
-      actualGameManager.createGame(data.code, data.admin);
-
-      enum QuestionMode {
-        Standard,
-        Photo,
-        Who,
-        Theme
+    socket.on(SocketEvents.SET_NEXT_GAME, (data: { code: string, playerName: string, image: string }) => {
+      const thisGame = actualGameManager.getGame(data.code);
+      if (!thisGame) {
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
       }
 
-      const allSelectedQuestions = data.categories
-        .map(category => {
-          const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
+      // sposta il generateLobbyCode nel GAME/GameManager
+      const codeTmp = generateLobbyCode();
+      const dataCreateLobby = {
+        code: codeTmp,
+        numQuestionsParam: thisGame.selectedQuestions.length,
+        categories: thisGame.gamesGenre,
+        admin: data.playerName,
+      }
 
-          return questions.map((questionText) => {
-            let questionMode = QuestionMode.Standard;
-            // Ora la domanda nel JSON è del tipo: contesto$domanda -> prendo solo domanda
-            const formattedQuestion = getTextQuestion(questionText);
-            let images: string[] = [];
+      if (thisGame.nextGame === undefined) {
+        // la lobby non esiste, crea lobby
+        // e qua ci va il valore thisGame.nextGame 
+        myCreateLobby(socket, io, dataCreateLobby);
+        thisGame.nextGame = codeTmp;
+      } else {
+        // gia esiste il game, gli restituisco quello che esiste
+        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: thisGame.nextGame });
+      }
+    });
 
-            // Determina il `mode` in base alla categoria o altre logiche
-            if (category === 'photo') {
-              const context = getContextQuestion(questionText);
-              questionMode = QuestionMode.Photo;
-
-              const onlyContextImages = photoUrls
-                .filter(p => p['tags'].includes(context))
-                .map(p => p['secure_url']);
-
-              // Mescola l'array photoUrls in modo casuale
-              const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
-
-              // Prendi i primi 4 elementi dall'array mescolato
-              images = shuffledonlyContextImages.slice(0, 4);
-
-            }
-            else if (category === 'who') {
-              questionMode = QuestionMode.Who;
-
-              const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-              who_questions.sort(() => 0.5 - Math.random());
-              images = who_questions.slice(0, 4);
-              console.log(images);
-            }
-
-            // Crea l'istanza della classe `Question`
-            return new Question(
-              questionMode,
-              category as QuestionGenre,
-              formattedQuestion,
-              images
-            );
-          });
-        })
-        .flat(); // Appiattisce l'array
-
-      actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
-
-      const lobbies = actualGameManager.listGames();
-      io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
-      const lobbyCode = data.code;
-      socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode })
+    // TODO check params on react
+    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string }) => {
+      myCreateLobby(socket, io, data);
     });
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
@@ -262,7 +295,6 @@ export function setupSocket(io: any) {
     });
 
     socket.on(SocketEvents.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);
@@ -285,7 +317,6 @@ export function setupSocket(io: any) {
     //socket.on(SocketEvents.VOTE_IMAGE) // TODO Una roba del genere
 
     socket.on(SocketEvents.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
-      console.log('Ho ricevuto il voto ', data);
 
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
@@ -300,10 +331,7 @@ export function setupSocket(io: any) {
       io.to(data.lobbyCode).emit(SocketEvents.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       //}
 
-      console.log(thisGame.players);
-
       if (thisGame.didAllPlayersVote()) {
-        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
@@ -342,7 +370,6 @@ export function setupSocket(io: any) {
         if (pages.length > 0) {
           io.to(data.lobbyCode).emit(SocketEvents.ENDGAMEWRAPPER, { pages });
         } else {
-          actualGameManager.deleteGame(thisGame.lobbyCode);
           io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
         }
       }
@@ -359,7 +386,6 @@ export function setupSocket(io: any) {
         return;
       }
 
-      actualGameManager.deleteGame(thisGame.lobbyCode);
       io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
 
@@ -376,7 +402,6 @@ export function setupSocket(io: any) {
 
     socket.on(SocketEvents.REQUEST_CATEGORIES, () => {
       const genres = getQuestionGenresAsStrings();
-      console.log('Generi da inviare: ', genres);
       socket.emit(SocketEvents.SEND_GENRES, { genres });
     });
 

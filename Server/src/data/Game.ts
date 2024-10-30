@@ -8,6 +8,8 @@ import { Question, QuestionMode } from "./Question.js";
 export class Game {
   // Lobby code
   public lobbyCode: string;
+  // List of Game Modes
+  public gamesGenre: QuestionGenre[]
   // Indicates whether the game has started
   public isGameStarted: boolean;
   // List of players
@@ -23,6 +25,8 @@ export class Game {
   public creationTime: number;
   // Admin of the lobby (can start the game / remove a player from the lobby)
   public admin: string;
+  // nextGame
+  public nextGame: string | undefined;
 
   /**
    * Creates an instance of the game.
@@ -31,6 +35,7 @@ export class Game {
    */
   constructor(lobbyCode: string, admin: string) {
     this.lobbyCode = lobbyCode;
+    this.gamesGenre = [];
     this.isGameStarted = false;
     this.players = {};
     this.numOfVoters = 0;
@@ -39,6 +44,7 @@ export class Game {
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
     this.admin = admin;
+    this.nextGame = undefined;
   }
 
   /**
