@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FinalResultData } from '../../ts/types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { socket } from '../../ts/socketInit';
 import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents';
 import { useSession } from '../../contexts/SessionContext';
+import Alert from '../common/Alert';
 
 const defaultHeights = [
   '7vh',
@@ -41,8 +42,7 @@ const FinalResults: React.FC = () => {
   const navigate = useNavigate();
   const { finalResults } = location.state as { finalResults: FinalResultData };
   const { currentPlayer, setCurrentLobby, currentPlayerImage, currentLobby } = useSession();
-
-  // Cantiere della sburra
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   function TODOREMATCH() {
     socket.emit(SocketEvents.SET_NEXT_GAME, { code: currentLobby, playerName: currentPlayer, image: currentPlayerImage });
@@ -54,7 +54,7 @@ const FinalResults: React.FC = () => {
         setCurrentLobby(data.lobbyCode);
         navigate('/lobby');
       } else {
-        // setShowAlert(true);
+        setShowAlert(true);
       }
     });
 
@@ -79,7 +79,6 @@ const FinalResults: React.FC = () => {
     };
   }, [currentPlayer, currentPlayerImage]);
 
-  // Cantiere della sburra
 
   // Ordinamento con tipizzazione
   const sortedResults = Object.entries(finalResults)
@@ -112,6 +111,7 @@ const FinalResults: React.FC = () => {
 
   return (
     <>
+      <Alert text='Sei già in questa lobby' show={showAlert} onHide={() => setShowAlert(false)} />
       <div id="gameOverMessage" className="paginator">
         <h2 className="">Classifica</h2>
 

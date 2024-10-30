@@ -61,7 +61,6 @@ function checkLobbiesAge(io: any) {
 
 function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string }) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
-  console.log('Categorie scelte: ', data.categories);
   actualGameManager.createGame(data.code, data.admin);
   const thisGame = actualGameManager.getGame(data.code);
   thisGame.gamesGenre = data.categories;
@@ -98,7 +97,6 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
           const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
           who_questions.sort(() => 0.5 - Math.random());
           images = who_questions.slice(0, 4);
-          console.log(images);
         }
 
         // Crea l'istanza della classe `Question`
@@ -231,6 +229,7 @@ export function setupSocket(io: any) {
         return;
       }
 
+      // sposta il generateLobbyCode nel GAME/GameManager
       const codeTmp = generateLobbyCode();
       const dataCreateLobby = {
         code: codeTmp,
@@ -296,7 +295,6 @@ export function setupSocket(io: any) {
     });
 
     socket.on(SocketEvents.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);
@@ -319,7 +317,6 @@ export function setupSocket(io: any) {
     //socket.on(SocketEvents.VOTE_IMAGE) // TODO Una roba del genere
 
     socket.on(SocketEvents.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
-      console.log('Ho ricevuto il voto ', data);
 
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
@@ -333,8 +330,6 @@ export function setupSocket(io: any) {
       thisGame.castVote(data.voter, data.vote);
       io.to(data.lobbyCode).emit(SocketEvents.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       //}
-
-      console.log(thisGame.players);
 
       if (thisGame.didAllPlayersVote()) {
         const players = thisGame.players;
@@ -375,7 +370,6 @@ export function setupSocket(io: any) {
         if (pages.length > 0) {
           io.to(data.lobbyCode).emit(SocketEvents.ENDGAMEWRAPPER, { pages });
         } else {
-          // actualGameManager.deleteGame(thisGame.lobbyCode); cantiere della sburra
           io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
         }
       }
@@ -392,7 +386,6 @@ export function setupSocket(io: any) {
         return;
       }
 
-      // actualGameManager.deleteGame(thisGame.lobbyCode); cantiere della sburra
       io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
 
@@ -409,7 +402,6 @@ export function setupSocket(io: any) {
 
     socket.on(SocketEvents.REQUEST_CATEGORIES, () => {
       const genres = getQuestionGenresAsStrings();
-      console.log('Generi da inviare: ', genres);
       socket.emit(SocketEvents.SEND_GENRES, { genres });
     });
 
