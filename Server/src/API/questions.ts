@@ -36,7 +36,6 @@ export const setupUpload = (app: Express) => {
   };
 
   app.post('/upload', authMiddleware, upload.single('file'), async (req: Request, res: Response) => {
-    console.log('eccoci');
     const tempPath = req.file?.path;
     const targetPath = join(__dirname, '../questions.json');
 
@@ -48,7 +47,6 @@ export const setupUpload = (app: Express) => {
       await rename(tempPath, targetPath);
       const data = await readFile(targetPath, 'utf8');
       AllQuestions = JSON.parse(data);
-      console.log(AllQuestions);
       res.status(200).json({ message: 'File aggiornato con successo' });
     } catch (err) {
       console.error('Errore durante il salvataggio del file', err);
