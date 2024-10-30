@@ -5,6 +5,7 @@ import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
+import { QuestionMode } from './data/Question.js';
 
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -58,17 +59,12 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: string[], admin: string }, oldQuestions: Question[]) {
+function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string }) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
   console.log('Categorie scelte: ', data.categories);
   actualGameManager.createGame(data.code, data.admin);
-
-  enum QuestionMode {
-    Standard,
-    Photo,
-    Who,
-    Theme
-  }
+  const thisGame = actualGameManager.getGame(data.code);
+  thisGame.gamesGenre = data.categories;
 
   const allSelectedQuestions = data.categories
     .map(category => {
@@ -255,8 +251,8 @@ export function setupSocket(io: any) {
       const codeTmp = generateLobbyCode();
       const dataCreateLobby = {
         code: codeTmp,
-        numQuestionsParam: 5,
-        categories: ['generic'],
+        numQuestionsParam: thisGame.selectedQuestions.length,
+        categories: thisGame.gamesGenre,
         admin: data.playerName,
       }
 
@@ -272,8 +268,8 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
-      myCreateLobby(socket, io, data, undefined);
+    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string }) => {
+      myCreateLobby(socket, io, data);
     });
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
@@ -358,7 +354,6 @@ export function setupSocket(io: any) {
       console.log(thisGame.players);
 
       if (thisGame.didAllPlayersVote()) {
-        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
