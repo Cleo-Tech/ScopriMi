@@ -58,7 +58,7 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) {
+function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: string[], admin: string }, oldQuestions: Question[]) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
   console.log('Categorie scelte: ', data.categories);
   actualGameManager.createGame(data.code, data.admin);
@@ -116,7 +116,20 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
     })
     .flat(); // Appiattisce l'array
 
-  actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+  if (oldQuestions === undefined) {
+    console.log('Selezionando nuove domande');
+    actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+  } else {
+    console.log('Tolgo le domande vecchie');
+
+    // Filtra le domande nuove escludendo quelle già presenti in oldQuestions
+    const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
+      !oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text)
+    );
+
+    // Mescola e seleziona il numero richiesto di domande, senza duplicati
+    actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
+  }
 
   const lobbies = actualGameManager.listGames();
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
@@ -227,7 +240,11 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
+    // Creazione di un gioco successivo
+    // Creato da "Gioca ancora"
     socket.on(SocketEvents.SET_NEXT_GAME, (data: { code: string, playerName: string, image: string }) => {
+      console.log('Dati partita vecchia: ', actualGameManager.getGame(data.code).selectedQuestions);
+
       const thisGame = actualGameManager.getGame(data.code);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);
@@ -243,13 +260,10 @@ export function setupSocket(io: any) {
       }
 
       if (thisGame.nextGame === undefined) {
-        // crea lobby
-        // e qua ci va il valore thisGame.nextGame 
-
-        myCreateLobby(socket, io, dataCreateLobby);
+        // crea lobby per partita successiva
+        myCreateLobby(socket, io, dataCreateLobby, actualGameManager.getGame(data.code).selectedQuestions);
         thisGame.nextGame = codeTmp;
       } else {
-        // TODO Roba del cantiere della sburra
         socket.emit(SocketEvents.ASK_TO_JOIN, thisGame.nextGame);
       }
       // return del new game?
@@ -257,7 +271,7 @@ export function setupSocket(io: any) {
 
     // TODO check params on react
     socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
-      myCreateLobby(socket, io, data);
+      myCreateLobby(socket, io, data, undefined);
     });
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
