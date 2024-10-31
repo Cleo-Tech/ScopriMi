@@ -63,7 +63,11 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
   actualGameManager.createGame(data.code, data.admin);
   const thisGame = actualGameManager.getGame(data.code);
-  //thisGame.gamesGenre = data.categories; Non so cosa sia
+  thisGame.gamesGenre = data.categories
+    .filter((category): category is QuestionGenre => {
+      return Object.values(QuestionGenre).includes(category as QuestionGenre);
+    });
+
 
   const allSelectedQuestions = data.categories
     .map(category => {
