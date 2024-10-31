@@ -63,7 +63,7 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
   actualGameManager.createGame(data.code, data.admin);
   const thisGame = actualGameManager.getGame(data.code);
-  thisGame.gamesGenre = data.categories;
+  //thisGame.gamesGenre = data.categories; Non so cosa sia
 
   const allSelectedQuestions = data.categories
     .map(category => {
@@ -258,12 +258,6 @@ export function setupSocket(io: any) {
       if (thisGame.nextGame === undefined) {
         // crea lobby per partita successiva
         myCreateLobby(socket, io, dataCreateLobby, actualGameManager.getGame(data.code).selectedQuestions);
-        thisGame.nextGame = codeTmp;
-      } else {
-        socket.emit(SocketEvents.ASK_TO_JOIN, thisGame.nextGame);
-        // la lobby non esiste, crea lobby
-        // e qua ci va il valore thisGame.nextGame 
-        myCreateLobby(socket, io, dataCreateLobby);
         thisGame.nextGame = codeTmp;
       } else {
         // gia esiste il game, gli restituisco quello che esiste
