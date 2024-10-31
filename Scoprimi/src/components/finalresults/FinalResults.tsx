@@ -58,9 +58,7 @@ const FinalResults: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log('Lazza pelato');
     socket.on(SocketEvents.ASK_TO_JOIN, (data) => {
-      console.log('Ancora Lazza pelato ', data);
 
       const datatoSend = {
         lobbyCode: data,
