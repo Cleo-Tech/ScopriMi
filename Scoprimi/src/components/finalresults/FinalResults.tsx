@@ -49,6 +49,19 @@ const FinalResults: React.FC = () => {
   }
 
   useEffect(() => {
+    socket.on(SocketEvents.ASK_TO_JOIN, (data) => {
+
+      const datatoSend = {
+        lobbyCode: data,
+        playerName: currentPlayer,
+        image: currentPlayerImage,
+      };
+      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
+
+    });
+  }, [currentPlayer, currentPlayerImage]);
+
+  useEffect(() => {
     socket.on(SocketEvents.PLAYER_CAN_JOIN, (data) => {
       if (data.canJoin) {
         setCurrentLobby(data.lobbyCode);
