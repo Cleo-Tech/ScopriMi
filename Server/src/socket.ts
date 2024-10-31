@@ -221,7 +221,7 @@ export function setupSocket(io: any) {
     });
 
     socket.on(c.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
-      const defaultAnswers = ["No vabbè", "Type shiii", "Rizz approved", "Cassone"];  // Si potrebbe pensare di leggere da answer.json
+      const defaultAnswers = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
       const thisGame = actualGameManager.getGame(data.currentLobby);
       if (!thisGame) {
         console.error('non esiste questa lobby');
@@ -236,10 +236,9 @@ export function setupSocket(io: any) {
 
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
 
-      // TODO non va con i valori mancanti non va;
       if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
         const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
-        io.to(data.currentLobby).emit(c.PUSSY, { answers: images });
+        io.to(data.currentLobby).emit(c.ALL_CUSTOM_ANSWER, { answers: images });
       }
     });
 

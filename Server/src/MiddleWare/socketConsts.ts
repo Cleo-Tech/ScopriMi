@@ -34,4 +34,4 @@ export const SEND_GENRES: string = 'SEND_GENRES';
 export const ENDGAMEWRAPPER: string = 'ENDGAMEWRAPPER';
 export const READY_FOR_PODIUM: string = 'READY_FOR_PODIUM';
 export const SEND_CUSTOM_ANSWER: string = 'SEND_CUSTOM_ANSWER';
-export const PUSSY: string = 'PUSSY';   // TODO: cambiare con un nome che ha senso
+export const ALL_CUSTOM_ANSWER: string = 'ALL_CUSTOM_ANSWER';
