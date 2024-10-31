@@ -12,8 +12,8 @@ import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 import QuestionList from './QuestionList';
-import EndGameWrapper from './EndGameWrapper.js';
-import CustomAnswer from './CustomAnswer.js';
+import EndGameWrapper from './EndGameWrapper';
+import CustomAnswer from './CustomAnswer';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -66,13 +66,13 @@ const Game: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    socket.on(c.PUSSY, (data: { answers: string[] }) => {
+    socket.on(c.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
       setQuestionImages(data.answers);
       fromQuestionToResponse();
     });
 
     return () => {
-      socket.off(c.PUSSY);
+      socket.off(c.ALL_CUSTOM_ANSWER);
     };
   }, [fromQuestionToResponse]);
 
