@@ -13,8 +13,8 @@ enum GameStates {
   WHOQUESTION = 'WHOQUESTION',
   WHORESPONSE = 'WHORESPONSE',
   // modalita con risposte a tema
-  THEMEQUESTION = 'THEMEQUESTION',
-  THEMERESPONSE = 'THEMERESPONSE',
+  CUSTOMQUESTION = 'CUSTOMQUESTION',
+  CUSTOMRESPONSE = 'CUSTOMRESPONSE',
   // Modalità dove voti foto
   PHOTOQUESTION = 'PHOTOQUESTION',
   PHOTORESPONSE = 'PHOTORESPONSE',
@@ -33,7 +33,7 @@ enum GameStates {
 const states = {
   [GameStates.NEXTQUESTION]: [
     // il gioco continua
-    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.THEMEQUESTION,
+    GameStates.STANDARDQUESTION, GameStates.WHOQUESTION, GameStates.PHOTOQUESTION, GameStates.CUSTOMQUESTION,
     // il gioco finisce
     GameStates.PREPODIUMWRAP, GameStates.PODIUM,
   ],
@@ -47,12 +47,12 @@ const states = {
   [GameStates.PHOTOQUESTION]: [GameStates.PHOTORESPONSE],
   [GameStates.PHOTORESPONSE]: [GameStates.RESULTOUTCOME],
 
-  [GameStates.THEMEQUESTION]: [GameStates.THEMERESPONSE],
-  [GameStates.THEMERESPONSE]: [GameStates.RESULTOUTCOME],
-  [GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PREPODIUMWRAP],
+  [GameStates.CUSTOMQUESTION]: [GameStates.CUSTOMRESPONSE],
+  [GameStates.CUSTOMRESPONSE]: [GameStates.RESULTOUTCOME],
+  //[GameStates.THEMERESULTFINAL]: [GameStates.MOCK, GameStates.NEXTQUESTION, GameStates.PREPODIUMWRAP],
 
   // TOGLI GameStates.PODIUM
-  [GameStates.RESULTOUTCOME]: [GameStates.THEMERESULTFINAL, GameStates.MOCK, GameStates.NEXTQUESTION],
+  [GameStates.RESULTOUTCOME]: [GameStates.PREPODIUMWRAP, GameStates.MOCK, GameStates.NEXTQUESTION],
 
   [GameStates.PREPODIUMWRAP]: [GameStates.PODIUM],
 
@@ -97,7 +97,7 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const fromNextQuestionToQuestion = (qstMode: QuestionMode) => {
     switch (qstMode) {
       case QuestionMode.Photo:
-        // TODO add ALL
+        // TODO FIX THIS SHIIIIIIIT
         transitionTo(GameStates.PHOTOQUESTION);
         break;
       case QuestionMode.Standard:
@@ -105,6 +105,9 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         break;
       case QuestionMode.Who:
         transitionTo(GameStates.WHOQUESTION);
+        break;
+      case QuestionMode.CustomWho:
+        transitionTo(GameStates.CUSTOMQUESTION);
         break;
       default:
         console.error('non dovevi finire qua');
@@ -115,8 +118,11 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const fromQuestionToResponse = () => {
 
     switch (actualState) {
+      // TODO lol bella merda
+      case GameStates.CUSTOMRESPONSE:
+        break;
       case GameStates.STANDARDQUESTION:
-        // TODO add ALL
+        // TODO FIX THIS 
         transitionTo(GameStates.STANDARDRESPONSE);
         break;
       case GameStates.WHOQUESTION:
@@ -125,8 +131,8 @@ const GameStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       case GameStates.PHOTOQUESTION:
         transitionTo(GameStates.PHOTORESPONSE);
         break;
-      case GameStates.THEMEQUESTION:
-        transitionTo(GameStates.THEMERESPONSE);
+      case GameStates.CUSTOMQUESTION:
+        transitionTo(GameStates.CUSTOMRESPONSE);
         break;
       default:
         console.error('non dovevi finire qua');

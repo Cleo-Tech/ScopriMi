@@ -2,7 +2,7 @@ export enum QuestionMode {
   Standard,
   Photo,
   Who,
-  Theme
+  CustomWho
 }
 
 import { QuestionGenre } from "../MiddleWare/Types.js";

@@ -10,7 +10,7 @@ import { QuestionMode } from './data/Question.js';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-
+import { randomInt } from 'crypto';
 
 export const actualGameManager = new GameManager();
 
@@ -68,7 +68,6 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
       return Object.values(QuestionGenre).includes(category as QuestionGenre);
     });
 
-
   const allSelectedQuestions = data.categories
     .map(category => {
       const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
@@ -96,11 +95,17 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
 
         }
         else if (category === 'who') {
-          questionMode = QuestionMode.Who;
+          if (randomInt(0, 100) > 60 /*false*/) {    // Change to percentage when ready for deployment
+            questionMode = QuestionMode.Who;
+            const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+            who_questions.sort(() => 0.5 - Math.random());
+            images = who_questions.slice(0, 4);
+            console.log(images);
+          } else {
+            questionMode = QuestionMode.CustomWho;
+            images = [];
+          }
 
-          const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-          who_questions.sort(() => 0.5 - Math.random());
-          images = who_questions.slice(0, 4);
         }
 
         // Crea l'istanza della classe `Question`
@@ -128,12 +133,13 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
     // Mescola e seleziona il numero richiesto di domande, senza duplicati
     actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
   }
-
   const lobbies = actualGameManager.listGames();
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
   const lobbyCode = data.code;
   socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
-}
+};
+
+
 
 
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
@@ -275,6 +281,8 @@ export function setupSocket(io: any) {
       myCreateLobby(socket, io, data);
     });
 
+
+
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
         const code = data.lobbyCode;
@@ -307,6 +315,28 @@ export function setupSocket(io: any) {
         io.to(code).emit(SocketEvents.RENDER_LOBBY, game);
         const lobbies = actualGameManager.listGames();
         io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+      }
+    });
+
+    socket.on(SocketEvents.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
+      const defaultAnswers = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      if (!thisGame) {
+        console.error('non esiste questa lobby');
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
+      }
+
+      // Se la domande è vuota gliene do un di default
+      if (data.answer.trim().length === 0) {
+        data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
+      }
+
+      thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
+
+      if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
+        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
+        io.to(data.currentLobby).emit(SocketEvents.ALL_CUSTOM_ANSWER, { answers: images });
       }
     });
 

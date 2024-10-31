@@ -26,7 +26,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, onVote, disabled
   };
 
   return (
-    <div className='fill textualAnswerContainer'>
+    <div className='fill textualAnswerContainer scrollable'>
       {questions.map((question, index) => (
         <div
           onClick={() => handlePlayerClick(question)}

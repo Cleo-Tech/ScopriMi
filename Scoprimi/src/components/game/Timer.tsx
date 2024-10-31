@@ -11,6 +11,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isActive }) => {
   const timerRef = useRef<number | null>(null);
 
   const startTimer = useCallback(() => {
+    setTimeLeft(duration); // Resetta il timer a duration all'inizio
     timerRef.current = window.setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
@@ -22,12 +23,18 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isActive }) => {
         }
         return prev - 1;
       });
-    }, 1 * 1000);
-  }, [onTimeUp]);
+    }, 1000);
+  }, [onTimeUp, duration]);
 
   useEffect(() => {
     if (isActive) {
       startTimer();
+    } else {
+      // Quando isActive diventa false, ferma il timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     }
 
     return () => {
