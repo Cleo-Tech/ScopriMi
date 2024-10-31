@@ -90,11 +90,9 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
 
   useEffect(() => {
     if (isOpen) {
-      console.log('Modal aperto per il giocatore:', playerName);
       socket.emit(SocketEvents.REQUEST_CATEGORIES);
 
       socket.on(SocketEvents.SEND_GENRES, (data: { genres: string[] }) => {
-        console.log('Categorie ricevute: ', data.genres);
         setCategories(data.genres);
         setSelectedCategories(new Array(data.genres.length).fill(false));
       });

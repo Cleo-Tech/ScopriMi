@@ -5,6 +5,7 @@ import { AllQuestions } from './API/questions.js';
 import { Question } from './data/Question.js';
 import { QuestionGenre } from './MiddleWare/Types.js';
 import { photoUrls } from './API/images.js';
+import { QuestionMode } from './data/Question.js';
 
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
@@ -60,15 +61,9 @@ function checkLobbiesAge(io: any) {
 
 function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: string[], admin: string }, oldQuestions: Question[]) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
-  console.log('Categorie scelte: ', data.categories);
   actualGameManager.createGame(data.code, data.admin);
-
-  enum QuestionMode {
-    Standard,
-    Photo,
-    Who,
-    Theme
-  }
+  const thisGame = actualGameManager.getGame(data.code);
+  thisGame.gamesGenre = data.categories;
 
   const allSelectedQuestions = data.categories
     .map(category => {
@@ -102,7 +97,6 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
           const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
           who_questions.sort(() => 0.5 - Math.random());
           images = who_questions.slice(0, 4);
-          console.log(images);
         }
 
         // Crea l'istanza della classe `Question`
@@ -136,6 +130,7 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
   const lobbyCode = data.code;
   socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
 }
+
 
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
   const thisGame = actualGameManager.getGame(data.currentLobby);
@@ -225,7 +220,7 @@ export function setupSocket(io: any) {
   io.on(SocketEvents.CONNECTION, (socket: any) => {
 
     console.log(`Client connected: ${socket.id}`);
-    // Avvia il controllo per l'eliminazione delle lobby (ogni 60 sec)
+
     setInterval(() => checkLobbiesAge(io), 10 * 1000);
 
     socket.on('mydisconnet', () => mydisconnect(socket, io));
@@ -251,11 +246,12 @@ export function setupSocket(io: any) {
         return;
       }
 
+      // sposta il generateLobbyCode nel GAME/GameManager
       const codeTmp = generateLobbyCode();
       const dataCreateLobby = {
         code: codeTmp,
-        numQuestionsParam: 5,
-        categories: ['generic'],
+        numQuestionsParam: thisGame.selectedQuestions.length,
+        categories: thisGame.gamesGenre,
         admin: data.playerName,
       }
 
@@ -265,8 +261,14 @@ export function setupSocket(io: any) {
         thisGame.nextGame = codeTmp;
       } else {
         socket.emit(SocketEvents.ASK_TO_JOIN, thisGame.nextGame);
+        // la lobby non esiste, crea lobby
+        // e qua ci va il valore thisGame.nextGame 
+        myCreateLobby(socket, io, dataCreateLobby);
+        thisGame.nextGame = codeTmp;
+      } else {
+        // gia esiste il game, gli restituisco quello che esiste
+        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: thisGame.nextGame });
       }
-      // return del new game?
     });
 
     // TODO check params on react
@@ -315,7 +317,6 @@ export function setupSocket(io: any) {
     });
 
     socket.on(SocketEvents.TOGGLE_IS_READY_TO_GAME, (data: { lobbyCode: string; playerName: string }) => {
-      console.log('Toggle', data.playerName, data.lobbyCode);
       const thisGame = actualGameManager.getGame(data.lobbyCode);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);
@@ -338,7 +339,6 @@ export function setupSocket(io: any) {
     //socket.on(SocketEvents.VOTE_IMAGE) // TODO Una roba del genere
 
     socket.on(SocketEvents.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
-      console.log('Ho ricevuto il voto ', data);
 
       const thisGame = actualGameManager.getGame(data.lobbyCode);
 
@@ -353,10 +353,7 @@ export function setupSocket(io: any) {
       io.to(data.lobbyCode).emit(SocketEvents.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
       //}
 
-      console.log(thisGame.players);
-
       if (thisGame.didAllPlayersVote()) {
-        console.log('Zelo hgay dentroe');
         const players = thisGame.players;
         const voteRecap = thisGame.getWhatPlayersVoted();
         const playerImages = thisGame.getImages();
@@ -395,7 +392,6 @@ export function setupSocket(io: any) {
         if (pages.length > 0) {
           io.to(data.lobbyCode).emit(SocketEvents.ENDGAMEWRAPPER, { pages });
         } else {
-          // actualGameManager.deleteGame(thisGame.lobbyCode); cantiere della sburra
           io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
         }
       }
@@ -412,7 +408,6 @@ export function setupSocket(io: any) {
         return;
       }
 
-      // actualGameManager.deleteGame(thisGame.lobbyCode); cantiere della sburra
       io.to(data.lobbyCode).emit(SocketEvents.GAME_OVER, { playerScores: thisGame.getScores(), playerImages: thisGame.getImages() });
     });
 
@@ -429,7 +424,6 @@ export function setupSocket(io: any) {
 
     socket.on(SocketEvents.REQUEST_CATEGORIES, () => {
       const genres = getQuestionGenresAsStrings();
-      console.log('Generi da inviare: ', genres);
       socket.emit(SocketEvents.SEND_GENRES, { genres });
     });
 
