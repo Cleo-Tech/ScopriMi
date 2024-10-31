@@ -66,13 +66,13 @@ const Game: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    socket.on(c.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
+    socket.on(SocketEvents.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
       setQuestionImages(data.answers);
       fromQuestionToResponse();
     });
 
     return () => {
-      socket.off(c.ALL_CUSTOM_ANSWER);
+      socket.off(SocketEvents.ALL_CUSTOM_ANSWER);
     };
   }, [fromQuestionToResponse]);
 
@@ -184,13 +184,13 @@ const Game: React.FC = () => {
 
   const handleTimeUpCostomWho = () => {
     console.log('Ho letto una risposta custom');
-    socket.emit(c.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
     setIsTimerActive(false);
   };
 
   const handleSubmit = (answer: string) => {
     console.log('Ho letto una risposta custom');
-    socket.emit(c.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
   };
 
   // Render delle page
