@@ -138,10 +138,12 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               />
               <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
             </div>
-            <p>Categoria domande:</p>
+            {/* <p>Categoria domande:</p> */}
             {/* Render dinamico delle categorie con mappatura */}
+            <div className='mt-5'></div>
             {categories.map((category, index) => (
               <div className="switch-container" key={index}>
+                <span className="switch-label">{categoryLabels[category] || category}</span>
                 <label className="switch">
                   <input
                     type="checkbox"
@@ -150,15 +152,14 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
                   />
                   <span className="slider round"></span>
                 </label>
-                <span className="switch-label">{categoryLabels[category] || category}</span>
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} className="my-btn my-bg-quartary">Crea</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">Crea</button>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 };

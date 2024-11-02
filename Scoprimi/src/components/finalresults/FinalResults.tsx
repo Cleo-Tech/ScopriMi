@@ -191,20 +191,22 @@ const FinalResults: React.FC = () => {
           </table>
         </div>
 
-
-        <button
-          className="my-btn mt-3 my-bg-puss"
-          onClick={() => navigate('/')}
-        >
-          Torna alla homepage
-        </button>
-        <button
-          className='my-btn mt-3 my-bg-puss'
-          onClick={TODOREMATCH}
-        >
-          Gioca ancora
-        </button>
+        <div className='lobby-button-group mt-3'>
+          <button
+            className="my-btn mt-3 my-bg-elegant-backgorund"
+            onClick={() => navigate('/')}
+          >
+            <i className="fa-solid fa-house"></i>
+          </button>
+          <button
+            className='my-btn mt-3 my-bg-puss'
+            onClick={TODOREMATCH}
+          >
+            Gioca ancora
+          </button>
+        </div>
       </div>
+
     </>
   );
 

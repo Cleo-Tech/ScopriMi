@@ -180,6 +180,7 @@ input:checked+.slider:before {
 .switch-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   /* Allinea lo switch e il testo verticalmente al centro */
   margin-bottom: 15px;
   /* Spazio inferiore tra gli switch */
