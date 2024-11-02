@@ -1,9 +1,9 @@
 ## v0.7.0
 
-- [ ] Tutti hanno votato alice
+- [x] Tutti hanno votato alice
 - [ ] Switch a destra (impostazioni partita)
 - [ ] Lunghezza pagina login (no scroll)
-- [ ] Modalita con foto (va oltre le altre - meno padding)
+- [x] Modalita con foto (va oltre le altre - meno padding)
 - [ ] non riusare le domande (check)
 
 
