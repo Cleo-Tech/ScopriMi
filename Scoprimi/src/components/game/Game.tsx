@@ -34,6 +34,7 @@ const Game: React.FC = () => {
   const [mostVotedPerson, setMostVotedPerson] = useState<string>('');
   const [playerImages, setPlayerImages] = useState<{ [key: string]: string }>({});
   const [voteRecap, setVoteRecap] = useState<{ [key: string]: string }>({});
+  const [allSameSelection, setAllSameSelection] = useState<boolean>(false);
 
   const [clicked, setClicked] = useState<boolean>(false);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
@@ -123,6 +124,8 @@ const Game: React.FC = () => {
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
     }) => {
+      const allEqual = (arr) => new Set(arr).size === 1;
+      setAllSameSelection(allEqual(Object.values(data.voteRecap)));
       setVoteRecap(data.voteRecap);
       setPlayerImages(data.playerImages);
       setMostVotedPerson(data.mostVotedPerson);
@@ -240,7 +243,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Inserisci una risposta</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
+            <Timer duration={45} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
           </div>
           <CustomAnswer handleSubmit={handleSubmit} />
         </div>
@@ -285,8 +288,13 @@ const Game: React.FC = () => {
           <div className="result-message text-center">
             <h4 style={{ textAlign: 'left' }}>{selectedPlayer ? question.replace('$', selectedPlayer) : question}</h4>
             <p className="result-subtitle" style={{ textAlign: 'left' }}>
-              {mostVotedPerson === '' ? 'Pareggio!' : 'Scelta più votata:'}
+              {allSameSelection
+                ? 'Tutti hanno votato:'
+                : mostVotedPerson === ''
+                  ? 'Pareggio!'
+                  : `Scelta più votata: ${mostVotedPerson}`}
             </p>
+
             {isWho ? <h4>{mostVotedPerson}</h4> : ( // Da fixare, fa un pò cagare
               isPhoto ?
                 <img
