@@ -22,7 +22,6 @@ export enum ModalUse {
 
 const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
   const [gameLenght, setGameLenght] = useState<string>('Corta');
-  const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -86,9 +85,6 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
       setShowAlert(true);
       return;
     }
-    if (modalUse === ModalUse.new) {
-      const code = generateLobbyCode();
-  
     let numberOfQuestion: number;
     switch (gameLenght) {
       case 'Corta':
@@ -102,9 +98,12 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
         numberOfQuestion = 30;
     }
 
-    socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
+    if (modalUse === ModalUse.new) {
+      const code = generateLobbyCode();
+
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
     } else if (modalUse === ModalUse.modify) {
-      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numQuestions, categories: selected });
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, categories: selected });
     }
     onClose();
   };
