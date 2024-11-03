@@ -263,11 +263,12 @@ export function setupSocket(io: any) {
         numQuestionsParam: thisGame.selectedQuestions.length,
         categories: thisGame.gamesGenre,
         admin: data.playerName,
+        oldQuestions: actualGameManager.getGame(data.code).selectedQuestions,
       }
 
       if (thisGame.nextGame === undefined) {
         // crea lobby per partita successiva
-        myCreateLobby(socket, io, dataCreateLobby, actualGameManager.getGame(data.code).selectedQuestions);
+        myCreateLobby(socket, io, dataCreateLobby);
         thisGame.nextGame = codeTmp;
       } else {
         // gia esiste il game, gli restituisco quello che esiste
