@@ -292,7 +292,7 @@ const Game: React.FC = () => {
                 ? 'Tutti hanno votato:'
                 : mostVotedPerson === ''
                   ? 'Pareggio!'
-                  : `Scelta più votata: ${mostVotedPerson}`}
+                  : 'Scelta più votata:'}
             </p>
 
             {isWho ? <h4>{mostVotedPerson}</h4> : ( // Da fixare, fa un pò cagare
