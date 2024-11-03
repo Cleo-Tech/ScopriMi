@@ -210,6 +210,7 @@ const Lobby: React.FC = () => {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           image={currentPlayerImage!}
           modalUse={ModalUse.modify}
+        // TODO allinea anche il colore tramite prop
         />
       </div>
     </>

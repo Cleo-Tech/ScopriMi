@@ -288,6 +288,15 @@ export function setupSocket(io: any) {
     });
 
 
+    socket.on(SocketEvents.MODIFY_GAME_CONFIG, (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], oldQuestions: Question[] }) => {
+      const thisGame = actualGameManager.getGame(data.code);
+      if (!thisGame) {
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
+      }
+      // TODO
+    });
+
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
