@@ -167,7 +167,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">modalPussy</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">{modalPussy}</button>
             </div>
           </div>
         </div>
