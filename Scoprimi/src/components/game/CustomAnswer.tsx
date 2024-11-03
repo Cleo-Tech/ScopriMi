@@ -33,12 +33,13 @@ const CustomAnswer: React.FC<CustomAnswerProps> = ({ handleSubmit }) => {
             handleClick();
           }}
           style={{
-            backgroundColor: btnClicked ? 'var(--disabled-color)' : 'var(--success-color)',
+            backgroundColor: btnClicked || answer === '' ? 'var(--disabled-color)' : 'var(--success-color)',
           }}
-          disabled={btnClicked ? true : false} // Gestisce il problema del voto multiplo, ma resta da fixare nel backend!!
+          disabled={btnClicked || answer === ''} // Disabilita se il bottone è già stato cliccato o l'input è vuoto
         >
           Conferma
         </button>
+
       </div>
     </div >
   );

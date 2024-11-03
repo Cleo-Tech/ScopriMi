@@ -10,14 +10,22 @@ interface NewGameModalProps {
   onClose: () => void;
   playerName: string;
   image: string;
+  modalUse: ModalUse;
 }
 
-const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image }) => {
+export enum ModalUse {
+  // eslint-disable-next-line no-unused-vars
+  new = 'Crea',
+  // eslint-disable-next-line no-unused-vars
+  modify = 'Modifica',
+}
+
+const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
   const [gameLenght, setGameLenght] = useState<string>('Corta');
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const { currentPlayer } = useSession();
+  const { currentPlayer, currentLobby } = useSession();
 
   const categoryLabels: { [key: string]: string } = {
     adult: 'Domande +18',
@@ -72,13 +80,11 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   }
 
   const handleCreateGame = () => {
-    const code = generateLobbyCode();
     const selected = categories.filter((_, index) => selectedCategories[index]);
     if (selected.length === 0) {
       setShowAlert(true);
       return;
     }
-
     let numberOfQuestion: number;
     switch (gameLenght) {
       case 'Corta':
@@ -92,7 +98,13 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
         numberOfQuestion = 30;
     }
 
-    socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
+    if (modalUse === ModalUse.new) {
+      const code = generateLobbyCode();
+
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
+    } else if (modalUse === ModalUse.modify) {
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, categories: selected });
+    }
     onClose();
   };
 
@@ -177,7 +189,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">Crea</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">{modalUse}</button>
             </div>
           </div>
         </div>
@@ -186,4 +198,4 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   );
 };
 
-export default NewGameModal;
+export default BottomGameModal;

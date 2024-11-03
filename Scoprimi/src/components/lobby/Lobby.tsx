@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { socket } from '../../ts/socketInit.ts';
 import { useSession } from '../../contexts/SessionContext.tsx';
-import LobbyList from '../common/LobbyList.tsx';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
-import LobbyPlayer from './LobbyPlayer.tsx'; // Import del nuovo componente Player
+import LobbyPlayer from './LobbyPlayer.tsx';
+import LobbyRecap from './LobbyRecap.tsx';
+import BottomGameModal, { ModalUse } from '../newGame/NewGameModal.tsx';
 
 const Lobby: React.FC = () => {
 
@@ -17,7 +18,8 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false); // stato per gestire il caricamento
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -158,7 +160,8 @@ const Lobby: React.FC = () => {
         <h2>ScopriMi</h2>
         {/* Primo blocco */}
         <div className="elegant-background mt-3">
-          <LobbyList lobbies={[game]} onJoin={() => void 0} />
+          {/* <LobbyList lobbies={[game]} onJoin={() => void 0} /> */}
+          <LobbyRecap lobby={game} onModify={() => setIsModalOpen(true)} />
         </div>
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
@@ -198,6 +201,16 @@ const Lobby: React.FC = () => {
           show={showModal}
           onConfirm={handleConfirmLeave}
           onCancel={handleCancelLeave}
+        />
+        <BottomGameModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          playerName={currentPlayer!}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          image={currentPlayerImage!}
+          modalUse={ModalUse.modify}
+        // TODO allinea anche il colore tramite prop
         />
       </div>
     </>
