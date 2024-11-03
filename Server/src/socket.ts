@@ -250,36 +250,6 @@ export function setupSocket(io: any) {
       callback(false);
     });
 
-    // Creazione di un gioco successivo
-    // Creato da "Gioca ancora"
-    socket.on(SocketEvents.SET_NEXT_GAME, (data: { code: string, playerName: string, image: string }) => {
-      console.log('Dati partita vecchia: ', actualGameManager.getGame(data.code).selectedQuestions);
-
-      const thisGame = actualGameManager.getGame(data.code);
-      if (!thisGame) {
-        socket.emit(SocketEvents.FORCE_RESET);
-        return;
-      }
-
-      // sposta il generateLobbyCode nel GAME/GameManager
-      const codeTmp = generateLobbyCode();
-      const dataCreateLobby = {
-        code: codeTmp,
-        numQuestionsParam: thisGame.selectedQuestions.length,
-        categories: thisGame.gamesGenre,
-        admin: data.playerName,
-        oldQuestions: actualGameManager.getGame(data.code).selectedQuestions,
-      }
-
-      if (thisGame.nextGame === undefined) {
-        // crea lobby per partita successiva
-        myCreateLobby(socket, io, dataCreateLobby);
-        thisGame.nextGame = codeTmp;
-      } else {
-        // gia esiste il game, gli restituisco quello che esiste
-        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: thisGame.nextGame });
-      }
-    });
 
     // Creazione di un gioco successivo
     // Creato da "Gioca ancora"
