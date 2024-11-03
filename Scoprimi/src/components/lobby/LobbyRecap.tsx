@@ -29,8 +29,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
         <i
           className="my-i fa-solid fa-gear"
           style={gearIconStyle}
-          onClick={(e) => {
-            e.stopPropagation(); // Previene l'attivazione del click sulla riga
+          onClick={() => {
             onModify(lobby.lobbyCode);
           }}
         ></i>
