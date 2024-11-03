@@ -127,11 +127,16 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
 
     // Filtra le domande nuove escludendo quelle già presenti in oldQuestions
     const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
-      !data.oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text)
+      !data.oldQuestions.includes(newQuestion)
     );
 
-    // Mescola e seleziona il numero richiesto di domande, senza duplicati
-    actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
+    if (filteredQuestions.length != data.numQuestionsParam) {
+      actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+    } else {
+      // Mescola e seleziona il numero richiesto di domande, senza duplicati
+      actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
+    }
+
   }
   const lobbies = actualGameManager.listGames();
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
