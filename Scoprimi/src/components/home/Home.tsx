@@ -5,7 +5,7 @@ import { socket } from '../../ts/socketInit.ts';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import LobbyList from '../common/LobbyList.tsx';
 import { useSession } from '../../contexts/SessionContext.tsx';
-import BottomModal from '../newGame/NewGameModal.tsx';
+import BottomModal, { ModalPussy } from '../newGame/NewGameModal.tsx';
 import Alert from '../common/Alert.tsx';
 
 const Home: React.FC = () => {
@@ -134,8 +134,8 @@ const Home: React.FC = () => {
         playerName={currentPlayer!}
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         image={currentPlayerImage!}
+        modalPussy={ModalPussy.new}
       />
-
     </>
   );
 };

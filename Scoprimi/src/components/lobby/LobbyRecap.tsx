@@ -3,7 +3,7 @@ import { Game } from '../../../../Server/src/data/Game.ts';
 
 interface LobbyRecapProps {
   lobby: Game;
-  onModify: (lobbyCode: string) => void;
+  onModify: () => void;
 }
 
 const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
@@ -20,7 +20,6 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
 
   return (
     <tr
-      onClick={() => !lobby.isGameStarted && onModify(lobby.lobbyCode)}
       className={`lobby-row ${lobby.isGameStarted ? 'disabled' : ''}`}
     >
       <td>{Object.keys(lobby.players).length}</td>
@@ -29,9 +28,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
         <i
           className="my-i fa-solid fa-gear"
           style={gearIconStyle}
-          onClick={() => {
-            onModify(lobby.lobbyCode);
-          }}
+          onClick={onModify}
         ></i>
       </td>
     </tr>

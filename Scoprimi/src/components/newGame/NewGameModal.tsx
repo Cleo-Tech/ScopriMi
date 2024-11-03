@@ -10,14 +10,22 @@ interface NewGameModalProps {
   onClose: () => void;
   playerName: string;
   image: string;
+  modalPussy: ModalPussy;
 }
 
-const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image }) => {
+export enum ModalPussy {
+  // eslint-disable-next-line no-unused-vars
+  new = 'Crea',
+  // eslint-disable-next-line no-unused-vars
+  modify = 'Modifica',
+}
+
+const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalPussy }) => {
   const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const { currentPlayer } = useSession();
+  const { currentPlayer, currentLobby } = useSession();
 
   const categoryLabels: { [key: string]: string } = {
     adult: 'Domande +18',
@@ -63,13 +71,17 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   }
 
   const handleCreateGame = () => {
-    const code = generateLobbyCode();
     const selected = categories.filter((_, index) => selectedCategories[index]);
     if (selected.length === 0) {
       setShowAlert(true);
       return;
     }
-    socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
+    if (modalPussy === ModalPussy.new) {
+      const code = generateLobbyCode();
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
+    } else if (modalPussy === ModalPussy.modify) {
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { currentLobby, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
+    }
     onClose();
   };
 
@@ -155,7 +167,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">Crea</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">modalPussy</button>
             </div>
           </div>
         </div>
