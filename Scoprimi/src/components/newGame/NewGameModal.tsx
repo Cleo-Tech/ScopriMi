@@ -21,6 +21,7 @@ export enum ModalUse {
 }
 
 const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
+  const [gameLenght, setGameLenght] = useState<string>('Corta');
   const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
@@ -35,17 +36,26 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
   };
 
   const increment = () => {
-    if (numQuestions < 50) {
-      setNumQuestions(numQuestions + 1);
+    switch (gameLenght) {
+      case 'Corta':
+        setGameLenght('Media');
+        break;
+      case 'Media':
+        setGameLenght('Lunga');
     }
   };
 
   const decrement = () => {
-    if (numQuestions > 5) {
-      setNumQuestions(numQuestions - 1);
+    switch (gameLenght) {
+      case 'Media':
+        setGameLenght('Corta');
+        break;
+      case 'Lunga':
+        setGameLenght('Media');
     }
   };
 
+  /* Per ora inutile
   const handleInputChange = (stringValue: string) => {
     let value = parseInt(stringValue);
     if (isNaN(value)) {
@@ -59,7 +69,7 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
     }
 
     setNumQuestions(value);
-  };
+  }; */
 
   function generateLobbyCode() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -78,7 +88,21 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
     }
     if (modalUse === ModalUse.new) {
       const code = generateLobbyCode();
-      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
+  
+    let numberOfQuestion: number;
+    switch (gameLenght) {
+      case 'Corta':
+      default:
+        numberOfQuestion = 10;
+        break;
+      case 'Media':
+        numberOfQuestion = 20;
+        break;
+      case 'Lunga':
+        numberOfQuestion = 30;
+    }
+
+    socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
     } else if (modalUse === ModalUse.modify) {
       socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numQuestions, categories: selected });
     }
@@ -136,19 +160,18 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
         <button className="btn-bottom-modal-close" onClick={onClose}><i className="fa-solid fa-xmark"></i></button>
         <div className="paginator">
           <div className="elegant-background">
-            <p>Numero di domande:</p>
+            <p>Lunghezza della partita:</p>
             <div className="counter mb-4">
-              <button className="btn-change-value my-bg-quartary" onClick={decrement}>-</button>
+              <button className="btn-change-value my-bg-quartary" onClick={decrement}>&lt;</button>
               <input
-                type="number"
                 className="my-input stretch text-center input-question"
-                value={numQuestions}
-                onChange={(e) => handleInputChange(e.target.value)}
+                value={gameLenght}
+                //onChange={(e) => handleInputChange(e.target.value)}
                 min="5"
                 max="50"
                 disabled
               />
-              <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
+              <button className="btn-change-value my-bg-quartary" onClick={increment}>&gt;</button>
             </div>
             {/* <p>Categoria domande:</p> */}
             {/* Render dinamico delle categorie con mappatura */}
