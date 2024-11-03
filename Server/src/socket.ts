@@ -61,7 +61,6 @@ function checkLobbiesAge(io: any) {
 
 function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string, oldQuestions: Question[] }) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
-  actualGameManager.createGame(data.code, data.admin);
   const thisGame = actualGameManager.getGame(data.code);
   thisGame.gamesGenre = data.categories
     .filter((category): category is QuestionGenre => {
@@ -138,10 +137,6 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
     }
 
   }
-  const lobbies = actualGameManager.listGames();
-  io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
-  const lobbyCode = data.code;
-  socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
 };
 
 
@@ -274,7 +269,11 @@ export function setupSocket(io: any) {
 
       if (thisGame.nextGame === undefined) {
         // crea lobby per partita successiva
+        actualGameManager.createGame(codeTmp, data.playerName);
         myCreateLobby(socket, io, dataCreateLobby);
+        const lobbies = actualGameManager.listGames();
+        io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: codeTmp });
         thisGame.nextGame = codeTmp;
       } else {
         // gia esiste il game, gli restituisco quello che esiste
@@ -284,17 +283,23 @@ export function setupSocket(io: any) {
 
     // TODO check params on react
     socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string, oldQuestions: Question[] }) => {
+      actualGameManager.createGame(data.code, data.admin);
       myCreateLobby(socket, io, data);
+      const lobbies = actualGameManager.listGames();
+      io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+      const lobbyCode = data.code;
+      socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
     });
 
 
-    socket.on(SocketEvents.MODIFY_GAME_CONFIG, (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], oldQuestions: Question[] }) => {
+    socket.on(SocketEvents.MODIFY_GAME_CONFIG, (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], oldQuestions: Question[], admin: string }) => {
       const thisGame = actualGameManager.getGame(data.code);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
-      // TODO
+      myCreateLobby(socket, io, data);
+      io.to(data.code).emit(SocketEvents.RENDER_LOBBY, thisGame)
     });
 
 
