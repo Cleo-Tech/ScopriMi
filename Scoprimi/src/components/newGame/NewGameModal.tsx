@@ -10,17 +10,17 @@ interface NewGameModalProps {
   onClose: () => void;
   playerName: string;
   image: string;
-  modalPussy: ModalPussy;
+  modalUse: ModalUse;
 }
 
-export enum ModalPussy {
+export enum ModalUse {
   // eslint-disable-next-line no-unused-vars
   new = 'Crea',
   // eslint-disable-next-line no-unused-vars
   modify = 'Modifica',
 }
 
-const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalPussy }) => {
+const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
   const [numQuestions, setNumQuestions] = useState(5);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
@@ -76,10 +76,10 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
       setShowAlert(true);
       return;
     }
-    if (modalPussy === ModalPussy.new) {
+    if (modalUse === ModalUse.new) {
       const code = generateLobbyCode();
       socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
-    } else if (modalPussy === ModalPussy.modify) {
+    } else if (modalUse === ModalUse.modify) {
       socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { currentLobby, numQuestionsParam: numQuestions, categories: selected, admin: currentPlayer });
     }
     onClose();
@@ -167,7 +167,7 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">{modalPussy}</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">{modalUse}</button>
             </div>
           </div>
         </div>
@@ -176,4 +176,4 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   );
 };
 
-export default NewGameModal;
+export default BottomGameModal;

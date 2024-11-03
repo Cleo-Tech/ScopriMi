@@ -8,7 +8,7 @@ import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
 import LobbyPlayer from './LobbyPlayer.tsx';
 import LobbyRecap from './LobbyRecap.tsx';
-import BottomModal, { ModalPussy } from '../newGame/NewGameModal.tsx';
+import BottomGameModal, { ModalUse } from '../newGame/NewGameModal.tsx';
 
 const Lobby: React.FC = () => {
 
@@ -202,14 +202,14 @@ const Lobby: React.FC = () => {
           onConfirm={handleConfirmLeave}
           onCancel={handleCancelLeave}
         />
-        <BottomModal
+        <BottomGameModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           playerName={currentPlayer!}
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           image={currentPlayerImage!}
-          modalPussy={ModalPussy.modify}
+          modalUse={ModalUse.modify}
         />
       </div>
     </>
