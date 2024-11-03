@@ -21,6 +21,9 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
   return (
     <tr
       className={`lobby-row ${lobby.isGameStarted ? 'disabled' : ''}`}
+      style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      }}
     >
       <td>{Object.keys(lobby.players).length}</td>
       <td>{lobby.lobbyCode}</td>
@@ -31,7 +34,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ lobby, onModify }) => {
           onClick={onModify}
         ></i>
       </td>
-    </tr>
+    </tr >
   );
 };
 
