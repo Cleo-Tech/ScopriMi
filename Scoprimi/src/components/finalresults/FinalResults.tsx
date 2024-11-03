@@ -49,19 +49,6 @@ const FinalResults: React.FC = () => {
   }
 
   useEffect(() => {
-    socket.on(SocketEvents.ASK_TO_JOIN, (data) => {
-
-      const datatoSend = {
-        lobbyCode: data,
-        playerName: currentPlayer,
-        image: currentPlayerImage,
-      };
-      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
-
-    });
-  }, [currentPlayer, currentPlayerImage]);
-
-  useEffect(() => {
     socket.on(SocketEvents.PLAYER_CAN_JOIN, (data) => {
       if (data.canJoin) {
         setCurrentLobby(data.lobbyCode);
@@ -205,19 +192,22 @@ const FinalResults: React.FC = () => {
         </div>
 
 
-        <button
-          className="my-btn mt-3 my-bg-puss"
-          onClick={() => navigate('/')}
-        >
-          Torna alla homepage
-        </button>
-        <button
-          className='my-btn mt-3 my-bg-puss'
-          onClick={TODOREMATCH}
-        >
-          Gioca ancora
-        </button>
+        <div className='lobby-button-group mt-3'>
+          <button
+            className="my-btn mt-3 my-bg-elegant-backgorund"
+            onClick={() => navigate('/')}
+          >
+            <i className="fa-solid fa-house"></i>
+          </button>
+          <button
+            className='my-btn mt-3 my-bg-puss'
+            onClick={TODOREMATCH}
+          >
+            Gioca ancora
+          </button>
+        </div>
       </div>
+
     </>
   );
 

@@ -1,14 +1,10 @@
 ## v0.7.0
 
-- [ ] Frasi relative all'andamento di un giocatore
-  - [x] Frasi per perculare giocatore a fine game (Ex. se vince arriva ultimo print "vince sei una sega" o "vince top rimasto"). Risultati alla mario party / wrapper Spotify (discutere con zelo grafica)
-  - [ ] Frasi a fine categoria domande (Ex. dopo ultima domanda su sesso con Mux al primo posto print "Mux sei proprio una porca")
-</br>
-
-- [ ] Potenzialmente tenere le domande altrove (non sono sicuro mi piaccia)
-- [ ] Classifica giocatori ogni tot domande
-- [ ] Domande con frasi/parole con giocatore scelto $
-- [ ] Animazioni di qualche tipo
+- [x] Tutti hanno votato alice
+- [ ] Switch a destra (impostazioni partita)
+- [ ] Lunghezza pagina login (no scroll)
+- [x] Modalita con foto (va oltre le altre - meno padding)
+- [ ] non riusare le domande (check)
 
 
 ## v0.8.0

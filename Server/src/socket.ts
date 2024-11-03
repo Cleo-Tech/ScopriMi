@@ -59,7 +59,7 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: string[], admin: string }, oldQuestions: Question[]) {
+function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string, oldQuestions: Question[] }) {
   console.log('Creo la lobby con [codice - domande - admin]: ', data.code, ' - ', data.numQuestionsParam, ' - ', data.admin);
   actualGameManager.createGame(data.code, data.admin);
   const thisGame = actualGameManager.getGame(data.code);
@@ -67,7 +67,6 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
     .filter((category): category is QuestionGenre => {
       return Object.values(QuestionGenre).includes(category as QuestionGenre);
     });
-
 
   const allSelectedQuestions = data.categories
     .map(category => {
@@ -96,11 +95,17 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
 
         }
         else if (category === 'who') {
-          questionMode = QuestionMode.Who;
+          if (randomInt(0, 100) > 60 /*false*/) {    // Change to percentage when ready for deployment
+            questionMode = QuestionMode.Who;
+            const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+            who_questions.sort(() => 0.5 - Math.random());
+            images = who_questions.slice(0, 4);
+            console.log(images);
+          } else {
+            questionMode = QuestionMode.CustomWho;
+            images = [];
+          }
 
-          const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-          who_questions.sort(() => 0.5 - Math.random());
-          images = who_questions.slice(0, 4);
         }
 
         // Crea l'istanza della classe `Question`
@@ -114,7 +119,7 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
     })
     .flat(); // Appiattisce l'array
 
-  if (oldQuestions === undefined) {
+  if (data.oldQuestions === undefined) {
     console.log('Selezionando nuove domande');
     actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
   } else {
@@ -122,18 +127,19 @@ function myCreateLobby(socket, io, data: { code: string, numQuestionsParam: numb
 
     // Filtra le domande nuove escludendo quelle già presenti in oldQuestions
     const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
-      !oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text)
+      !data.oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text)
     );
 
     // Mescola e seleziona il numero richiesto di domande, senza duplicati
     actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
   }
-
   const lobbies = actualGameManager.listGames();
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
   const lobbyCode = data.code;
   socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode });
-}
+};
+
+
 
 
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
@@ -269,32 +275,43 @@ export function setupSocket(io: any) {
       }
     });
 
-    // TODO check params on react
-    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
-      myCreateLobby(socket, io, data, undefined);
-    });
+    // Creazione di un gioco successivo
+    // Creato da "Gioca ancora"
+    socket.on(SocketEvents.SET_NEXT_GAME, (data: { code: string, playerName: string, image: string }) => {
+      console.log('Dati partita vecchia: ', actualGameManager.getGame(data.code).selectedQuestions);
 
-    socket.on(SocketEvents.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
-      const defaultAnswers = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
-      const thisGame = actualGameManager.getGame(data.currentLobby);
+      const thisGame = actualGameManager.getGame(data.code);
       if (!thisGame) {
-        console.error('non esiste questa lobby');
         socket.emit(SocketEvents.FORCE_RESET);
         return;
       }
 
-      // Se la domande è vuota gliene do un di default
-      if (data.answer.trim().length === 0) {
-        data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
+      // sposta il generateLobbyCode nel GAME/GameManager
+      const codeTmp = generateLobbyCode();
+      const dataCreateLobby = {
+        code: codeTmp,
+        numQuestionsParam: thisGame.selectedQuestions.length,
+        categories: thisGame.gamesGenre,
+        admin: data.playerName,
+        oldQuestions: actualGameManager.getGame(data.code).selectedQuestions,
       }
 
-      thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
-
-      if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
-        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
-        io.to(data.currentLobby).emit(SocketEvents.ALL_CUSTOM_ANSWER, { answers: images });
+      if (thisGame.nextGame === undefined) {
+        // crea lobby per partita successiva
+        myCreateLobby(socket, io, dataCreateLobby);
+        thisGame.nextGame = codeTmp;
+      } else {
+        // gia esiste il game, gli restituisco quello che esiste
+        socket.emit(SocketEvents.RETURN_NEWGAME, { lobbyCode: thisGame.nextGame });
       }
     });
+
+    // TODO check params on react
+    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string, oldQuestions: Question[] }) => {
+      myCreateLobby(socket, io, data);
+    });
+
+
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {
       if (actualGameManager.listLobbiesCode().includes(data.lobbyCode)) {
@@ -328,6 +345,28 @@ export function setupSocket(io: any) {
         io.to(code).emit(SocketEvents.RENDER_LOBBY, game);
         const lobbies = actualGameManager.listGames();
         io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
+      }
+    });
+
+    socket.on(SocketEvents.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
+      const defaultAnswers = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      if (!thisGame) {
+        console.error('non esiste questa lobby');
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
+      }
+
+      // Se la domande è vuota gliene do un di default
+      if (data.answer.trim().length === 0) {
+        data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
+      }
+
+      thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
+
+      if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
+        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
+        io.to(data.currentLobby).emit(SocketEvents.ALL_CUSTOM_ANSWER, { answers: images });
       }
     });
 
