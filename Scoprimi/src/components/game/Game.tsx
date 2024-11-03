@@ -68,6 +68,7 @@ const Game: React.FC = () => {
 
   useEffect(() => {
     socket.on(SocketEvents.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
+      setIsTimerActive(true);
       setQuestionImages(data.answers);
       fromQuestionToResponse();
     });
@@ -192,7 +193,7 @@ const Game: React.FC = () => {
   };
 
   const handleSubmit = (answer: string) => {
-    console.log('Ho letto una risposta custom');
+    setIsTimerActive(false);
     socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
   };
 
@@ -243,7 +244,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Inserisci una risposta</p>
             </div>
-            <Timer duration={45} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
+            <Timer key={GameStates.CUSTOMQUESTION} duration={45} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
           </div>
           <CustomAnswer handleSubmit={handleSubmit} />
         </div>
@@ -256,7 +257,7 @@ const Game: React.FC = () => {
             <div className='label-container'>
               <p>Scegli un giocatore</p>
             </div>
-            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+            <Timer key={GameStates.CUSTOMRESPONSE} duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
           </div>
           <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
