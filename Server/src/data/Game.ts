@@ -329,7 +329,7 @@ export class Game {
     const totalVotes: { [key: string]: number } = {};
 
     for (const qst of this.selectedQuestions) {
-      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who)
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who || qst.mode === QuestionMode.CustomWho)
         continue;
       for (const vote of Object.values(qst.whatPlayersVoted)) {
         totalVotes[vote] = (totalVotes[vote] || 0) + 1;
@@ -357,7 +357,7 @@ export class Game {
 
     // Itera su tutte le domande selezionate
     for (const qst of this.selectedQuestions) {
-      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who)
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who || qst.mode === QuestionMode.CustomWho)
         continue;
       // Itera su tutti i voti dei giocatori per la domanda corrente
       for (const vote of Object.values(qst.whatPlayersVoted)) {

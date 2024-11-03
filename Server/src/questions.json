@@ -96,10 +96,7 @@
     "Chi è più probabile che adotti un gatto randagio trovato per strada?",
     "Chi andrebbe in vacanza senza prenotare un posto dove dormire?",
     "Chi passerebbe tutto il giorno in giro per mercatini dell'usato?",
-    "Chi potrebbe creare un meme che diventa famoso senza volerlo?",
-    "Chi è più probabile che resti sveglio tutta la notte a guardare una serie TV?",
-    "Chi è più probabile che faccia la figura più imbarazzante a una festa?",
-    "Chi è più probabile che cambi completamente lavoro da un giorno all’altro?"
+    "Chi potrebbe creare un meme che diventa famoso senza volerlo?"
   ],
   "adult": [
     "Chi è più probabile che venga arrestato per atti osceni in luogo pubblico?",
@@ -155,8 +152,7 @@
     "Chi comprerebbe 1000 bottiglie di baby oil?",
     "Chi è più probabile che abbia una storia di una notte e non lo ammetta mai?",
     "Chi è più probabile che si faccia sorprendere a guardare porno sul lavoro?",
-    "Chi andrebbe con il partner a Temptation Island?",
-    "Chi è più probabile che confonda il nome del proprio partner durante il sesso?"
+    "Chi andrebbe con il partner a Temptation Island?"
   ],
   "photo": [
     "animal£Quale animale regalerebbe $ alla sua anima gemella?",
@@ -172,25 +168,14 @@
     "tattoo£Che tatuaggio si farebbe $?",
     "lottery£Cosa farebbe $ se domani vincesse alla lotteria?",
     "island£Se $ dovesse passare una settimana da solo su un isola deserta, cosa porterebbe con sé?",
-    "concert£Di quale artista $ andrebbe al concerto?",
-    "superhero£Quale supereroe sceglierebbe $ per salvare il mondo?",
-    "foodDish£Quale piatto mangerebbe $ ogni giorno per il resto della vita?",
-    "crazyOutfit£Quale accessorio stravagante non potrebbe mancare nel guardaroba di $?"
+    "concert£Di quale artista $ andrebbe al concerto?"
   ],
   "who": [
-    "Cosa urlerebbe $ al cassiere mentre fa una rapina?",
-    "Quale sarebbe l'urlo di $ se fosse un wrestler?",
-    "Cosa direbbe $ per rompere il ghiaccio al primo appuntamento?",
-    "Cosa scriverebbe $ in un messaggio di scuse dopo una brutta figura?",
-    "Cosa direbbe $ se si ritrovasse bloccato in un ascensore con un suo nemico?",
-    "Quale sarebbe la prima cosa che $ farebbe se vincesse alla lotteria?",
-    "Cosa racconterebbe $ a un alieno per spiegare cosa significa essere umano?",
-    "Quale sarebbe il consiglio più strano di $ per superare un esame?",
-    "Cosa direbbe $ se potesse intervistare il suo io del futuro?",
-    "Quale sarebbe la reazione di $ se scoprisse di avere un clone?",
-    "Cosa scriverebbe $ su un cartello per attirare l'attenzione durante una protesta?",
-    "Con che esclamazione $ interromperebbe un matrimonio?",
-    "Con che frase $ inizierebbe un discorso in un funerale?",
-    "Che cosa direbbe $ per approcciare qualcuno in discoteca?"
+    "Dai mamma! Esci dalla stanza che mi sto ...!?",
+    "Il peggior film da mettere quando vuoi fare Netflix & Chill",
+    "Un risultato notevole che non metteresti sul curriculum",
+    "L'ultima cosa che vedi prima di saltare in aria",
+    "Non volevo ucciderlo! È solo che ...",
+    "Il nome di un insegnante che sai che odieresti all'istante"
   ]
 }

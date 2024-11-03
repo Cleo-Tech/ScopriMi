@@ -10,7 +10,7 @@ import { QuestionMode } from './data/Question.js';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync } from 'fs';
-
+import { randomInt } from 'crypto';
 
 export const actualGameManager = new GameManager();
 
@@ -272,6 +272,28 @@ export function setupSocket(io: any) {
     // TODO check params on react
     socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: string[], admin: string }) => {
       myCreateLobby(socket, io, data, undefined);
+    });
+
+    socket.on(SocketEvents.SEND_CUSTOM_ANSWER, (data: { answer: string, currentPlayer: string, currentLobby: string }) => {
+      const defaultAnswers = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+      const thisGame = actualGameManager.getGame(data.currentLobby);
+      if (!thisGame) {
+        console.error('non esiste questa lobby');
+        socket.emit(SocketEvents.FORCE_RESET);
+        return;
+      }
+
+      // Se la domande è vuota gliene do un di default
+      if (data.answer.trim().length === 0) {
+        data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
+      }
+
+      thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
+
+      if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
+        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
+        io.to(data.currentLobby).emit(SocketEvents.ALL_CUSTOM_ANSWER, { answers: images });
+      }
     });
 
     socket.on(SocketEvents.REQUEST_TO_JOIN_LOBBY, (data: { lobbyCode: string; playerName: string, image: string }) => {

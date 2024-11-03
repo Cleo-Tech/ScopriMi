@@ -12,7 +12,8 @@ import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
 import QuestionList from './QuestionList';
-import EndGameWrapper from './EndGameWrapper.js';
+import EndGameWrapper from './EndGameWrapper';
+import CustomAnswer from './CustomAnswer';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -64,6 +65,17 @@ const Game: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    socket.on(SocketEvents.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
+      setQuestionImages(data.answers);
+      fromQuestionToResponse();
+    });
+
+    return () => {
+      socket.off(SocketEvents.ALL_CUSTOM_ANSWER);
+    };
+  }, [fromQuestionToResponse]);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
     socket.emit(SocketEvents.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
@@ -85,7 +97,7 @@ const Game: React.FC = () => {
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
-      setIsWho(data.question.mode === QuestionMode.Who);
+      setIsWho(data.question.mode === QuestionMode.Who || data.question.mode === QuestionMode.CustomWho);
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
@@ -170,6 +182,17 @@ const Game: React.FC = () => {
     setIsTimerActive(false);
   };
 
+  const handleTimeUpCostomWho = () => {
+    console.log('Ho letto una risposta custom');
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
+    setIsTimerActive(false);
+  };
+
+  const handleSubmit = (answer: string) => {
+    console.log('Ho letto una risposta custom');
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
+  };
+
   // Render delle page
   switch (actualState) {
 
@@ -209,10 +232,32 @@ const Game: React.FC = () => {
         </div>
       );
 
-    case GameStates.THEMEQUESTION:
-      break;
-    case GameStates.THEMERESPONSE:
-      break;
+    case GameStates.CUSTOMQUESTION:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Inserisci una risposta</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
+          </div>
+          <CustomAnswer handleSubmit={handleSubmit} />
+        </div>
+      );
+    case GameStates.CUSTOMRESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
     case GameStates.THEMERESULTFINAL:
       break;
 
