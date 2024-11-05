@@ -59,71 +59,70 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function myCreateLobby(data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], oldQuestions: Question[] }) {
-  console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam, ' - ');
+function myCreateLobby(data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], oldQuestions: Question[] }) {
+  console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
   const thisGame = actualGameManager.getGame(data.code);
-  thisGame.gamesGenre = data.categories
-    .filter((category): category is QuestionGenre => {
-      return Object.values(QuestionGenre).includes(category as QuestionGenre);
-    });
 
-  const allSelectedQuestions = data.categories
-    .map(category => {
-      const questions = AllQuestions[category as QuestionGenre]; // Ottiene le domande per categoria
+  thisGame.gamesGenre = data.selectedGenres
 
-      return questions.map((questionText) => {
-        let questionMode = QuestionMode.Standard;
-        // Ora la domanda nel JSON è del tipo: contesto$domanda -> prendo solo domanda
-        const formattedQuestion = getTextQuestion(questionText);
-        let images: string[] = [];
+  const lunghezza_gay = Math.floor(data.numQuestionsParam / data.selectedGenres.length)
 
-        // Determina il `mode` in base alla categoria o altre logiche
-        if (category === 'photo') {
-          const context = getContextQuestion(questionText);
-          questionMode = QuestionMode.Photo;
 
+  let allSelectedQuestions: Question[] = [];
+  data.selectedGenres.forEach(genre => {
+    AllQuestions[genre].forEach(wholeText => {
+      let tmpQuestion = new Question();
+      tmpQuestion.genre = genre;
+
+      tmpQuestion.text = getTextQuestion(wholeText);
+
+      let conversion = {
+        'generic': QuestionMode.Standard,
+        'adult': QuestionMode.Standard,
+        'photo': QuestionMode.Photo,
+        'who': (randomInt(0, 100) > 60) ? QuestionMode.CustomWho : QuestionMode.Who,
+      };
+      tmpQuestion.mode = conversion[genre];
+
+
+      // imposta il valore di images[]
+      switch (tmpQuestion.mode) {
+        case QuestionMode.Photo:
+          const context = getContextQuestion(wholeText);
+          console.log(context);
           const onlyContextImages = photoUrls
             .filter(p => p['tags'].includes(context))
             .map(p => p['secure_url']);
 
-          // Mescola l'array photoUrls in modo casuale
           const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+          tmpQuestion.images = shuffledonlyContextImages.slice(0, 4);
+          break;
 
-          // Prendi i primi 4 elementi dall'array mescolato
-          images = shuffledonlyContextImages.slice(0, 4);
+        case QuestionMode.CustomWho:
+          const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
+          who_questions.sort(() => 0.5 - Math.random());
+          tmpQuestion.images = who_questions.slice(0, 4);
+          break;
 
-        }
-        else if (category === 'who') {
-          if (randomInt(0, 100) > 60 /*false*/) {    // Change to percentage when ready for deployment
-            questionMode = QuestionMode.Who;
-            const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-            who_questions.sort(() => 0.5 - Math.random());
-            images = who_questions.slice(0, 4);
-            console.log(images);
-          } else {
-            questionMode = QuestionMode.CustomWho;
-            images = [];
-          }
+        case QuestionMode.Standard:
+        case QuestionMode.Who:
+          tmpQuestion.images = [];
+          break;
 
-        }
+        default:
+          console.error('che cazzo ci fai qua');
+      }
+      allSelectedQuestions.push(tmpQuestion);
+    });
+  });
 
-        // Crea l'istanza della classe `Question`
-        return new Question(
-          questionMode,
-          category as QuestionGenre,
-          formattedQuestion,
-          images
-        );
-      });
-    })
-    .flat(); // Appiattisce l'array
+  // dA RIFARE QUA SOTTO
 
+  // roba per nuovo game
   if (data.oldQuestions === undefined) {
-    console.log('Selezionando nuove domande');
     actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
   } else {
-    console.log('Tolgo le domande vecchie');
-
+    // PER REMATCH
     // Filtra le domande nuove escludendo quelle già presenti in oldQuestions
     const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
       !data.oldQuestions.includes(newQuestion)
@@ -135,7 +134,6 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, categori
       // Mescola e seleziona il numero richiesto di domande, senza duplicati
       actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
     }
-
   }
 };
 
@@ -262,7 +260,7 @@ export function setupSocket(io: any) {
       const dataCreateLobby = {
         code: codeTmp,
         numQuestionsParam: thisGame.selectedQuestions.length,
-        categories: thisGame.gamesGenre,
+        selectedGenres: thisGame.gamesGenre,
         oldQuestions: actualGameManager.getGame(data.code).selectedQuestions,
       }
 
@@ -281,7 +279,7 @@ export function setupSocket(io: any) {
     });
 
     // TODO check params on react
-    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], admin: string, oldQuestions: Question[] }) => {
+    socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], admin: string, oldQuestions: Question[] }) => {
       actualGameManager.createGame(data.code, data.admin);
       myCreateLobby(data);
       const lobbies = actualGameManager.listGames();
@@ -291,7 +289,7 @@ export function setupSocket(io: any) {
     });
 
 
-    socket.on(SocketEvents.MODIFY_GAME_CONFIG, (data: { code: string, numQuestionsParam: number, categories: QuestionGenre[], oldQuestions: Question[], admin: string }) => {
+    socket.on(SocketEvents.MODIFY_GAME_CONFIG, (data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], oldQuestions: Question[], admin: string }) => {
       const thisGame = actualGameManager.getGame(data.code);
       if (!thisGame) {
         socket.emit(SocketEvents.FORCE_RESET);

@@ -101,9 +101,9 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
     if (modalUse === ModalUse.new) {
       const code = generateLobbyCode();
 
-      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, selectedGenres: selected, admin: currentPlayer });
     } else if (modalUse === ModalUse.modify) {
-      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, categories: selected });
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, selectedGenres: selected });
     }
     onClose();
   };
