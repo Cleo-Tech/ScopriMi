@@ -59,17 +59,20 @@ function checkLobbiesAge(io: any) {
   });
 }
 
-function myCreateLobby(data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], oldQuestions: Question[] }) {
+function myCreateLobby(data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], oldQuestions?: Question[] }) {
   console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
   const thisGame = actualGameManager.getGame(data.code);
 
   thisGame.gamesGenre = data.selectedGenres;
 
-  const lunghezza_gay = Math.floor(data.numQuestionsParam / data.selectedGenres.length);
-
+  const questionsPerGenre = Math.floor(data.numQuestionsParam / data.selectedGenres.length);
+  const extraQuestions = data.numQuestionsParam % data.selectedGenres.length;
 
   let allSelectedQuestions: Question[] = [];
-  data.selectedGenres.forEach(genre => {
+
+  data.selectedGenres.forEach((genre, index) => {
+    let genreQuestions: Question[] = [];
+
     AllQuestions[genre].forEach(wholeText => {
       let tmpQuestion = new Question();
       tmpQuestion.genre = genre;
@@ -89,19 +92,18 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
       switch (tmpQuestion.mode) {
         case QuestionMode.Photo:
           const context = getContextQuestion(wholeText);
-          console.log(context);
           const onlyContextImages = photoUrls
             .filter(p => p['tags'].includes(context))
             .map(p => p['secure_url']);
 
-          const shuffledonlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
-          tmpQuestion.images = shuffledonlyContextImages.slice(0, 4);
+          const shuffledOnlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+          tmpQuestion.images = shuffledOnlyContextImages.slice(0, 4);
           break;
 
         case QuestionMode.CustomWho:
-          const who_questions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));   // Lettura sincrona perché spacca allSelectedQuestions
-          who_questions.sort(() => 0.5 - Math.random());
-          tmpQuestion.images = who_questions.slice(0, 4);
+          const whoQuestions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
+          whoQuestions.sort(() => 0.5 - Math.random());
+          tmpQuestion.images = whoQuestions.slice(0, 4);
           break;
 
         case QuestionMode.Standard:
@@ -110,32 +112,48 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
           break;
 
         default:
-          console.error('che cazzo ci fai qua');
+          console.error('Errore: tipo di domanda sconosciuto');
       }
-      allSelectedQuestions.push(tmpQuestion);
+
+      genreQuestions.push(tmpQuestion);
     });
+
+    const selectedGenreQuestions = shuffle(genreQuestions).slice(0, questionsPerGenre + (index < extraQuestions ? 1 : 0));
+    allSelectedQuestions = allSelectedQuestions.concat(selectedGenreQuestions);
   });
 
-  // dA RIFARE QUA SOTTO
+  // Funzione di utilità per ottenere le domande in proporzione anche in caso di rematch
+  function selectProportionalQuestions(questions: Question[], numQuestions: number): Question[] {
+    const proportionalQuestions: Question[] = [];
+    const genreCount = data.selectedGenres.length;
+    const questionsPerGenreRematch = Math.floor(numQuestions / genreCount);
+    const extraQuestionsRematch = numQuestions % genreCount;
 
-  // roba per nuovo game
+    data.selectedGenres.forEach((genre, index) => {
+      const genreQuestions = questions.filter(q => q.genre === genre);
+      const selectedQuestions = shuffle(genreQuestions).slice(0, questionsPerGenreRematch + (index < extraQuestionsRematch ? 1 : 0));
+      proportionalQuestions.push(...selectedQuestions);
+    });
+
+    return shuffle(proportionalQuestions);
+  }
+
+  // Assegna le domande mantenendo le proporzioni
   if (data.oldQuestions === undefined) {
-    actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
+    actualGameManager.getGame(data.code).selectedQuestions = selectProportionalQuestions(allSelectedQuestions, data.numQuestionsParam);
   } else {
-    // PER REMATCH
-    // Filtra le domande nuove escludendo quelle già presenti in oldQuestions
     const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
-      !data.oldQuestions.includes(newQuestion)
+      !data.oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text && oldQuestion.genre === newQuestion.genre)
     );
 
-    if (filteredQuestions.length != data.numQuestionsParam) {
-      actualGameManager.getGame(data.code).selectedQuestions = shuffle(allSelectedQuestions).slice(0, data.numQuestionsParam);
-    } else {
-      // Mescola e seleziona il numero richiesto di domande, senza duplicati
-      actualGameManager.getGame(data.code).selectedQuestions = shuffle(filteredQuestions).slice(0, data.numQuestionsParam);
-    }
+    const questionsToAssign = filteredQuestions.length >= data.numQuestionsParam
+      ? selectProportionalQuestions(filteredQuestions, data.numQuestionsParam)
+      : selectProportionalQuestions(allSelectedQuestions, data.numQuestionsParam);
+
+    actualGameManager.getGame(data.code).selectedQuestions = questionsToAssign;
   }
-};
+}
+
 
 
 
