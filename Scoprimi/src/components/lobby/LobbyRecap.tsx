@@ -13,7 +13,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ isAdmin, lobby, onModify }) => 
     color: '#fff',
     padding: '0.625em',
     border: '0.125em solid #444',
-    borderRadius: '1em',
+    borderRadius: '0.7em',
     backgroundColor: '#333',
     cursor: 'pointer',
     transition: 'background-color 0.3s',
@@ -23,7 +23,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ isAdmin, lobby, onModify }) => 
     <tr
       className={`lobby-row ${lobby.isGameStarted ? 'disabled' : ''}`}
       style={{
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '14vw',
       }}
     >
       <td>{Object.keys(lobby.players).length}</td>
