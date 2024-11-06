@@ -26,11 +26,21 @@ export class Question {
   public whatPlayersVoted: { [key: string]: string };
   public winner: string;
 
-  constructor(questionMode: QuestionMode, questionGenre: QuestionGenre, question: string, images: string[]) {
-    this.mode = questionMode;
-    this.text = question;
-    this.genre = questionGenre;
-    this.images = images;
+  constructor() {
+    this.mode;
+    this.text = '';
+    this.genre;
+    this.images = [];
     this.whatPlayersVoted = {};
+    this.winner = '';
   }
+
+  // constructor(questionMode: QuestionMode, questionGenre: QuestionGenre, question: string, images: string[]) {
+  //   this.mode = questionMode;
+  //   this.text = question;
+  //   this.genre = questionGenre;
+  //   this.images = images;
+  //   this.whatPlayersVoted = {};
+  //   this.winner = '';
+  // }
 }

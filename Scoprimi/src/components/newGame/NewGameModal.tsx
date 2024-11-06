@@ -20,8 +20,26 @@ export enum ModalUse {
   modify = 'Modifica',
 }
 
+
+const GameStringLength = import.meta.env.PROD
+  ? ['Corta', 'Media', 'Lunga']
+  : ['Test', 'Corta', 'Media', 'Lunga'];
+
+const conversionLength = import.meta.env.PROD
+  ? {
+    0: 10,
+    1: 20,
+    2: 30,
+  }
+  : {
+    0: 1,
+    1: 10,
+    2: 20,
+    3: 30,
+  };
+
 const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
-  const [gameLenght, setGameLenght] = useState<string>('Corta');
+  const [indexGameLenght, setIndexGameLenght] = useState<number>(0);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -35,40 +53,13 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
   };
 
   const increment = () => {
-    switch (gameLenght) {
-      case 'Corta':
-        setGameLenght('Media');
-        break;
-      case 'Media':
-        setGameLenght('Lunga');
-    }
+    setIndexGameLenght(Math.min(indexGameLenght + 1, GameStringLength.length - 1));
   };
 
   const decrement = () => {
-    switch (gameLenght) {
-      case 'Media':
-        setGameLenght('Corta');
-        break;
-      case 'Lunga':
-        setGameLenght('Media');
-    }
+    setIndexGameLenght(Math.max(indexGameLenght - 1, 0));
   };
 
-  /* Per ora inutile
-  const handleInputChange = (stringValue: string) => {
-    let value = parseInt(stringValue);
-    if (isNaN(value)) {
-      value = 5;
-    }
-
-    if (value > 50) {
-      value = 50;
-    } else if (value < 5) {
-      value = 5;
-    }
-
-    setNumQuestions(value);
-  }; */
 
   function generateLobbyCode() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -85,25 +76,14 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
       setShowAlert(true);
       return;
     }
-    let numberOfQuestion: number;
-    switch (gameLenght) {
-      case 'Corta':
-      default:
-        numberOfQuestion = 10;
-        break;
-      case 'Media':
-        numberOfQuestion = 20;
-        break;
-      case 'Lunga':
-        numberOfQuestion = 30;
-    }
+
+    const numberOfQuestion = conversionLength[indexGameLenght];
 
     if (modalUse === ModalUse.new) {
       const code = generateLobbyCode();
-
-      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, categories: selected, admin: currentPlayer });
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, selectedGenres: selected, admin: currentPlayer });
     } else if (modalUse === ModalUse.modify) {
-      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, categories: selected });
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, selectedGenres: selected });
     }
     onClose();
   };
@@ -164,7 +144,7 @@ const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerN
               <button className="btn-change-value my-bg-quartary" onClick={decrement}>&lt;</button>
               <input
                 className="my-input stretch text-center input-question"
-                value={gameLenght}
+                value={GameStringLength[indexGameLenght]}
                 //onChange={(e) => handleInputChange(e.target.value)}
                 min="5"
                 max="50"
