@@ -161,7 +161,7 @@ const Lobby: React.FC = () => {
         {/* Primo blocco */}
         <div className="elegant-background mt-3">
           {/* <LobbyList lobbies={[game]} onJoin={() => void 0} /> */}
-          <LobbyRecap lobby={game} onModify={() => setIsModalOpen(true)} />
+          <LobbyRecap isAdmin={game.admin === currentPlayer ? true : false} lobby={game} onModify={() => setIsModalOpen(true)} />
         </div>
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
