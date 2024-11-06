@@ -63,9 +63,9 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
   console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
   const thisGame = actualGameManager.getGame(data.code);
 
-  thisGame.gamesGenre = data.selectedGenres
+  thisGame.gamesGenre = data.selectedGenres;
 
-  const lunghezza_gay = Math.floor(data.numQuestionsParam / data.selectedGenres.length)
+  const lunghezza_gay = Math.floor(data.numQuestionsParam / data.selectedGenres.length);
 
 
   let allSelectedQuestions: Question[] = [];
@@ -214,7 +214,6 @@ function mydisconnect(socket, io) {
   }
 }
 
-// QUII
 function generateLobbyCode() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
@@ -278,7 +277,7 @@ export function setupSocket(io: any) {
       }
     });
 
-    // TODO check params on react
+
     socket.on(SocketEvents.CREATE_LOBBY, async (data: { code: string, numQuestionsParam: number, selectedGenres: QuestionGenre[], admin: string, oldQuestions: Question[] }) => {
       actualGameManager.createGame(data.code, data.admin);
       myCreateLobby(data);
@@ -382,7 +381,6 @@ export function setupSocket(io: any) {
       io.to(data.lobbyCode).emit(SocketEvents.INIZIA);
     });
 
-    //socket.on(SocketEvents.VOTE_IMAGE) // TODO Una roba del genere
 
     socket.on(SocketEvents.VOTE, (data: { lobbyCode: string; voter: string, vote: string }) => {
 
@@ -394,10 +392,8 @@ export function setupSocket(io: any) {
         return;
       }
 
-      //if (Object.keys(thisGame.players).includes(data.vote) || data.vote === null || data.vote.startsWith('https')) {
       thisGame.castVote(data.voter, data.vote);
       io.to(data.lobbyCode).emit(SocketEvents.PLAYERS_WHO_VOTED, { players: thisGame.getWhatPlayersVoted() });
-      //}
 
       if (thisGame.didAllPlayersVote()) {
         const players = thisGame.players;
@@ -427,7 +423,7 @@ export function setupSocket(io: any) {
       const { value: question, done } = thisGame.getNextQuestion();
 
       if (!done) {
-        thisGame.resetReadyForNextQuestion(); // Reset readiness for the next round
+        thisGame.resetReadyForNextQuestion();
         const players = Object.keys(thisGame.players);
         const images = thisGame.getImages();
         const keys = Object.keys(thisGame.players);
