@@ -24,6 +24,7 @@ const LobbyRecap: React.FC<LobbyRecapProps> = ({ isAdmin, lobby, onModify }) => 
       className={`lobby-row ${lobby.isGameStarted ? 'disabled' : ''}`}
       style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: '14vw',
+        paddingLeft: '4vw',
       }}
     >
       <td>{Object.keys(lobby.players).length}</td>
