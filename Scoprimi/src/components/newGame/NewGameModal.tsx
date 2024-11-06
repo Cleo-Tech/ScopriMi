@@ -20,12 +20,12 @@ export enum ModalUse {
   modify = 'Modifica',
 }
 
-const isProd = process.env.NODE_ENV === 'production';
-const GameStringLength = isProd
+
+const GameStringLength = import.meta.env.PROD
   ? ['Corta', 'Media', 'Lunga']
   : ['Test', 'Corta', 'Media', 'Lunga'];
 
-const conversionLength = isProd
+const conversionLength = import.meta.env.PROD
   ? {
     0: 10,
     1: 20,
