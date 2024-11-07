@@ -32,16 +32,25 @@ function getContextQuestion(input: string): string {
   return '';
 }
 
-function shuffle(array: Question[]) {
-  if (!Array.isArray(array)) {
-    return [];
+function shuffle(array: any[]): any[] {
+  let copy = [...array];
+  let currentIndex = copy.length;
+
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    let randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [copy[currentIndex], copy[randomIndex]] = [
+      copy[randomIndex], copy[currentIndex]];
   }
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
+
+  // Restituisce l'array mescolato senza modificare l'originale
+  return copy;
 }
+
 
 // Funzione per verificare se una lobby è da eliminare
 function checkLobbiesAge(io: any) {
@@ -96,14 +105,13 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
             .filter(p => p['tags'].includes(context))
             .map(p => p['secure_url']);
 
-          const shuffledOnlyContextImages = onlyContextImages.sort(() => 0.5 - Math.random());
+          const shuffledOnlyContextImages = shuffle(onlyContextImages);
           tmpQuestion.images = shuffledOnlyContextImages.slice(0, 4);
           break;
 
         case QuestionMode.Who:
           const whoQuestions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
-          whoQuestions.sort(() => 0.5 - Math.random());
-          tmpQuestion.images = whoQuestions.slice(0, 4);
+          tmpQuestion.images = shuffle(whoQuestions).slice(0, 4);
           break;
 
         case QuestionMode.Standard:
