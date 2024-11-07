@@ -143,7 +143,7 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
     actualGameManager.getGame(data.code).selectedQuestions = selectProportionalQuestions(allSelectedQuestions, data.numQuestionsParam);
   } else {
     const filteredQuestions = allSelectedQuestions.filter(newQuestion =>
-      !data.oldQuestions.some(oldQuestion => oldQuestion.text === newQuestion.text && oldQuestion.genre === newQuestion.genre)
+      !data.oldQuestions.includes(newQuestion)
     );
 
     const questionsToAssign = filteredQuestions.length >= data.numQuestionsParam
