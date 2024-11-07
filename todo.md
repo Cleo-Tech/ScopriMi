@@ -1,13 +1,10 @@
-## v0.7.0
-
-- [x] Tutti hanno votato alice
-- [ ] Switch a destra (impostazioni partita)
-- [ ] Lunghezza pagina login (no scroll)
-- [x] Modalita con foto (va oltre le altre - meno padding)
-- [ ] non riusare le domande (check)
-
-
 ## v0.8.0
+- [ ] Il grande Refactor del backend
+- [ ] Valutare un bella base di dati
+- [ ] Refactor della sezione di gaming w/ Led
+- [ ] Wrap del recap (spotify)
+
+## v0.9.0
 
 - [ ] Separare giocatori in squadre
   - [ ] Domande sulle squadre (Ex. quale squadra organizzerebbe la miglior festa).
@@ -16,7 +13,7 @@
   - [ ] Creazione di nuove domande dedicate
 </br>
 
-- [ ] Refactor del player sul backend
+- [ ] Lunghezza pagina login (no scroll)
 - [ ] Controlli server-side per non rompere tutto
 - [ ] Fare in modo di disegnare le immagini
       
