@@ -100,14 +100,14 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
           tmpQuestion.images = shuffledOnlyContextImages.slice(0, 4);
           break;
 
-        case QuestionMode.CustomWho:
+        case QuestionMode.Who:
           const whoQuestions = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../src/answers.json'), 'utf8'));
           whoQuestions.sort(() => 0.5 - Math.random());
           tmpQuestion.images = whoQuestions.slice(0, 4);
           break;
 
         case QuestionMode.Standard:
-        case QuestionMode.Who:
+        case QuestionMode.CustomWho:
           tmpQuestion.images = [];
           break;
 
