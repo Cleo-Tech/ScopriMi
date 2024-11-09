@@ -374,6 +374,10 @@ export function setupSocket(io: any) {
         data.answer = defaultAnswers[randomInt(defaultAnswers.length)]
       }
 
+      if (data.answer.length > 100) {
+        data.answer.slice(0, 99);
+      }
+
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
 
       if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
