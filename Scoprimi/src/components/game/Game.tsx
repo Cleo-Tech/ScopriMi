@@ -187,14 +187,13 @@ const Game: React.FC = () => {
   };
 
   const handleTimeUpCostomWho = () => {
-    console.log('Ho letto una risposta custom');
     socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
     setIsTimerActive(false);
   };
 
   const handleSubmit = (answer: string) => {
     setIsTimerActive(false);
-    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer, currentPlayer, currentLobby });
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: answer.slice(0, 99), currentPlayer, currentLobby });
   };
 
   // Render delle page
@@ -202,7 +201,6 @@ const Game: React.FC = () => {
 
     case GameStates.MOCK:
       break;
-
 
     case GameStates.PHOTOQUESTION:
     case GameStates.PHOTORESPONSE:
