@@ -270,7 +270,6 @@ export function setupSocket(io: any) {
     // Creazione di un gioco successivo
     // Creato da "Gioca ancora"
     socket.on(SocketEvents.SET_NEXT_GAME, (data: { code: string, playerName: string, image: string }) => {
-      console.log('Dati partita vecchia: ', actualGameManager.getGame(data.code).selectedQuestions);
 
       const thisGame = actualGameManager.getGame(data.code);
       if (!thisGame) {
@@ -379,7 +378,7 @@ export function setupSocket(io: any) {
       thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.push(data.answer);
 
       if (thisGame.selectedQuestions[thisGame.currentQuestionIndex].images.length === Object.keys(thisGame.players).length) {
-        const images = thisGame.selectedQuestions[thisGame.currentQuestionIndex].images;
+        const images = Array.from(new Set(thisGame.selectedQuestions[thisGame.currentQuestionIndex].images));
         io.to(data.currentLobby).emit(SocketEvents.ALL_CUSTOM_ANSWER, { answers: images });
       }
     });

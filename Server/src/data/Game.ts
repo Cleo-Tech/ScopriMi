@@ -309,7 +309,7 @@ export class Game {
     if (player !== '') {
       playersSummary.push({
         player: this.players[player],
-        phrase: 'AYO, nessuno ti sta votando!',
+        phrase: ' Sei stata la persona meno votata!',
       });
     }
 
@@ -317,7 +317,7 @@ export class Game {
     if (player !== '') {
       playersSummary.push({
         player: this.players[player],
-        phrase: 'Il cecchino delle foto!',
+        phrase: 'Il cecchino delle foto!\nHai azzeccato più foto!',
       });
     }
 
