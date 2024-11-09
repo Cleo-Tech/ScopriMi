@@ -176,7 +176,8 @@
         "perfume£Quale profumo sceglierebbe $?",
         "pizza£Che pizza mangerebbe $?",
         "car£Che auto guiderebbe $?",
-        "hero£Che supereroe vorrebbe essere $?"
+        "hero£Che supereroe vorrebbe essere $?",
+        "drink£Cosa berrebbe $?"
     ],
     "who": [
         "Cosa risponderebbe $? \n Dai mamma! Esci dalla stanza che mi sto ...!?",
