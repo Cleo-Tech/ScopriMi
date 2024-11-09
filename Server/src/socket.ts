@@ -92,7 +92,7 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
         'generic': QuestionMode.Standard,
         'adult': QuestionMode.Standard,
         'photo': QuestionMode.Photo,
-        'who': (randomInt(0, 100) > 60) ? QuestionMode.CustomWho : QuestionMode.Who,
+        'who': (randomInt(0, 100) > -1) ? QuestionMode.CustomWho : QuestionMode.Who,
       };
       tmpQuestion.mode = conversion[genre];
 
