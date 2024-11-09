@@ -164,8 +164,6 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
 
 
 
-
-
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
   const thisGame = actualGameManager.getGame(data.currentLobby);
   console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
