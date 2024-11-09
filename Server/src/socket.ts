@@ -163,7 +163,6 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
 }
 
 
-
 function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: string; }) {
   const thisGame = actualGameManager.getGame(data.currentLobby);
   console.log(`Removing ${data.currentPlayer} from lobby ${data.currentLobby} where admin is ${thisGame?.admin}`);
@@ -195,6 +194,7 @@ function myExitLobby(socket, io, data: { currentPlayer: string; currentLobby: st
   io.emit(SocketEvents.RENDER_LOBBIES, { lobbies });
   io.to(data.currentLobby).emit(SocketEvents.RENDER_LOBBY, thisGame);
 }
+
 
 function mydisconnect(socket, io) {
   console.log('Client disconnected:', socket.id);
