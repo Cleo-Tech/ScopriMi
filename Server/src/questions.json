@@ -174,7 +174,11 @@
         "tattoo£Che tatuaggio si farebbe $?",
         "lottery£Cosa farebbe $ se domani vincesse alla lotteria?",
         "island£Se $ dovesse passare una settimana da solo su un isola deserta, cosa porterebbe con sé?",
-        "concert£Di quale artista $ andrebbe al concerto?"
+        "concert£Di quale artista $ andrebbe al concerto?",
+        "perfume£Quale profumo sceglierebbe $?",
+        "pizza£Che pizza mangerebbe $?",
+        "car£Che auto guiderebbe $?",
+        "hero£Che supereroe vorrebbe essere $?"
     ],
     "who": [
         "Dai mamma! Esci dalla stanza che ...!?",
