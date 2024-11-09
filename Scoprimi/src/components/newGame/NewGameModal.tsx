@@ -1,54 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { socket } from '../../ts/socketInit';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { useSwipeable } from 'react-swipeable';
 import Alert from '../common/Alert.js';
+import { useSession } from '../../contexts/SessionContext';
 
 interface NewGameModalProps {
   isOpen: boolean;
   onClose: () => void;
   playerName: string;
   image: string;
+  modalUse: ModalUse;
 }
 
-const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image }) => {
-  const [numQuestions, setNumQuestions] = useState(5);
+export enum ModalUse {
+  // eslint-disable-next-line no-unused-vars
+  new = 'Crea',
+  // eslint-disable-next-line no-unused-vars
+  modify = 'Modifica',
+}
+
+
+const GameStringLength = import.meta.env.PROD
+  ? ['Corta', 'Media', 'Lunga']
+  : ['Test', 'Corta', 'Media', 'Lunga'];
+
+const conversionLength = import.meta.env.PROD
+  ? {
+    0: 10,
+    1: 20,
+    2: 30,
+  }
+  : {
+    0: 1,
+    1: 10,
+    2: 20,
+    3: 30,
+  };
+
+const BottomGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName, image, modalUse }) => {
+  const [indexGameLenght, setIndexGameLenght] = useState<number>(0);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<boolean[]>([]);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const { currentPlayer, currentLobby } = useSession();
 
   const categoryLabels: { [key: string]: string } = {
     adult: 'Domande +18',
     photo: 'Fotografie',
     generic: 'Domande Standard',
+    who: 'Domande testuali',
   };
 
   const increment = () => {
-    if (numQuestions < 50) {
-      setNumQuestions(numQuestions + 1);
-    }
+    setIndexGameLenght(Math.min(indexGameLenght + 1, GameStringLength.length - 1));
   };
 
   const decrement = () => {
-    if (numQuestions > 5) {
-      setNumQuestions(numQuestions - 1);
-    }
+    setIndexGameLenght(Math.max(indexGameLenght - 1, 0));
   };
 
-  const handleInputChange = (stringValue: string) => {
-    let value = parseInt(stringValue);
-    if (isNaN(value)) {
-      value = 5;
-    }
-
-    if (value > 50) {
-      value = 50;
-    } else if (value < 5) {
-      value = 5;
-    }
-
-    setNumQuestions(value);
-  };
 
   function generateLobbyCode() {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -60,51 +71,50 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
   }
 
   const handleCreateGame = () => {
-    const code = generateLobbyCode();
-
     const selected = categories.filter((_, index) => selectedCategories[index]);
-
     if (selected.length === 0) {
       setShowAlert(true);
       return;
     }
 
+    const numberOfQuestion = conversionLength[indexGameLenght];
 
-    socket.emit(c.CREATE_LOBBY, { code, numQuestionsParam: numQuestions, categories: selected });
-
+    if (modalUse === ModalUse.new) {
+      const code = generateLobbyCode();
+      socket.emit(SocketEvents.CREATE_LOBBY, { code, numQuestionsParam: numberOfQuestion, selectedGenres: selected, admin: currentPlayer });
+    } else if (modalUse === ModalUse.modify) {
+      socket.emit(SocketEvents.MODIFY_GAME_CONFIG, { code: currentLobby, numQuestionsParam: numberOfQuestion, selectedGenres: selected });
+    }
     onClose();
   };
 
   useEffect(() => {
-    socket.on(c.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
+    socket.on(SocketEvents.RETURN_NEWGAME, (data: { lobbyCode: string }) => {
       const datatoSend = {
         lobbyCode: data.lobbyCode,
         playerName: playerName,
         image: image,
       };
-      console.log(data);
-      socket.emit(c.REQUEST_TO_JOIN_LOBBY, datatoSend);
+      socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, datatoSend);
     });
 
     return () => {
-      socket.off(c.RETURN_NEWGAME);
+      socket.off(SocketEvents.RETURN_NEWGAME);
     };
   }, [image, playerName]);
 
   useEffect(() => {
     if (isOpen) {
-      console.log('Modal aperto per il giocatore:', playerName);
-      socket.emit(c.REQUEST_CATEGORIES);
+      socket.emit(SocketEvents.REQUEST_CATEGORIES);
 
-      socket.on(c.SEND_GENRES, (data: { genres: string[] }) => {
-        console.log('Categorie ricevute: ', data.genres);
+      socket.on(SocketEvents.SEND_GENRES, (data: { genres: string[] }) => {
         setCategories(data.genres);
         setSelectedCategories(new Array(data.genres.length).fill(false));
       });
     }
 
     return () => {
-      socket.off(c.SEND_GENRES);
+      socket.off(SocketEvents.SEND_GENRES);
     };
   }, [isOpen, playerName]);
 
@@ -129,24 +139,25 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
         <button className="btn-bottom-modal-close" onClick={onClose}><i className="fa-solid fa-xmark"></i></button>
         <div className="paginator">
           <div className="elegant-background">
-            <p>Numero di domande:</p>
+            <p>Lunghezza della partita:</p>
             <div className="counter mb-4">
-              <button className="btn-change-value my-bg-quartary" onClick={decrement}>-</button>
+              <button className="btn-change-value my-bg-quartary" onClick={decrement}>&lt;</button>
               <input
-                type="number"
                 className="my-input stretch text-center input-question"
-                value={numQuestions}
-                onChange={(e) => handleInputChange(e.target.value)}
+                value={GameStringLength[indexGameLenght]}
+                //onChange={(e) => handleInputChange(e.target.value)}
                 min="5"
                 max="50"
                 disabled
               />
-              <button className="btn-change-value my-bg-quartary" onClick={increment}>+</button>
+              <button className="btn-change-value my-bg-quartary" onClick={increment}>&gt;</button>
             </div>
-            <p>Categoria domande:</p>
+            {/* <p>Categoria domande:</p> */}
             {/* Render dinamico delle categorie con mappatura */}
+            <div className='mt-5'></div>
             {categories.map((category, index) => (
               <div className="switch-container" key={index}>
+                <span className="switch-label">{categoryLabels[category] || category}</span>
                 <label className="switch">
                   <input
                     type="checkbox"
@@ -155,17 +166,16 @@ const NewGameModal: React.FC<NewGameModalProps> = ({ isOpen, onClose, playerName
                   />
                   <span className="slider round"></span>
                 </label>
-                <span className="switch-label">{categoryLabels[category] || category}</span>
               </div>
             ))}
             <div className='counter pt-3'>
-              <button onClick={handleCreateGame} className="my-btn my-bg-quartary">Crea</button>
+              <button onClick={handleCreateGame} style={{ paddingRight: '15vw', paddingLeft: '15vw' }} className="my-btn my-bg-quartary">{modalUse}</button>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   );
 };
 
-export default NewGameModal;
+export default BottomGameModal;

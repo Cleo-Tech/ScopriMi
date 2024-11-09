@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../Server/src/MiddleWare/SocketEvents.js';
 import { socket } from '../ts/socketInit';
 
 // Questo pezzo di codice serve per forzare luscita dalla lobby a tutti i player.
@@ -10,12 +10,12 @@ const SocketListener = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.on(c.FORCE_RESET, () => {
+    socket.on(SocketEvents.FORCE_RESET, () => {
       navigate('/error');
     });
 
     return () => {
-      socket.off(c.FORCE_RESET);
+      socket.off(SocketEvents.FORCE_RESET);
     };
   }, [navigate]);
 

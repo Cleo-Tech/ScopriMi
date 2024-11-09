@@ -22,12 +22,18 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isActive }) => {
         }
         return prev - 1;
       });
-    }, 1 * 1000);
+    }, 1000);
   }, [onTimeUp]);
 
   useEffect(() => {
     if (isActive) {
       startTimer();
+    } else {
+      // Quando isActive diventa false, ferma il timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     }
 
     return () => {

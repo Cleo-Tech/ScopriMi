@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { PlayerImages, PlayerScores, FinalResultData } from '../../ts/types';
 import { socket } from '../../ts/socketInit';
 import Timer from './Timer';
@@ -11,6 +11,9 @@ import Results from './Results';
 import { GameStates, useGameState } from '../../contexts/GameStateContext';
 import ImageList from './ImageList';
 import { Question, QuestionMode } from '../../../../Server/src/data/Question';
+import QuestionList from './QuestionList';
+import EndGameWrapper from './EndGameWrapper';
+import CustomAnswer from './CustomAnswer';
 
 // Funzione per il parsing di filename di immagini
 export const todoShitFunction = (votestring: string) => {
@@ -31,11 +34,12 @@ const Game: React.FC = () => {
   const [mostVotedPerson, setMostVotedPerson] = useState<string>('');
   const [playerImages, setPlayerImages] = useState<{ [key: string]: string }>({});
   const [voteRecap, setVoteRecap] = useState<{ [key: string]: string }>({});
+  const [allSameSelection, setAllSameSelection] = useState<boolean>(false);
 
   const [clicked, setClicked] = useState<boolean>(false);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
   const [resetSelection, setResetSelection] = useState<boolean>(false);
-  const [buttonClicked, setButtonClicked] = useState<boolean>(false); // Nuovo stato per il bottone
+  const [buttonClicked, setButtonClicked] = useState<boolean>(false);
   const [playersWhoVoted, setPlayersWhoVoted] = useState<string[]>([]); //non è come il server, questo è un array e bona
   const [questionImages, setQuestionImages] = useState<string[]>([]);
 
@@ -45,16 +49,43 @@ const Game: React.FC = () => {
   const [isPhoto, setIsPhoto] = useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
 
+  const [pages, setPages] = useState<any>();
+
+  const [isWho, setIsWho] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = 'Sicuro di voler uscire?'; // Messaggio non personalizzabile, ma appare una finestra di dialogo di conferma.
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on(SocketEvents.ALL_CUSTOM_ANSWER, (data: { answers: string[] }) => {
+      setIsTimerActive(true);
+      setQuestionImages(data.answers);
+      fromQuestionToResponse();
+    });
+
+    return () => {
+      socket.off(SocketEvents.ALL_CUSTOM_ANSWER);
+    };
+  }, [fromQuestionToResponse]);
+
   // Questo viene fatto solo 1 volta e amen
   useEffect(() => {
-    socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(SocketEvents.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    socket.on(c.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
-      console.log('questions: ');
-      console.log(data.question.images);
+    socket.on(SocketEvents.SEND_QUESTION, (data: { question: Question, players: string[], images: { [key: string]: string }, selectedPlayer: string }) => {
       setClicked(false);
       setIsTimerActive(true);
       setQuestion(data.question.text);
@@ -68,26 +99,34 @@ const Game: React.FC = () => {
       // TODO fix veloce per 2 pagine di show_result
       setIsPhoto(data.question.mode === QuestionMode.Photo);
       setSelectedPlayer(data.selectedPlayer);
+      setIsWho(data.question.mode === QuestionMode.Who || data.question.mode === QuestionMode.CustomWho);
     });
   }, [fromNextQuestionToQuestion, playersWhoVoted, selectedPlayer]);
 
+  useEffect(() => {
+    socket.on(SocketEvents.ENDGAMEWRAPPER, (data: { pages }) => {
+      setPages(data.pages);
+      transitionTo(GameStates.PREPODIUMWRAP);
+    });
+  }, [transitionTo]);
 
   useEffect(() => {
-    socket.on(c.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
-      console.log(Object.keys(data.players));
+    socket.on(SocketEvents.PLAYERS_WHO_VOTED, (data: { players: { [key: string]: string } }) => {
       setPlayersWhoVoted(Object.keys(data.players));
     });
     return () => {
-      socket.off(c.PLAYERS_WHO_VOTED);
+      socket.off(SocketEvents.PLAYERS_WHO_VOTED);
     };
   }, []);
 
   useEffect(() => {
-    socket.on(c.SHOW_RESULTS, (data: {
+    socket.on(SocketEvents.SHOW_RESULTS, (data: {
       voteRecap: { [key: string]: string },
       playerImages: { [key: string]: string },
       mostVotedPerson: string,
     }) => {
+      const allEqual = (arr) => new Set(arr).size === 1;
+      setAllSameSelection(allEqual(Object.values(data.voteRecap)));
       setVoteRecap(data.voteRecap);
       setPlayerImages(data.playerImages);
       setMostVotedPerson(data.mostVotedPerson);
@@ -95,11 +134,10 @@ const Game: React.FC = () => {
       transitionTo(GameStates.RESULTOUTCOME);
     });
 
-    socket.on(c.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
+    socket.on(SocketEvents.GAME_OVER, (data: { playerScores: PlayerScores, playerImages: PlayerImages }) => {
       setQuestion('');
       setPlayers([]);
-      setCurrentLobby(null);
-      socket.emit(c.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
+      socket.emit(SocketEvents.LEAVE_ROOM, { playerName: currentPlayer, LobbyCode: currentLobby });
 
       const finalResults: FinalResultData = {};
       Object.keys(data.playerScores).forEach(playerName => {
@@ -108,16 +146,15 @@ const Game: React.FC = () => {
           image: data.playerImages[playerName],
         };
       });
-      console.log(finalResults);
+
       navigate('/final-results', { state: { finalResults } });
     });
 
     return () => {
-      socket.off(c.SEND_QUESTION);
-      socket.off(c.SHOW_RESULTS);
-      socket.off(c.RESULT_MESSAGE);
-      socket.off(c.GAME_OVER);
-      //socket.off(c.PLAYERS_WHO_VOTED); IDK
+      socket.off(SocketEvents.SEND_QUESTION);
+      socket.off(SocketEvents.SHOW_RESULTS);
+      socket.off(SocketEvents.RESULT_MESSAGE);
+      socket.off(SocketEvents.GAME_OVER);
     };
   }, [currentLobby, currentPlayer, navigate, setCurrentLobby, transitionTo]);
 
@@ -129,24 +166,34 @@ const Game: React.FC = () => {
     }
     setClicked(true);
     setIsTimerActive(false);
-    socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
+    socket.emit(SocketEvents.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: player });
     fromQuestionToResponse();
   };
 
 
   const handleNextQuestion = () => {
     setResetSelection(true);
-    setButtonClicked(true); // Cambia lo stato del bottone
-    socket.emit(c.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
+    setButtonClicked(true);
+    socket.emit(SocketEvents.READY_FOR_NEXT_QUESTION, { lobbyCode: currentLobby, playerName: currentPlayer });
     transitionTo(GameStates.NEXTQUESTION);
   };
 
   const handleTimeUp = () => {
     if (!clicked) {
-      socket.emit(c.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: null });
+      socket.emit(SocketEvents.VOTE, { lobbyCode: currentLobby, voter: currentPlayer, vote: null });
       fromQuestionToResponse();
     }
     setIsTimerActive(false);
+  };
+
+  const handleTimeUpCostomWho = () => {
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: '', currentPlayer, currentLobby });
+    setIsTimerActive(false);
+  };
+
+  const handleSubmit = (answer: string) => {
+    setIsTimerActive(false);
+    socket.emit(SocketEvents.SEND_CUSTOM_ANSWER, { answer: answer.slice(0, 99), currentPlayer, currentLobby });
   };
 
   // Render delle page
@@ -154,8 +201,9 @@ const Game: React.FC = () => {
 
     case GameStates.MOCK:
       break;
-    case GameStates.WHORESPONSE:
-    case GameStates.WHOQUESTION:
+
+    case GameStates.PHOTOQUESTION:
+    case GameStates.PHOTORESPONSE:
       return (
         <div className="paginator">
           <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
@@ -170,10 +218,48 @@ const Game: React.FC = () => {
           } onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
         </div>
       );
-    case GameStates.THEMEQUESTION:
-      break;
-    case GameStates.THEMERESPONSE:
-      break;
+
+    case GameStates.WHOQUESTION:
+    case GameStates.WHORESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
+
+    case GameStates.CUSTOMQUESTION:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Inserisci una risposta</p>
+            </div>
+            <Timer key={GameStates.CUSTOMQUESTION} duration={45} onTimeUp={handleTimeUpCostomWho} isActive={isTimerActive} />
+          </div>
+          <CustomAnswer handleSubmit={handleSubmit} />
+        </div>
+      );
+    case GameStates.CUSTOMRESPONSE:
+      return (
+        <div className="paginator">
+          <QuestionComponent question={question} selectedPlayer={selectedPlayer} />
+          <div className='inline'>
+            <div className='label-container'>
+              <p>Scegli un giocatore</p>
+            </div>
+            <Timer key={GameStates.CUSTOMRESPONSE} duration={25} onTimeUp={handleTimeUp} isActive={isTimerActive} />
+          </div>
+          <QuestionList questions={questionImages} onVote={handleVote} disabled={clicked} resetSelection={resetSelection} />
+        </div>
+      );
     case GameStates.THEMERESULTFINAL:
       break;
 
@@ -199,22 +285,39 @@ const Game: React.FC = () => {
       return (
         <div className="paginator">
           <div className="result-message text-center">
-            {mostVotedPerson === '' ? (<h3>Pareggio!</h3>) : (<h3>Scelta più votata:</h3>)}
-            {!isPhoto ?
-              <img
-                src={playerImages[mostVotedPerson]}
-                alt={mostVotedPerson}
-                className="winnerImage"
-              /> :
-              <img
-                src={mostVotedPerson}
-                alt={todoShitFunction(mostVotedPerson)}
-                className="winnerImage"
-              />}
-            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : mostVotedPerson}</p>
+            <h4 style={{ textAlign: 'left' }}>{selectedPlayer ? question.replace('$', selectedPlayer) : question}</h4>
+            <p className="result-subtitle" style={{ textAlign: 'left' }}>
+              {allSameSelection
+                ? 'Tutti hanno votato:'
+                : mostVotedPerson === ''
+                  ? 'Pareggio!'
+                  : 'Scelta più votata:'}
+            </p>
+
+            {isWho ? <h4>{mostVotedPerson}</h4> : ( // Da fixare, fa un pò cagare
+              isPhoto ?
+                <img
+                  src={mostVotedPerson}
+                  alt={todoShitFunction(mostVotedPerson)}
+                  className="winnerImage"
+                />
+                :
+                <img
+                  src={playerImages[mostVotedPerson]}
+                  alt={mostVotedPerson}
+                  className="winnerImage"
+                />
+            )}
+            <p>{isPhoto ? todoShitFunction(mostVotedPerson) : !isWho ? mostVotedPerson : ''}</p>
           </div>
-          <div className='elegant-background image-container fill scrollable'>
-            <Results mostVotedPerson={mostVotedPerson} playerImages={playerImages} voteRecap={voteRecap} isPhoto={isPhoto} />
+          <div className="elegant-background image-container fill scrollable">
+            <Results
+              curPlayer={currentPlayer}
+              mostVotedPerson={mostVotedPerson}
+              playerImages={playerImages}
+              voteRecap={voteRecap}
+              isPhoto={isPhoto}
+            />
           </div>
           <div className="d-flex justify-content-center align-items-center">
             <button
@@ -223,13 +326,18 @@ const Game: React.FC = () => {
               onClick={handleNextQuestion}
               style={{
                 width: '100%',
-                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268', // Cambia il colore al clic
+                backgroundColor: buttonClicked ? 'var(--disabled-color)' : '#75b268',
               }}
             >
-              Prosegui al prossimo turno
+              Prosegui
             </button>
           </div>
         </div>
+      );
+
+    case GameStates.PREPODIUMWRAP:
+      return (
+        <EndGameWrapper pages={pages} />
       );
 
     default:

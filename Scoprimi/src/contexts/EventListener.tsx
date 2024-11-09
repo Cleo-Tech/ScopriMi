@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSession } from './SessionContext';
 import { socket } from '../ts/socketInit';
+import { SocketEvents } from '../../../Server/src/MiddleWare/SocketEvents.js';
 
 const PopStateContext = createContext<void | null>(null);
 
@@ -25,7 +26,6 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
 
     // Determina la pagina corrente basandoti sull'URL
     const pathname = location.pathname;
-    console.log('pathname', pathname);
     if (pathname.includes('/lobby')) {
       setCurrentPage('lobby');
     } else if (pathname.includes('/game')) {
@@ -43,13 +43,11 @@ export const PopStateProvider: React.FC<React.PropsWithChildren> = ({ children }
     const handlePopState = () => {
       if (currentLobby !== null && currentPlayer !== null) {
         if (currentPage === 'lobby') {
-          console.log('@LOBBY');
-          socket.emit('exitLobby', { currentPlayer, currentLobby });
+          socket.emit(SocketEvents.EXIT_LOBBY, { currentPlayer, currentLobby });
           setCurrentLobby(null);
           navigate('/', { replace: true });
         } else if (currentPage === 'game') {
-          console.log('@GAME');
-          socket.emit('mydisconnet');
+          socket.emit(SocketEvents.DISCONNECT);
           navigate('/', { replace: true });
         }
       }

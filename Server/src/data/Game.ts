@@ -1,5 +1,6 @@
+import { QuestionGenre } from "../MiddleWare/Types.js";
 import { Player } from "./Player.js";
-import { Question } from "./Question.js";
+import { Question, QuestionMode } from "./Question.js";
 
 /**
  * Represents a game in a lobby.
@@ -7,6 +8,8 @@ import { Question } from "./Question.js";
 export class Game {
   // Lobby code
   public lobbyCode: string;
+  // List of Game Modes
+  public gamesGenre: QuestionGenre[]
   // Indicates whether the game has started
   public isGameStarted: boolean;
   // List of players
@@ -22,6 +25,8 @@ export class Game {
   public creationTime: number;
   // Admin of the lobby (can start the game / remove a player from the lobby)
   public admin: string;
+  // nextGame
+  public nextGame: string | undefined;
 
   /**
    * Creates an instance of the game.
@@ -30,6 +35,7 @@ export class Game {
    */
   constructor(lobbyCode: string, admin: string) {
     this.lobbyCode = lobbyCode;
+    this.gamesGenre = [];
     this.isGameStarted = false;
     this.players = {};
     this.numOfVoters = 0;
@@ -38,6 +44,7 @@ export class Game {
     this.iterator = this.createIterator();
     this.creationTime = Date.now();
     this.admin = admin;
+    this.nextGame = undefined;
   }
 
   /**
@@ -78,7 +85,6 @@ export class Game {
       }
     }
 
-    console.log('MostVotedPerson: ', mostVotedPerson);
     this.resetVoters(); // Reset votes after the voting
     return mostVotedPerson;
   }
@@ -99,9 +105,10 @@ export class Game {
    * @param socketId - Socket ID of the player
    * @param image - URL of the player's image
    */
-  addPlayer(playerName: string, socketId: string, image: string): void {
+  addPlayer(playerName: string, socketId: string, image: string): Player {
     if (!(playerName in this.players)) {
       this.players[playerName] = new Player(playerName, socketId, image);
+      return this.players[playerName];
     }
   }
 
@@ -131,6 +138,11 @@ export class Game {
   castVote(playerName: string, vote: string): void {
     if (playerName in this.players) {
       this.players[playerName].whatPlayerVoted = vote; // Set the player's vote
+      // save the value inside the GAME for late state
+      // TODO valore "duplicato" per fare prima, potenzialmente ok
+      // TODO fix this nigga
+      if (this.selectedQuestions.length !== 0)
+        this.selectedQuestions[this.currentQuestionIndex].whatPlayersVoted[playerName] = vote;
       this.numOfVoters++;
     } else {
       console.error('Player not found.');
@@ -179,17 +191,6 @@ export class Game {
   }
 
   /**
-   * Advances to the next question.
-   */
-  nextQuestion(): void {
-    if (this.currentQuestionIndex < this.selectedQuestions.length - 1) {
-      this.currentQuestionIndex++;
-    } else {
-      console.log('No more questions.');
-    }
-  }
-
-  /**
    * Checks if all players are ready for the next question.
    * @returns True if all players are ready, otherwise false
    */
@@ -203,6 +204,14 @@ export class Game {
    */
   isAllPlayersReadyToGame(): boolean {
     return Object.values(this.players).every(player => player.isReadyToGame);
+  }
+
+  /**
+   * Checks if all players are ready to podium.
+   * @returns True if all players are ready, otherwise false
+   */
+  isAllPlayersReadyToPodium(): boolean {
+    return Object.values(this.players).every(player => player.isReadyToPodiumm);
   }
 
   /**
@@ -278,6 +287,152 @@ export class Game {
     Object.values(this.players).forEach(p => {
       p.whatPlayerVoted = '';
     });
+  }
+
+  // --------- //
+  // PREPODIUM //
+  // --------- //
+
+  getAllPlayersSummary(): { player: Player; phrase: string }[] {
+    const playersSummary: { player: Player; phrase: string }[] = [];
+    let player = '';
+
+    player = this.getMostVotedPlayer();
+    if (player !== '') {
+      playersSummary.push({
+        player: this.players[player],
+        phrase: 'Sei la persona piu votata, sei la star!',
+      });
+    }
+
+    player = this.getLeastVotedPlayer();
+    if (player !== '') {
+      playersSummary.push({
+        player: this.players[player],
+        phrase: ' Sei stata la persona meno votata!',
+      });
+    }
+
+    player = this.getPlayerWithMostPhotoVotes();
+    if (player !== '') {
+      playersSummary.push({
+        player: this.players[player],
+        phrase: 'Il cecchino delle foto!\nHai azzeccato più foto!',
+      });
+    }
+
+    return playersSummary;
+  }
+
+
+  getLeastVotedPlayer(): string {
+    const totalVotes: { [key: string]: number } = {};
+
+    for (const qst of this.selectedQuestions) {
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who || qst.mode === QuestionMode.CustomWho)
+        continue;
+      for (const vote of Object.values(qst.whatPlayersVoted)) {
+        totalVotes[vote] = (totalVotes[vote] || 0) + 1;
+      }
+    }
+
+    if (totalVotes.length === 0)
+      return '';
+
+    // Trova il giocatore con il numero minimo di voti
+    let minVotes = Infinity;
+    let playerWithMinVotes = '';
+
+    for (const player in totalVotes) {
+      if (totalVotes[player] < minVotes) {
+        minVotes = totalVotes[player];
+        playerWithMinVotes = player;
+      }
+    }
+    return playerWithMinVotes;
+  }
+
+  getMostVotedPlayer(): string {
+    const totalVotes: { [key: string]: number } = {};
+
+    // Itera su tutte le domande selezionate
+    for (const qst of this.selectedQuestions) {
+      if (qst.mode === QuestionMode.Photo || qst.mode === QuestionMode.Who || qst.mode === QuestionMode.CustomWho)
+        continue;
+      // Itera su tutti i voti dei giocatori per la domanda corrente
+      for (const vote of Object.values(qst.whatPlayersVoted)) {
+        totalVotes[vote] = (totalVotes[vote] || 0) + 1;
+      }
+    }
+
+    if (totalVotes.length === 0)
+      return '';
+
+    // Trova il giocatore con il numero massimo di voti
+    let maxVotes = 0;
+    let playerWithMaxVotes = '';
+
+    for (const player in totalVotes) {
+      if (totalVotes[player] > maxVotes) {
+        maxVotes = totalVotes[player];
+        playerWithMaxVotes = player;
+      }
+    }
+    return playerWithMaxVotes;
+  }
+
+
+  getPlayerWithMostPhotoVotes(): string {
+    const totalVotes: { [key: string]: number } = {};
+
+    for (const qst of this.selectedQuestions) {
+      if (qst.mode === QuestionMode.Photo) {
+        for (const [voter, vote] of Object.entries(qst.whatPlayersVoted)) {
+          if (vote === qst.winner) {
+            totalVotes[voter] = (totalVotes[voter] || 0) + 1;
+          }
+        }
+      }
+    }
+
+    // Trova il giocatore con il numero massimo di voti nelle domande "photo"
+    let maxVotes = 0;
+    let playerWithMaxPhotoVotes = '';
+
+    for (const player in totalVotes) {
+      if (totalVotes[player] > maxVotes) {
+        maxVotes = totalVotes[player];
+        playerWithMaxPhotoVotes = player;
+      }
+    }
+
+    return playerWithMaxPhotoVotes;
+  }
+
+
+  getPlayerWithMostGenericVotes(): string {
+    const totalVotes: { [key: string]: number } = {};
+
+    for (const qst of this.selectedQuestions) {
+      if (qst.genre === QuestionGenre.GENERIC) {
+        for (const vote of Object.values(qst.whatPlayersVoted)) {
+          totalVotes[vote] = (totalVotes[vote] || 0) + 1;
+        }
+      }
+    }
+
+    // Trova il giocatore con il numero massimo di voti nelle domande "generic"
+    let maxVotes = 0;
+    let playerWithMaxGenericVotes = '';
+
+    for (const player in totalVotes) {
+      if (totalVotes[player] > maxVotes) {
+        maxVotes = totalVotes[player];
+        playerWithMaxGenericVotes = player;
+      }
+    }
+
+    return playerWithMaxGenericVotes;
   }
 
 }

@@ -24,7 +24,10 @@ In questo gioco un gruppo di persone si connette ad una lobby e gli vengono prop
   <img src="/images/Lobby.png" alt="Lobby" width="300" style="display:inline-block;" />
   <img src="/images/Game.png" alt="Game" width="300" style="display:inline-block;" />
   <img src="/images/Photo.png" alt="Photo" width="300" style="display:inline-block;" />
+  <img src="/images/CustomWho.png" alt="Photo" width="300" style="display:inline-block;" />
+  <img src="/images/CustomWhoResponse.png" alt="Photo" width="300" style="display:inline-block;" />
   <img src="/images/Results.png" alt="Results" width="300" style="display:inline-block;" />
+  <img src="/images/Wrap.png" alt="Results" width="300" style="display:inline-block;" />
   <img src="/images/FinalResults.png" alt="Final Results" width="300" style="display:inline-block;" />
 </p>
 

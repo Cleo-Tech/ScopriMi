@@ -36,11 +36,11 @@
   /* Occupano metà della larghezza, meno il margine */
   height: 50%;
   /* Imposta l'altezza al 50% del contenitore */
-  margin-bottom: 1rem;
+  padding: 0.5rem 0 0.5rem 0.5rem;
   /* Margine inferiore per lo spazio tra le righe */
   object-fit: cover;
   /* Ritaglia l'immagine per riempire il contenitore */
-  border-radius: 10px;
+  border-radius: 20px;
   /* Arrotonda i bordi delle immagini */
 }
 

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as c from '../../../../Server/src/MiddleWare/socketConsts.js';
+import { SocketEvents } from '../../../../Server/src/MiddleWare/SocketEvents.js';
 import { socket } from '../../ts/socketInit.ts';
 import { useSession } from '../../contexts/SessionContext.tsx';
-import LobbyList from '../common/LobbyList.tsx';
 import { Game } from '../../../../Server/src/data/Game.ts';
 import Modal from '../common/Modal.tsx';
 import Alert from '../common/Alert.tsx';
-import LobbyPlayer from './LobbyPlayer.tsx'; // Import del nuovo componente Player
+import LobbyPlayer from './LobbyPlayer.tsx';
+import LobbyRecap from './LobbyRecap.tsx';
+import BottomGameModal, { ModalUse } from '../newGame/NewGameModal.tsx';
 
 const Lobby: React.FC = () => {
 
@@ -17,11 +18,11 @@ const Lobby: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false); // stato per gestire il caricamento
+  const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      console.log('dentro alla funzione');
       if (!document.hidden) {
 
         const data = {
@@ -33,7 +34,7 @@ const Lobby: React.FC = () => {
 
         setLoading(true); // mostra la rotella di caricamento
         const timer = setTimeout(() => {
-          socket.emit(c.REQUEST_TO_JOIN_LOBBY, data);
+          socket.emit(SocketEvents.REQUEST_TO_JOIN_LOBBY, data);
           setLoading(false);
         }, 5000);
 
@@ -54,14 +55,13 @@ const Lobby: React.FC = () => {
 
   useEffect(() => {
     document.title = `Lobby - ${currentLobby}`;
-    socket.emit(c.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
-      console.log('Received data:', data);
+    socket.emit(SocketEvents.REQUEST_RENDER_LOBBY, currentLobby, (data: Game) => {
       setGame(data);
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
-    socket.on(c.RENDER_LOBBY, (data: Game) => {
+    socket.on(SocketEvents.RENDER_LOBBY, (data: Game) => {
       console.log(data);
       setGame(data);
 
@@ -75,7 +75,7 @@ const Lobby: React.FC = () => {
       setIsReady(data.players[currentPlayer!].isReadyToGame);
     });
 
-    socket.on(c.INIZIA, () => {
+    socket.on(SocketEvents.INIZIA, () => {
       setGame((prevGame) => {
         if (!prevGame) { return null; }
         return Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame, {
@@ -86,12 +86,13 @@ const Lobby: React.FC = () => {
     });
 
     return () => {
-      socket.off(c.INIZIA);
+      socket.off(SocketEvents.INIZIA);
+      socket.off(SocketEvents.RENDER_LOBBY);
     };
   }, [currentLobby, navigate, currentPlayer]);
 
   const handleConfirmLeave = () => {
-    socket.emit(c.EXIT_LOBBY, { currentPlayer, currentLobby });
+    socket.emit(SocketEvents.EXIT_LOBBY, { currentPlayer, currentLobby });
     setCurrentLobby(null);
     navigate('/');
   };
@@ -99,13 +100,12 @@ const Lobby: React.FC = () => {
   const toggleReady = () => {
     const newReadyState = !isReady;
     setIsReady(newReadyState);
-    socket.emit(c.TOGGLE_IS_READY_TO_GAME, { lobbyCode: currentLobby, playerName: currentPlayer });
+    socket.emit(SocketEvents.TOGGLE_IS_READY_TO_GAME, { lobbyCode: currentLobby, playerName: currentPlayer });
   };
 
   const handleRemovePlayer = (playerName: string) => {
     console.log('Admin is removing the player:', playerName);
-    socket.emit(c.REMOVE_PLAYER, { playerName, currentLobby });
-    console.log('Io sono il giocatore: ', currentPlayer);
+    socket.emit(SocketEvents.REMOVE_PLAYER, { playerName, currentLobby });
   };
 
   const handleCancelLeave = () => {
@@ -160,7 +160,8 @@ const Lobby: React.FC = () => {
         <h2>ScopriMi</h2>
         {/* Primo blocco */}
         <div className="elegant-background mt-3">
-          <LobbyList lobbies={[game]} onJoin={() => void 0} />
+          {/* <LobbyList lobbies={[game]} onJoin={() => void 0} /> */}
+          <LobbyRecap isAdmin={game.admin === currentPlayer ? true : false} lobby={game} onModify={() => setIsModalOpen(true)} />
         </div>
         {/* Secondo blocco */}
         <div className="elegant-background mt-3 scrollable fill">
@@ -200,6 +201,16 @@ const Lobby: React.FC = () => {
           show={showModal}
           onConfirm={handleConfirmLeave}
           onCancel={handleCancelLeave}
+        />
+        <BottomGameModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          playerName={currentPlayer!}
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          image={currentPlayerImage!}
+          modalUse={ModalUse.modify}
+        // TODO allinea anche il colore tramite prop
         />
       </div>
     </>
