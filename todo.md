@@ -16,4 +16,3 @@
 - [ ] Lunghezza pagina login (no scroll)
 - [ ] Controlli server-side per non rompere tutto
 - [ ] Fare in modo di disegnare le immagini
-      
