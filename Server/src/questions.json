@@ -179,7 +179,8 @@
         "pizza£Che pizza mangerebbe $?",
         "car£Che auto guiderebbe $?",
         "hero£Che supereroe vorrebbe essere $?",
-        "drink£Cosa berrebbe $?"
+        "drink£Cosa berrebbe $?",
+        "murderPartner£Da chi si farebbe aiutare $ per compiere un omicidio?"
     ],
     "who": [
         "Dai mamma! Esci dalla stanza che ...!?",
@@ -220,6 +221,18 @@
         "Cosa hai trovato nel telefono di $?",
         "Perché $ non risponde più ai tuoi messaggi?",
         "Il motivo per cui non presti più soldi a $?",
-        "Il segreto di $ che hai rivelato a tutti"
+        "Il segreto di $ che hai rivelato a tutti",
+        "La frase più sbagliata da dire a un bambino?",
+        "Cosa hai detto che ha fatto scoppiare a piangere $?",
+        "Un titolo di giornale che ti riguarderebbe (ma speri non accada mai)?",
+        "Qual è l'ultima cosa che vorresti vedere prima di addormentarti?",
+        "Il peggior incubo che potrebbe diventare realtà?",
+        "Cosa troveresti nel peggior kit di sopravvivenza?",
+        "$ ha paccato un'uscita. Che scusa ha inventato?",
+        "Il peggior nome per un bimbo appena nato?",
+        "Che posto sceglierebbe $ per un primo appuntamento?",
+        "Come spiegheresti a un bambino cosa fa Babbo Natale quando non lavora?",
+        "Cosa urleresti per far uscire tutti da una stanza in 10 secondi?",
+        "Qual è il peggior nome che potresti dare al tuo prossimo animale domestico?"
     ]
 }
