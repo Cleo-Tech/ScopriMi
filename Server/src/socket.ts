@@ -72,6 +72,8 @@ function myCreateLobby(data: { code: string, numQuestionsParam: number, selected
   console.log('Creo la lobby con [codice - domande]: ', data.code, ' - ', data.numQuestionsParam);
   const thisGame = actualGameManager.getGame(data.code);
 
+  // ADDSQL qua valorizzare le tabelle
+
   thisGame.gamesGenre = data.selectedGenres;
 
   const questionsPerGenre = Math.floor(data.numQuestionsParam / data.selectedGenres.length);

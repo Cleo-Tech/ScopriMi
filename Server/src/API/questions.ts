@@ -14,6 +14,7 @@ export const SetAllQuestions = async (): Promise<any> => {
   const __dirname = dirname(__filename);
   const data = await readFile(join(__dirname, '../questions.json'), 'utf8');
   AllQuestions = JSON.parse(data);
+  // ADDSQL qua si valorizza la tabella Question al posto che usare AllQuestions
 }
 
 export const setupUpload = (app: Express) => {

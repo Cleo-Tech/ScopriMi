@@ -5,6 +5,7 @@ export let photoUrls: any[];
 export async function setPhotoUrls() {
   try {
     photoUrls = await fetchImageUrls(apiUrl);
+    // ADDSQL valorizzare la tabella Images al posto di questo export, qua ci sono anche i tags
   } catch (error) {
     console.error('Error fetching image URLs:', error);
   }
