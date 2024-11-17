@@ -1,6 +1,6 @@
 ## v0.8.0
 - [ ] Il grande Refactor del backend
-- [ ] Valutare un bella base di dati
+- [ ] Valutare un bella base di dati (se la utilizziamo si potrebbe già tradurre il gioco)
 - [ ] Refactor della sezione di gaming w/ Led
 - [ ] Wrap del recap (spotify)
 
