@@ -18,12 +18,12 @@ export async function setPhotoUrls() {
         db.serialize(() => {
 
           db.run(`
-            INSERT INTO Image_Tag_Cloudinary (name) VALUES (?);
+            INSERT OR IGNORE INTO Image_Tag_Cloudinary (name) VALUES (?);
           `, [tag])
 
 
           db.run(`
-            INSERT INTO Image_Tag (image_id, tag_id) VALUES 
+            INSERT OR IGNORE INTO Image_Tag (image_id, tag_id) VALUES 
             ((SELECT id FROM Image WHERE URL = ?),
             (SELECT id FROM Image_Tag_Cloudinary WHERE name = ?))
             `, [element.secure_url, tag]
