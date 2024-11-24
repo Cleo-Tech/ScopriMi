@@ -11,7 +11,7 @@ export async function setPhotoUrls() {
     Object.values(photoUrls).forEach(element => {
 
       db.run(`
-        INSERT INTO Image (URL) VALUES (?);
+        INSERT OR IGNORE INTO Image (URL) VALUES (?);
       `, [element.secure_url])
 
       Object.values(element.tags).forEach(tag => {

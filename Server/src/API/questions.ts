@@ -5,6 +5,7 @@ import { Express } from 'express-serve-static-core';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { QuestionGenre } from '../MiddleWare/Types';
+import { db } from '../sqlite.js';
 
 // Tutte le domande che vengono lette dal file json
 export let AllQuestions: { [key in QuestionGenre]: string[] }
@@ -15,6 +16,33 @@ export const SetAllQuestions = async (): Promise<any> => {
   const data = await readFile(join(__dirname, '../questions.json'), 'utf8');
   AllQuestions = JSON.parse(data);
   // ADDSQL qua si valorizza la tabella Question al posto che usare AllQuestions
+
+  // Inserisci tutti i generi 
+  Object.keys(AllQuestions).forEach(genre => {
+    db.serialize(() => {
+      db.run(`
+        INSERT OR IGNORE INTO Genre (name) VALUES (?);
+      `, [genre]);
+
+
+
+      db.get(`SELECT id FROM Genre WHERE name = ?`, [genre], (err, row) => {
+        console.log(row['id']);
+        AllQuestions[genre].forEach(value => {
+          db.run(`
+            INSERT OR IGNORE INTO Question (genre_id, content) VALUES (?, ?);
+          `, [parseInt(row['id']), value]);
+        })
+      });
+    });
+
+
+  }
+  );
+
+
+
+
 }
 
 export const setupUpload = (app: Express) => {
