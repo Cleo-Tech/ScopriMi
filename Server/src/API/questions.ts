@@ -18,19 +18,19 @@ export const SetAllQuestions = async (): Promise<any> => {
   // ADDSQL qua si valorizza la tabella Question al posto che usare AllQuestions
 
   // Inserisci tutti i generi 
-  Object.keys(AllQuestions).forEach(genre => {
+  Object.keys(AllQuestions).forEach(questionType => {
     db.serialize(() => {
       db.run(`
-        INSERT OR IGNORE INTO Genre (name) VALUES (?);
-      `, [genre]);
+        INSERT OR IGNORE INTO QuestionType (name) VALUES (?);
+      `, [questionType]);
 
 
 
-      db.get(`SELECT id FROM Genre WHERE name = ?`, [genre], (err, row) => {
+      db.get(`SELECT id FROM QuestionType WHERE name = ?`, [questionType], (err, row) => {
         console.log(row['id']);
-        AllQuestions[genre].forEach(value => {
+        AllQuestions[questionType].forEach(value => {
           db.run(`
-            INSERT OR IGNORE INTO Question (genre_id, content) VALUES (?, ?);
+            INSERT OR IGNORE INTO Question (questiontype_id, content) VALUES (?, ?);
           `, [parseInt(row['id']), value]);
         })
       });

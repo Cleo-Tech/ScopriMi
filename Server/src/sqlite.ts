@@ -35,7 +35,7 @@ export function setupDB() {
     tag_id INTEGER,
     PRIMARY KEY (image_id, tag_id),
     FOREIGN KEY (image_id) REFERENCES Image(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Image_Tag_Cloudinary(id) ON DELETE CASCADE
+    FOREIGN KEY (tag_id) REFERENCES TagCloudinary(id) ON DELETE CASCADE
   );
 `);
 
@@ -62,10 +62,10 @@ export function setupDB() {
   db.run(`
   CREATE TABLE IF NOT EXISTS Question_Category (
     question_id INTEGER,
-    tag_id INTEGER,
-    PRIMARY KEY (question_id, tag_id),
+    category_id INTEGER,
+    PRIMARY KEY (question_id, category_id),
     FOREIGN KEY (question_id) REFERENCES Question(id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES Tag(id) ON DELETE CASCADE
+    FOREIGN KEY (category_id) REFERENCES Category(id) ON DELETE CASCADE
   );
 `);
 
@@ -73,9 +73,9 @@ export function setupDB() {
   db.run(`
   CREATE TABLE IF NOT EXISTS Question (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    genre_id INTEGER,
+    questiontype_id INTEGER,
     content TEXT NOT NULL,
-    FOREIGN KEY (genre_id) REFERENCES Genre(id) ON DELETE SET NULL
+    FOREIGN KEY (questiontype_id) REFERENCES QuestionType(id) ON DELETE SET NULL
   );
 `);
 

@@ -18,14 +18,14 @@ export async function setPhotoUrls() {
         db.serialize(() => {
 
           db.run(`
-            INSERT OR IGNORE INTO Image_Tag_Cloudinary (name) VALUES (?);
+            INSERT OR IGNORE INTO TagCloudinary (name) VALUES (?);
           `, [tag]);
 
 
           db.run(`
-            INSERT OR IGNORE INTO Image_Tag (image_id, tag_id) VALUES 
+            INSERT OR IGNORE INTO Image_TagCloudinary (image_id, tag_id) VALUES 
             ((SELECT id FROM Image WHERE URL = ?),
-            (SELECT id FROM Image_Tag_Cloudinary WHERE name = ?))
+            (SELECT id FROM TagCloudinary WHERE name = ?))
             `, [element.secure_url, tag]
           );
 
@@ -36,17 +36,7 @@ export async function setPhotoUrls() {
 
       db.serialize(() => {
 
-        db.all(`
-          SELECT *
-          FROM Question
-          WHERE content LIKE '%' || ? || '%'
-        `, [TAG_SEPARATOR], (err, rows) => {
-          if (err) {
-            console.error(err.message);
-            return;
-          }
-          console.log(rows);
-        });
+        // SBORRA
 
       });
     });
