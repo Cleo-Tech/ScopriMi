@@ -158,3 +158,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.db

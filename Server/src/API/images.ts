@@ -19,7 +19,7 @@ export async function setPhotoUrls() {
 
           db.run(`
             INSERT OR IGNORE INTO Image_Tag_Cloudinary (name) VALUES (?);
-          `, [tag])
+          `, [tag]);
 
 
           db.run(`
@@ -27,9 +27,28 @@ export async function setPhotoUrls() {
             ((SELECT id FROM Image WHERE URL = ?),
             (SELECT id FROM Image_Tag_Cloudinary WHERE name = ?))
             `, [element.secure_url, tag]
-          )
+          );
+
         });
-      })
+      });
+
+      const TAG_SEPARATOR = '£';
+
+      db.serialize(() => {
+
+        db.all(`
+          SELECT *
+          FROM Question
+          WHERE content LIKE '%' || ? || '%'
+        `, [TAG_SEPARATOR], (err, rows) => {
+          if (err) {
+            console.error(err.message);
+            return;
+          }
+          console.log(rows);
+        });
+
+      });
     });
 
   } catch (error) {

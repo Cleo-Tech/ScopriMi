@@ -6,7 +6,7 @@ export const db = new sqlite3.Database('./database.db');
 export function setupDB() {
   // Creazione della tabella Genre
   db.run(`
-  CREATE TABLE IF NOT EXISTS Genre (
+  CREATE TABLE IF NOT EXISTS QuestionType (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(50) NOT NULL
   );
@@ -14,7 +14,7 @@ export function setupDB() {
 
   // Creazione della tabella Image_Tag_Cloudinary
   db.run(`
-  CREATE TABLE IF NOT EXISTS Image_Tag_Cloudinary (
+  CREATE TABLE IF NOT EXISTS TagCloudinary (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
   );
@@ -30,7 +30,7 @@ export function setupDB() {
 
   // Creazione della tabella Image_Tag (associazione tra Image e Tag)
   db.run(`
-  CREATE TABLE IF NOT EXISTS Image_Tag (
+  CREATE TABLE IF NOT EXISTS Image_TagCloudinary (
     image_id INTEGER,
     tag_id INTEGER,
     PRIMARY KEY (image_id, tag_id),
@@ -52,7 +52,7 @@ export function setupDB() {
 
   // Creazione della tabella Tag
   db.run(`
-  CREATE TABLE IF NOT EXISTS Tag (
+  CREATE TABLE IF NOT EXISTS Category (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tag TEXT NOT NULL
   );
@@ -60,7 +60,7 @@ export function setupDB() {
 
   // Creazione della tabella Question_Tag (associazione tra Question e Tag)
   db.run(`
-  CREATE TABLE IF NOT EXISTS Question_Tag (
+  CREATE TABLE IF NOT EXISTS Question_Category (
     question_id INTEGER,
     tag_id INTEGER,
     PRIMARY KEY (question_id, tag_id),
