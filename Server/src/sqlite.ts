@@ -8,7 +8,7 @@ export function setupDB() {
   db.run(`
   CREATE TABLE IF NOT EXISTS QuestionType (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL UNIQUE
   );
 `);
 

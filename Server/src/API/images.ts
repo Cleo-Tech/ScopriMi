@@ -32,10 +32,50 @@ export async function setPhotoUrls() {
         });
       });
 
-      const TAG_SEPARATOR = '£';
+      // Megacantiere in vista della sburra
+
+      // TODOshitImprove
+      function getContextQuestion(input: string): string {
+        const index = input.indexOf('£');
+        if (index !== -1) {
+          return input.substring(0, index).trim(); // Restituisce tutto prima del carattere £ e rimuove eventuali spazi
+        }
+        return '';
+      }
+
 
       db.serialize(() => {
 
+        db.all(`
+            SELECT Question.content, Question.id
+            FROM Question, QuestionType
+            WHERE Question.questiontype_id = QuestionType.id
+            AND QuestionType.name = 'photo'
+          `, [], (err, rows) => {
+          if (err) {
+            console.error(err.message);
+            return;
+          }
+          rows.forEach(question => {
+            console.log(question['content']);
+            db.all(`
+              SELECT Image.id
+              from TagCloudinary, Image_TagCloudinary, Image
+              WHERE TagCloudinary.id = Image_TagCloudinary.tag_id and Image_TagCloudinary.image_id = Image.id and TagCloudinary.name = ?
+            `, [getContextQuestion(question['content'])], (err, selectedImages) => {
+              if (err) {
+                console.error(err.message);
+                return;
+              }
+              selectedImages.forEach(image => {
+                console.log(image['id']);
+                db.run(`
+                  INSERT INTO Image_Question (question_id, image_id) VALUES (?, ?);
+                `, [parseInt(question['id']), parseInt(image['id'])])
+              })
+            });
+          });
+        });
         // SBORRA
 
       });
@@ -45,6 +85,8 @@ export async function setPhotoUrls() {
     console.error('Error fetching image URLs:', error);
   }
 }
+
+// Megacantiere in vista della sburra
 
 // Funzione per ottenere gli URL delle immagini
 async function fetchImageUrls(apiUrl: string) {
